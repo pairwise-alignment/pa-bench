@@ -1,7 +1,7 @@
 mod bench;
-mod params;
 use crate::bench::*;
-use crate::params::*;
+
+use core_lib::*;
 
 use std::io::{self, prelude::*};
 
