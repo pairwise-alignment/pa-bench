@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Parameters {
@@ -31,6 +31,10 @@ pub struct Costs {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Algorithm {
-    BlockAligner { costs: Costs, min_size: usize, max_size: usize },
+    BlockAligner {
+        costs: Costs,
+        min_size: usize,
+        max_size: usize,
+    },
     // Add more algorithms here!
 }
