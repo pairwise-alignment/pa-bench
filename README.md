@@ -1,5 +1,7 @@
 # Pairwise Alignment Benchmarks
 
+Status: Work in progress
+
 This repository contains code to benchmark pairwise aligners.
 
 Benchmarking is done using `job`s. Each job consists on an input dataset (a
