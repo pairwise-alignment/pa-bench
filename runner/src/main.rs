@@ -1,8 +1,8 @@
 mod bench;
 use crate::bench::*;
 
-use core_lib::*;
 use itertools::Itertools;
+use pa_types::*;
 
 use std::{
     fs,

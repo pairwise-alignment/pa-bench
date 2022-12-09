@@ -1,0 +1,18 @@
+[package]
+name = "runner"
+authors = ["Daniel Liu", "Ragnar Groot Koerkamp"]
+description = "A binary to run and benchmark pairwise alignment tasks."
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/pairwise-alignment/pa-bench"
+license = "MIT"
+keywords = ["pairwise-alignment", "benchmark", "bioinformatics", "cli"]
+categories = ["science"]
+
+[dependencies]
+clap = { version = "^4.0", features = ["derive"] }
+libc = "^0.2"
+serde_json = "^1.0"
+pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
+parse_duration = "*"
+itertools = "*"

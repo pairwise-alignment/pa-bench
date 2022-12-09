@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
-use core_lib::Bytes;
 use libc;
+use pa_types::Bytes;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Measured {

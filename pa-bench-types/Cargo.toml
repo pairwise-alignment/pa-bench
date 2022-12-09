@@ -1,0 +1,13 @@
+[package]
+name = "pa-bench-types"
+authors = ["Ragnar Groot Koerkamp", "Daniel Liu"]
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/pairwise-alignment/pa-bench"
+license = "MIT"
+keywords = ["pairwise-alignment", "benchmark", "bioinformatics", "library"]
+readme = "README.md"
+categories = ["science"]
+
+[dependencies]
+pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }

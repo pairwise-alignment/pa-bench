@@ -67,15 +67,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "core-lib"
-version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/core-lib#e172c1deb1bc6937967aefede7f3574067ba66f8"
-dependencies = [
- "parse-size",
- "serde",
-]
-
-[[package]]
 name = "either"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -262,10 +253,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86f0b0d4bf799edbc74508c1e8bf170ff5f41238e5f8225603ca7caaae2b7860"
 
 [[package]]
+name = "orchestrator"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "pa-types",
+ "parse_duration",
+ "serde_json",
+]
+
+[[package]]
 name = "os_str_bytes"
 version = "6.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
+
+[[package]]
+name = "pa-bench-types"
+version = "0.1.0"
+dependencies = [
+ "pa-types",
+]
+
+[[package]]
+name = "pa-types"
+version = "0.1.0"
+source = "git+https://github.com/pairwise-alignment/pa-types#794581537bb9d42b557d5966d2670fe07645a82d"
+dependencies = [
+ "parse-size",
+ "serde",
+]
 
 [[package]]
 name = "parse-size"
@@ -348,9 +365,9 @@ name = "runner"
 version = "0.1.0"
 dependencies = [
  "clap",
- "core-lib",
  "itertools",
  "libc",
+ "pa-types",
  "parse_duration",
  "serde_json",
 ]
