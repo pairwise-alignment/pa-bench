@@ -49,10 +49,8 @@ fn main() {
         .tuples()
         .map(|(a, b)| {
             (
-                a.strip_prefix(&['>' as u8])
-                    .expect("Odd lines must start with >"),
-                b.strip_prefix(&['<' as u8])
-                    .expect("Odd lines must start with >"),
+                a.strip_prefix(b">").expect("Odd lines must start with >"),
+                b.strip_prefix(b"<").expect("Even lines must start with <"),
             )
         })
         .collect();
