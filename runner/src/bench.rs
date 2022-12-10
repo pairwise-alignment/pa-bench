@@ -13,8 +13,8 @@ pub fn measure<F, T>(f: F) -> (Measured, T)
 where
     F: FnOnce() -> T,
 {
-    let initial_mem = get_maxrss();
     let start_time = Instant::now();
+    let initial_mem = get_maxrss();
 
     let t = f();
 
@@ -56,6 +56,5 @@ pub fn set_limits(time: Duration, mem: Bytes) {
         }
     };
     set(libc::RLIMIT_CPU, time.as_secs());
-    // TODO(ragnar): Should this be in bytes for macos?
     set(libc::RLIMIT_AS, mem / 1024);
 }
