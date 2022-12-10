@@ -20,7 +20,7 @@ struct Args {
     results: PathBuf,
 
     /// Path to the runner binary.
-    #[arg(short, long, default_value = "../runner/target/release/runner")]
+    #[arg(short, long, default_value = "target/release/runner")]
     runner: PathBuf,
 
     #[arg(short, long, value_parser = parse_duration::parse, default_value = "1h")]

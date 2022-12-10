@@ -9,6 +9,8 @@ license = "MIT"
 keywords = ["pairwise-alignment", "benchmark", "bioinformatics", "cli"]
 categories = ["science"]
 
+default-run = "orchestrator"
+
 [dependencies]
 clap = { version = "^4.0", features = ["derive"] }
 serde_json = "^1.0"

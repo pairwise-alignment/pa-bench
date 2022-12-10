@@ -19,4 +19,4 @@ job at a time and limits and measures the time and memory usage. The
 
 1. Clone this repo and make sure you have Rust installed.
 2. Build all crates in this repo with `cargo build --release`.
-3. `cd orchestrator && cargo run --release`.
+3. `cargo run --release`.
