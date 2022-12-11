@@ -257,6 +257,7 @@ name = "orchestrator"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "pa-bench-types",
  "pa-types",
  "parse_duration",
  "serde_json",
@@ -273,12 +274,13 @@ name = "pa-bench-types"
 version = "0.1.0"
 dependencies = [
  "pa-types",
+ "serde",
 ]
 
 [[package]]
 name = "pa-types"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-types#794581537bb9d42b557d5966d2670fe07645a82d"
+source = "git+https://github.com/pairwise-alignment/pa-types#a819bfc9bfd151e6c37ec9bc8fa425a23e3db832"
 dependencies = [
  "parse-size",
  "serde",
@@ -367,6 +369,7 @@ dependencies = [
  "clap",
  "itertools",
  "libc",
+ "pa-bench-types",
  "pa-types",
  "parse_duration",
  "serde_json",
