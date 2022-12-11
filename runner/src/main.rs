@@ -1,5 +1,6 @@
 mod bench;
-use crate::bench::*;
+mod wrappers;
+use crate::{bench::*, wrappers::*};
 
 use itertools::Itertools;
 use pa_bench_types::*;
@@ -55,14 +56,27 @@ fn main() {
             )
         })
         .collect();
-    let (measured, (costs, cigars)) = measure(|| {
-        sequence_pairs
-            .into_iter()
-            .map(|(_a, _b)| -> (Cost, Cigar) {
-                todo!("Align the sequences a and b using the algorithm and parameters of choice.");
-            })
-            .unzip()
+    let max_len = sequence_pairs
+        .iter()
+        .map(|(a, b)| a.len().max(b.len()))
+        .max()
+        .unwrap_or(0);
+    let mut costs = Vec::with_capacity(sequence_pairs.len());
+    let mut cigars = Vec::with_capacity(sequence_pairs.len());
+
+    let measured = measure(|| {
+        let mut wrapper = get_wrapper(job.algo, max_len, job.costs, job.traceback);
+        sequence_pairs.into_iter().for_each(|(a, b)| {
+            if job.traceback {
+                let (cost, cigar) = wrapper.align(&a, &b);
+                costs.push(cost);
+                cigars.push(cigar);
+            } else {
+                costs.push(wrapper.cost(&a, &b));
+            }
+        });
     });
+
     let output = JobOutput {
         runtime: measured.runtime,
         memory: measured.memory,

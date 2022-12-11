@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use pa_types::*;
 
 mod algorithms;
-use crate::algorithms::*;
+pub use crate::algorithms::*;
 
 /// An alignment job: a single task for the runner to execute and benchmark.
 #[derive(Serialize, Deserialize, Debug)]

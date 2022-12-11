@@ -9,22 +9,19 @@ pub struct Measured {
     pub memory: Bytes,
 }
 
-pub fn measure<F, T>(f: F) -> (Measured, T)
+pub fn measure<F>(f: F) -> Measured
 where
-    F: FnOnce() -> T,
+    F: FnOnce(),
 {
     let start_time = Instant::now();
     let initial_mem = get_maxrss();
 
-    let t = f();
+    f();
 
-    (
-        Measured {
-            runtime: start_time.elapsed(),
-            memory: get_maxrss().saturating_sub(initial_mem),
-        },
-        t,
-    )
+    Measured {
+        runtime: start_time.elapsed(),
+        memory: get_maxrss().saturating_sub(initial_mem),
+    }
 }
 
 /// Returns the maximum resident set size, ie the physical memory the program
