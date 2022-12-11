@@ -1,3 +1,4 @@
+use pa_bench_types::*;
 use pa_types::*;
 
 use std::fs;

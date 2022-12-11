@@ -2,6 +2,7 @@ mod bench;
 use crate::bench::*;
 
 use itertools::Itertools;
+use pa_bench_types::*;
 use pa_types::*;
 
 use std::{

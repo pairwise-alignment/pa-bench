@@ -11,3 +11,4 @@ categories = ["science"]
 
 [dependencies]
 pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
+serde = { version = "^1.0", features = ["derive"] }
