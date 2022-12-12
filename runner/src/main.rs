@@ -14,6 +14,8 @@ use std::{
 
 use serde_json;
 
+use core_affinity;
+
 use clap::Parser;
 
 #[derive(Debug, Parser)]
@@ -23,11 +25,19 @@ struct Args {
     time_limit: Duration,
     #[arg(short, long, value_parser = parse_bytes, default_value = "1GiB")]
     mem_limit: Bytes,
+    #[arg(short, long)]
+    pin_core_id: Option<usize>,
 }
 
 fn main() {
     let args = Args::parse();
     set_limits(args.time_limit, args.mem_limit);
+    if let Some(id) = args.pin_core_id {
+        assert!(
+            core_affinity::set_for_current(core_affinity::CoreId { id }),
+            "Failed to set core id!"
+        );
+    }
 
     let mut stdin_job = vec![];
     io::stdin()
