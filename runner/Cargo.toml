@@ -15,8 +15,9 @@ libc = "^0.2"
 serde_json = "^1.0"
 pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
 pa-bench-types = { path = "../pa-bench-types" }
-parse_duration = "*"
-itertools = "*"
+core_affinity = "^0.7"
+parse_duration = "^2.1"
+itertools = "^0.10"
 
 # Aligners:
 parasailors = { git = "https://github.com/Daniel-Liu-c0deb0t/parasailors-new" }

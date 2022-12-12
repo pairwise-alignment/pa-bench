@@ -234,6 +234,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "core_affinity"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "479fdfb5e75b80b678a34a8231b4415481b06b706e486bf5b3ba72378710caaf"
+dependencies = [
+ "libc",
+ "num_cpus",
+ "winapi",
+]
+
+[[package]]
 name = "edlib_rs"
 version = "0.1.2"
 source = "git+https://github.com/Daniel-Liu-c0deb0t/edlib-rs#a861349fc0f3ba870bca411684ab6fb6778c8cba"
@@ -563,6 +574,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "num_cpus"
+version = "1.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6058e64324c71e02bc2b150e4f3bc8286db6c83092132ffa3f6b1eab0f9def5"
+dependencies = [
+ "hermit-abi 0.1.19",
+ "libc",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -573,6 +594,7 @@ name = "orchestrator"
 version = "0.1.0"
 dependencies = [
  "clap 4.0.29",
+ "core_affinity",
  "pa-bench-types",
  "pa-types",
  "parse_duration",
@@ -764,6 +786,7 @@ version = "0.1.0"
 dependencies = [
  "block-aligner",
  "clap 4.0.29",
+ "core_affinity",
  "edlib_rs",
  "itertools",
  "libc",

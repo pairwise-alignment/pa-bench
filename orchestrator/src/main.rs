@@ -5,9 +5,13 @@ use std::fs;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::Mutex;
+use std::thread;
 use std::time::Duration;
 
 use serde_json;
+
+use core_affinity;
 
 use clap::Parser;
 
@@ -29,6 +33,13 @@ struct Args {
 
     #[arg(short, long, value_parser = parse_bytes, default_value = "1GiB")]
     mem_limit: Bytes,
+
+    /// Number of processes to use.
+    ///
+    /// Processes are pinned to separate cores.
+    /// The number of processes is capped to the total number of cores.
+    #[arg(short, long)]
+    processes: Option<usize>,
 }
 
 fn main() {
@@ -46,10 +57,25 @@ fn main() {
         args.runner.display()
     );
 
-    let job_results: Vec<JobResult> = jobs
-        .into_iter()
-        .map(|job| run(&args.runner, job, args.time_limit, args.mem_limit))
-        .collect();
+    let job_results: Vec<JobResult> = if let Some(processes) = args.processes {
+        let pin_cores = core_affinity::get_core_ids()
+            .unwrap()
+            .into_iter()
+            .take(processes)
+            .map(|c| c.id)
+            .collect();
+        run_with_threads(
+            &args.runner,
+            jobs,
+            args.time_limit,
+            args.mem_limit,
+            pin_cores,
+        )
+    } else {
+        jobs.into_iter()
+            .map(|job| run(&args.runner, job, args.time_limit, args.mem_limit, None))
+            .collect()
+    };
 
     fs::write(&args.results, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
         "Failed to write results to {}",
@@ -57,19 +83,55 @@ fn main() {
     ));
 }
 
-fn run(runner: &Path, job: Job, time_limit: Duration, mem_limit: Bytes) -> JobResult {
-    let child = Command::new(runner)
-        .arg("--time-limit")
+fn run_with_threads(
+    runner: &Path,
+    jobs: Vec<Job>,
+    time_limit: Duration,
+    mem_limit: Bytes,
+    cores: Vec<usize>,
+) -> Vec<JobResult> {
+    let jobs_iter = Mutex::new(jobs.into_iter());
+    let job_results = Mutex::new(Vec::new());
+
+    thread::scope(|scope| {
+        for id in &cores {
+            scope.spawn(|| loop {
+                if let Some(job) = jobs_iter.lock().unwrap().next() {
+                    let job_result = run(runner, job, time_limit, mem_limit, Some(*id));
+                    job_results.lock().unwrap().push(job_result);
+                } else {
+                    break;
+                }
+            });
+        }
+    });
+
+    job_results.into_inner().unwrap()
+}
+
+fn run(
+    runner: &Path,
+    job: Job,
+    time_limit: Duration,
+    mem_limit: Bytes,
+    core_id: Option<usize>,
+) -> JobResult {
+    let mut cmd = Command::new(runner);
+    cmd.arg("--time-limit")
         .arg(time_limit.as_secs().to_string())
         .arg("--mem-limit")
-        .arg(mem_limit.to_string())
+        .arg(mem_limit.to_string());
+    if let Some(id) = core_id {
+        cmd.arg("--pin-core-id").arg(id.to_string());
+    }
+    let mut child = cmd
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
 
     {
-        let mut stdin = child.stdin.as_ref().unwrap();
+        let mut stdin = child.stdin.take().unwrap();
         stdin.write_all(&serde_json::to_vec(&job).unwrap()).unwrap();
     }
 
