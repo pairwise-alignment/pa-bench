@@ -40,6 +40,10 @@ struct Args {
     /// The number of jobs is capped to the total number of cores minus 1.
     #[arg(short = 'j', long)]
     num_jobs: Option<usize>,
+
+    /// Show stderr of runner process
+    #[arg(long)]
+    stderr: bool,
 }
 
 fn main() {
@@ -79,10 +83,20 @@ fn main() {
             args.time_limit,
             args.mem_limit,
             runner_cores,
+            args.stderr,
         )
     } else {
         jobs.into_iter()
-            .map(|job| run(&args.runner, job, args.time_limit, args.mem_limit, None))
+            .map(|job| {
+                run(
+                    &args.runner,
+                    job,
+                    args.time_limit,
+                    args.mem_limit,
+                    None,
+                    args.stderr,
+                )
+            })
             .collect()
     };
 
@@ -98,6 +112,7 @@ fn run_with_threads(
     time_limit: Duration,
     mem_limit: Bytes,
     cores: Vec<usize>,
+    show_stderr: bool,
 ) -> Vec<JobResult> {
     let job_results = Mutex::new(Vec::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
@@ -106,7 +121,8 @@ fn run_with_threads(
         for id in &cores {
             scope.spawn(|| {
                 while let Some(job) = jobs_iter.lock().unwrap().next() {
-                    let job_result = run(runner, job, time_limit, mem_limit, Some(*id));
+                    let job_result =
+                        run(runner, job, time_limit, mem_limit, Some(*id), show_stderr);
                     job_results.lock().unwrap().push(job_result);
                 }
             });
@@ -122,6 +138,7 @@ fn run(
     time_limit: Duration,
     mem_limit: Bytes,
     core_id: Option<usize>,
+    show_stderr: bool,
 ) -> JobResult {
     let mut cmd = Command::new(runner);
     cmd.arg("--time-limit")
@@ -131,11 +148,11 @@ fn run(
     if let Some(id) = core_id {
         cmd.arg("--pin-core-id").arg(id.to_string());
     }
-    let mut child = cmd
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
+    let child = cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
+    if !show_stderr {
+        child.stderr(Stdio::null());
+    }
+    let mut child = child.spawn().unwrap();
 
     {
         let mut stdin = child.stdin.take().unwrap();
