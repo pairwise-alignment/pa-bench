@@ -100,6 +100,9 @@ fn main() {
             .collect()
     };
 
+    if let Some(dir) = args.results.parent() {
+        fs::create_dir_all(dir).unwrap();
+    }
     fs::write(&args.results, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
         "Failed to write results to {}",
         args.results.display()
