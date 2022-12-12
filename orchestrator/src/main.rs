@@ -90,17 +90,15 @@ fn run_with_threads(
     mem_limit: Bytes,
     cores: Vec<usize>,
 ) -> Vec<JobResult> {
+    let job_results = Mutex::new(Vec::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
-    let job_results = Mutex::new(Vec::new());
 
     thread::scope(|scope| {
         for id in &cores {
-            scope.spawn(|| loop {
-                if let Some(job) = jobs_iter.lock().unwrap().next() {
+            scope.spawn(|| {
+                while let Some(job) = jobs_iter.lock().unwrap().next() {
                     let job_result = run(runner, job, time_limit, mem_limit, Some(*id));
                     job_results.lock().unwrap().push(job_result);
-                } else {
-                    break;
                 }
             });
         }
