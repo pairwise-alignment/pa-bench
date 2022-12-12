@@ -1,3 +1,4 @@
+use itertools::iproduct;
 use pa_bench_types::*;
 use pa_types::*;
 
@@ -24,6 +25,10 @@ struct Args {
     /// Path to the output json file.
     results: PathBuf,
 
+    /// Path to the data directory.
+    #[arg(short, long, default_value = "data")]
+    data_dir: PathBuf,
+
     /// Path to the runner binary.
     #[arg(short, long, default_value = "target/release/runner")]
     runner: PathBuf,
@@ -46,14 +51,82 @@ struct Args {
     stderr: bool,
 }
 
+/// Generates missing .seq files in the data/ directory and returns them.
+// TODO(ragnar): Make this more configurable.
+fn generate_input_files(data_dir: &Path) -> Vec<PathBuf> {
+    use pa_generate::ErrorModel as EM;
+    use pa_generate::*;
+    let mut paths = vec![];
+    let seed = 31415;
+    let total_size = 10000;
+    for error_model in [
+        EM::Uniform,
+        EM::NoisyInsert,
+        EM::NoisyDelete,
+        EM::NoisyMove,
+        EM::NoisyDuplicate,
+        EM::SymmetricRepeat,
+    ] {
+        for error_rate in [0.001, 0.01, 0.05, 0.10, 0.15, 0.20] {
+            for length in [100, 1_000, 10_000] {
+                // TODO(ragnar): Only generate these files if they do not exist already.
+                let path = data_dir.join(format!(
+                    "generated/{error_model:?}-n{length}-e{error_rate}.seq"
+                ));
+                GenerateArgs {
+                    options: GenerateOptions {
+                        length,
+                        error_rate,
+                        error_model,
+                        pattern_length: None,
+                    },
+                    seed: Some(seed),
+                    cnt: None,
+                    size: Some(total_size),
+                }
+                .generate_file(&path);
+                paths.push(path);
+            }
+        }
+    }
+    paths
+}
+
+fn generate_jobs(data_dir: &Path) -> Vec<Job> {
+    let datasets = generate_input_files(data_dir);
+    let costs = [
+        CostModel::unit(),
+        CostModel::linear(1, 2),
+        CostModel::affine(2, 3, 1),
+    ];
+    // TODO: Enable traceback.
+    let traces = [false];
+    let algos = [
+        AlgorithmParams::BlockAligner(BlockAlignerParams {
+            min_size: 64,
+            max_size: 1024,
+        }),
+        AlgorithmParams::ParasailStriped(ParasailStripedParams),
+    ];
+    iproduct!(datasets, costs, traces, algos)
+        .map(|(dataset, costs, traceback, algo)| Job {
+            dataset,
+            costs,
+            traceback,
+            algo,
+        })
+        .collect()
+}
+
 fn main() {
     let args = Args::parse();
-    let jobs_json = fs::read_to_string(&args.jobs)
-        .map_err(|err| format!("Failed to read jobs: {err}"))
-        .unwrap();
-    let jobs: Vec<Job> = serde_json::from_str(&jobs_json)
-        .map_err(|err| format!("Failed to parse jobs json: {err}"))
-        .unwrap();
+    // let jobs_json = fs::read_to_string(&args.jobs)
+    //     .map_err(|err| format!("Failed to read jobs: {err}"))
+    //     .unwrap();
+    // let jobs: Vec<Job> = serde_json::from_str(&jobs_json)
+    //     .map_err(|err| format!("Failed to parse jobs json: {err}"))
+    //     .unwrap();
+    let jobs = generate_jobs(&args.data_dir);
 
     assert!(
         args.runner.exists(),
