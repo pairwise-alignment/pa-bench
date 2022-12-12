@@ -17,7 +17,7 @@ pub struct BlockAligner {
     b: PaddedBytes,
 }
 
-impl AlignerConfig for BlockAlignerParams {
+impl AlignerParams for BlockAlignerParams {
     type Aligner = BlockAligner;
 
     fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {

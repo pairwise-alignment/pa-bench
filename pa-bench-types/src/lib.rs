@@ -17,7 +17,7 @@ pub struct Job {
     /// Return the full alignment/cigar?
     pub traceback: bool,
     /// The algorithm/parameters to use.
-    pub algo: AlgorithmConfig,
+    pub algo: AlgorithmParams,
 }
 
 /// The output of an alignment job.

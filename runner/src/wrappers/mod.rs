@@ -4,7 +4,7 @@ use pa_types::*;
 mod block_aligner_wrapper;
 mod parasail_wrapper;
 
-pub trait AlignerConfig {
+pub trait AlignerParams {
     type Aligner: Aligner;
 
     /// Instantiate the aligner with a configuration.
@@ -12,7 +12,7 @@ pub trait AlignerConfig {
 
     /// Instantiate the aligner with a default configuration.
     fn default(_cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
-        unimplemented!("This aligner does not support a default configuration.");
+        unimplemented!("This aligner does not support default parameters.");
     }
 }
 
@@ -25,14 +25,14 @@ pub trait Aligner {
 
 /// Get an instance of the corresponding wrapper based on the algorithm.
 pub fn get_aligner(
-    algo: AlgorithmConfig,
+    algo: AlgorithmParams,
     cm: CostModel,
     trace: bool,
     max_len: usize,
 ) -> Box<dyn Aligner> {
-    use AlgorithmConfig::*;
+    use AlgorithmParams::*;
     match algo {
-        BlockAligner(config) => Box::new(config.new(cm, trace, max_len)),
-        ParasailStriped(config) => Box::new(config.new(cm, trace, max_len)),
+        BlockAligner(params) => Box::new(params.new(cm, trace, max_len)),
+        ParasailStriped(params) => Box::new(params.new(cm, trace, max_len)),
     }
 }
