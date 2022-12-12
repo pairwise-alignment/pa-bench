@@ -34,12 +34,12 @@ struct Args {
     #[arg(short, long, value_parser = parse_bytes, default_value = "1GiB")]
     mem_limit: Bytes,
 
-    /// Number of processes to use.
+    /// Number of parallel jobs to use.
     ///
-    /// Processes are pinned to separate cores.
-    /// The number of processes is capped to the total number of cores.
-    #[arg(short, long)]
-    processes: Option<usize>,
+    /// Jobs are pinned to separate cores.
+    /// The number of jobs is capped to the total number of cores minus 1.
+    #[arg(short = 'j', long)]
+    num_jobs: Option<usize>,
 }
 
 fn main() {
@@ -57,8 +57,8 @@ fn main() {
         args.runner.display()
     );
 
-    let job_results: Vec<JobResult> = if let Some(processes) = args.processes {
         let pin_cores = core_affinity::get_core_ids()
+    let job_results: Vec<JobResult> = if let Some(num_jobs) = args.num_jobs {
             .unwrap()
             .into_iter()
             .take(processes)
