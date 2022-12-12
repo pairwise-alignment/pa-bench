@@ -19,6 +19,7 @@ pub trait AlignerParams {
 /// Generic pairwise global alignment interface.
 pub trait Aligner {
     /// An alignment of sequences `a` and `b`.
+    /// The returned cost is the *non-negative* cost of the alignment.
     /// Returns a trace when specified on construction.
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>);
 }

@@ -34,7 +34,7 @@ impl Aligner for ParasailStriped {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
         let a = Profile::new(a, &self.matrix);
         (
-            global_alignment_score(&a, b, self.gap_open, self.gap_extend),
+            -global_alignment_score(&a, b, self.gap_open, self.gap_extend),
             None,
         )
     }
