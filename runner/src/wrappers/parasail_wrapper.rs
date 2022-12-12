@@ -8,17 +8,21 @@ pub struct ParasailStriped {
     gap_extend: i32,
 }
 
-impl AlignerConfig for ParasailStripedParams {
+impl AlignerParams for ParasailStripedParams {
     type Aligner = ParasailStriped;
 
-    fn new(self, cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
+        Self::default(cm, trace, max_len)
+    }
+
+    fn default(cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
         let CostModel {
             r#match,
             sub,
             open,
             extend,
         }: CostModel = cm;
-        Self::Aligner {
+        ParasailStriped {
             matrix: Matrix::create("ACGT", r#match as _, -sub as _),
             gap_open: open + extend,
             gap_extend: extend,
