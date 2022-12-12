@@ -7,6 +7,7 @@ use pa_bench_types::*;
 use pa_types::*;
 
 use std::{
+    cmp::max,
     fs,
     io::{self, prelude::*},
     time::Duration,
@@ -69,29 +70,27 @@ fn main() {
         .collect();
     let max_len = sequence_pairs
         .iter()
-        .map(|(a, b)| a.len().max(b.len()))
+        .map(|(a, b)| max(a.len(), b.len()))
         .max()
         .unwrap_or(0);
 
     let mut costs = Vec::with_capacity(sequence_pairs.len());
     let mut cigars = Vec::with_capacity(sequence_pairs.len());
 
-    let measured = measure(|| {
-        let mut wrapper = get_wrapper(job.algo, max_len, job.costs, job.traceback);
+    let Measured { runtime, memory } = measure(|| {
+        let mut aligner = get_aligner(job.algo, job.costs, job.traceback, max_len);
         sequence_pairs.into_iter().for_each(|(a, b)| {
-            if job.traceback {
-                let (cost, cigar) = wrapper.align(&a, &b);
-                costs.push(cost);
+            let (cost, cigar) = aligner.align(&a, &b);
+            costs.push(cost);
+            if let Some(cigar) = cigar {
                 cigars.push(cigar);
-            } else {
-                costs.push(wrapper.cost(&a, &b));
             }
         });
     });
 
     let output = JobOutput {
-        runtime: measured.runtime,
-        memory: measured.memory,
+        runtime,
+        memory,
         costs,
         cigars,
     };
