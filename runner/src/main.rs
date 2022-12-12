@@ -44,7 +44,8 @@ fn main() {
         job.dataset.display()
     );
 
-    // NOTE: Although we could read and process the pairs in the dataset in streaming manner, that complicates the time and memory measurement.
+    // NOTE: Although we could read and process the pairs in the dataset in streaming
+    // manner, that complicates the time and memory measurement.
     let dataset = fs::read(&job.dataset).expect("Could not read dataset file");
     let sequence_pairs: Vec<(Seq, Seq)> = dataset
         .split(|&c| c == '\n' as u8)
@@ -61,6 +62,7 @@ fn main() {
         .map(|(a, b)| a.len().max(b.len()))
         .max()
         .unwrap_or(0);
+
     let mut costs = Vec::with_capacity(sequence_pairs.len());
     let mut cigars = Vec::with_capacity(sequence_pairs.len());
 
