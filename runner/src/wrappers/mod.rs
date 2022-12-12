@@ -1,8 +1,8 @@
 use pa_bench_types::*;
 use pa_types::*;
 
-mod block_aligner_wrapper;
-mod parasail_wrapper;
+mod block_aligner;
+mod parasail;
 
 pub trait AlignerParams {
     type Aligner: Aligner;
