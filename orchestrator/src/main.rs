@@ -57,19 +57,28 @@ fn main() {
         args.runner.display()
     );
 
-        let pin_cores = core_affinity::get_core_ids()
     let job_results: Vec<JobResult> = if let Some(num_jobs) = args.num_jobs {
+        let mut cores = core_affinity::get_core_ids()
             .unwrap()
             .into_iter()
-            .take(processes)
-            .map(|c| c.id)
-            .collect();
+            // NOTE: This assumes that virtual cores 0 and n/2 are on the same
+            // physical core, in case hyperthreading is enabled.
+            // TODO(ragnar): Is it better to spread the load over non-adjacent
+            // physical cores? Unclear to me.
+            .take(num_jobs + 1);
+
+        // Reserve one core for the orchestrator.
+        let orchestrator_core = cores.next().unwrap();
+        core_affinity::set_for_current(orchestrator_core);
+
+        // Remaining (up to) #processes cores are for runners.
+        let runner_cores = cores.map(|c| c.id).collect();
         run_with_threads(
             &args.runner,
             jobs,
             args.time_limit,
             args.mem_limit,
-            pin_cores,
+            runner_cores,
         )
     } else {
         jobs.into_iter()
