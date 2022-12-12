@@ -3,54 +3,45 @@ use super::*;
 use block_aligner::scan_block::*;
 use block_aligner::scores::*;
 
-pub struct BlockAlignerWrapper {
-    params: BlockAlignerParams,
-    matrix: NucMatrix,
-    gaps: Gaps,
-    block: BlockAligner,
-    a: PaddedBytes,
-    b: PaddedBytes,
-}
-
-enum BlockAligner {
+enum BlockAlignerBlock {
     Trace(Block<true, false>),
     NoTrace(Block<false, false>),
 }
 
-impl BlockAlignerWrapper {
-    pub fn new(
-        max_len: usize,
-        params: BlockAlignerParams,
-        costs: CostModel,
-        traceback: bool,
-    ) -> Self {
-        let block = if traceback {
-            BlockAligner::Trace(Block::new(max_len, max_len, params.max_size))
+pub struct BlockAligner {
+    params: BlockAlignerParams,
+    matrix: NucMatrix,
+    gaps: Gaps,
+    block: BlockAlignerBlock,
+    a: PaddedBytes,
+    b: PaddedBytes,
+}
+
+impl AlignerConfig for BlockAlignerParams {
+    type Aligner = BlockAligner;
+
+    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
+        let block = if trace {
+            BlockAlignerBlock::Trace(Block::new(max_len, max_len, self.max_size))
         } else {
-            BlockAligner::NoTrace(Block::new(max_len, max_len, params.max_size))
+            BlockAlignerBlock::NoTrace(Block::new(max_len, max_len, self.max_size))
         };
-        let (matrix, gaps) = if let CostModel::Affine {
+        let CostModel {
             r#match,
             sub,
             open,
             extend,
-        } = costs
-        {
-            (
-                NucMatrix::new_simple(r#match as i8, -sub as i8),
-                Gaps {
-                    open: -(open + extend) as i8,
-                    extend: -extend as i8,
-                },
-            )
-        } else {
-            unimplemented!()
+        } = cm;
+        let matrix = NucMatrix::new_simple(r#match as i8, -sub as i8);
+        let gaps = Gaps {
+            open: -(open + extend) as i8,
+            extend: -extend as i8,
         };
-        let a = PaddedBytes::new::<NucMatrix>(max_len, params.max_size);
-        let b = PaddedBytes::new::<NucMatrix>(max_len, params.max_size);
+        let a = PaddedBytes::new::<NucMatrix>(max_len, self.max_size);
+        let b = PaddedBytes::new::<NucMatrix>(max_len, self.max_size);
 
-        Self {
-            params,
+        Self::Aligner {
+            params: self,
             matrix,
             gaps,
             block,
@@ -60,11 +51,11 @@ impl BlockAlignerWrapper {
     }
 }
 
-impl Wrapper for BlockAlignerWrapper {
-    fn cost(&mut self, a: Seq, b: Seq) -> Cost {
+impl Aligner for BlockAligner {
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
         self.a.set_bytes::<NucMatrix>(a, self.params.max_size);
         self.b.set_bytes::<NucMatrix>(b, self.params.max_size);
-        if let BlockAligner::NoTrace(block) = &mut self.block {
+        if let BlockAlignerBlock::NoTrace(block) = &mut self.block {
             block.align(
                 &self.a,
                 &self.b,
@@ -73,13 +64,9 @@ impl Wrapper for BlockAlignerWrapper {
                 self.params.min_size..=self.params.max_size,
                 0,
             );
-            block.res().score
+            (block.res().score, None)
         } else {
-            unimplemented!()
+            unimplemented!("Trace is not implemented for BlockAligner.");
         }
-    }
-
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Cigar) {
-        todo!()
     }
 }

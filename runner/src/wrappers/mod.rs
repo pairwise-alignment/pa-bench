@@ -2,28 +2,37 @@ use pa_bench_types::*;
 use pa_types::*;
 
 mod block_aligner_wrapper;
-use block_aligner_wrapper::*;
 mod parasail_wrapper;
-use parasail_wrapper::*;
+
+pub trait AlignerConfig {
+    type Aligner: Aligner;
+
+    /// Instantiate the aligner with a configuration.
+    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner;
+
+    /// Instantiate the aligner with a default configuration.
+    fn default(_cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
+        unimplemented!("This aligner does not support a default configuration.");
+    }
+}
 
 /// Generic pairwise global alignment interface.
-pub trait Wrapper {
-    fn cost(&mut self, a: Seq, b: Seq) -> Cost;
-
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Cigar);
+pub trait Aligner {
+    /// An alignment of sequences `a` and `b`.
+    /// Returns a trace when specified on construction.
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>);
 }
 
 /// Get an instance of the corresponding wrapper based on the algorithm.
-pub fn get_wrapper(
-    algo: Algorithm,
+pub fn get_aligner(
+    algo: AlgorithmConfig,
+    cm: CostModel,
+    trace: bool,
     max_len: usize,
-    costs: CostModel,
-    traceback: bool,
-) -> Box<dyn Wrapper> {
-    use Algorithm::*;
-
+) -> Box<dyn Aligner> {
+    use AlgorithmConfig::*;
     match algo {
-        BlockAligner(p) => Box::new(BlockAlignerWrapper::new(max_len, p, costs, traceback)),
-        ParasailStriped(p) => Box::new(ParasailStripedWrapper::new(max_len, p, costs, traceback)),
+        BlockAligner(config) => Box::new(config.new(cm, trace, max_len)),
+        ParasailStriped(config) => Box::new(config.new(cm, trace, max_len)),
     }
 }
