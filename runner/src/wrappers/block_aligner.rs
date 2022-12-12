@@ -1,7 +1,10 @@
 use super::*;
 
-use block_aligner::scan_block::*;
-use block_aligner::scores::*;
+// Leading :: needs to be preserved to disambiguate the crate against this module.
+#[rustfmt::skip]
+use ::block_aligner::scan_block::*;
+#[rustfmt::skip]
+use ::block_aligner::scores::*;
 
 enum BlockAlignerBlock {
     Trace(Block<true, false>),
@@ -64,7 +67,7 @@ impl Aligner for BlockAligner {
                 self.params.min_size..=self.params.max_size,
                 0,
             );
-            (block.res().score, None)
+            (-block.res().score, None)
         } else {
             unimplemented!("Trace is not implemented for BlockAligner.");
         }
