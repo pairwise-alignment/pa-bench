@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// Which algorithm to run and benchmark, along with algorithm-specific parameters.
 #[derive(Serialize, Deserialize, Debug)]
-pub enum Algorithm {
+pub enum AlgorithmConfig {
     BlockAligner(BlockAlignerParams),
     ParasailStriped(ParasailStripedParams),
     // Add more algorithms here!
@@ -14,4 +14,5 @@ pub struct BlockAlignerParams {
     pub max_size: usize,
 }
 
-pub type ParasailStripedParams = ();
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ParasailStripedParams;
