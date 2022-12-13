@@ -13,10 +13,12 @@ default-run = "orchestrator"
 
 [dependencies]
 clap = { version = "^4.0", features = ["derive"] }
+serde = "^1.0"
 serde_json = "^1.0"
+serde_yaml = "^0.9"
 pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
 pa-generate = { git = "https://github.com/pairwise-alignment/pa-generate" }
 pa-bench-types = { path = "../pa-bench-types" }
 core_affinity = "^0.7"
 parse_duration = "^2.1"
-itertools = "0.10.5"
+itertools = "^0.10"
