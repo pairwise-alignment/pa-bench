@@ -132,9 +132,39 @@ fn run_with_threads(
     thread::scope(|scope| {
         for id in &cores {
             scope.spawn(|| {
-                while let Some(job) = jobs_iter.lock().unwrap().next() {
+                'job_loop: while let Some(job) = jobs_iter.lock().unwrap().next() {
+                    // If a smaller job for the same algorithm failed, skip it.
+
+                    if job.meta.is_some() {
+                        for failed_job in job_results.lock().unwrap().iter().filter_map(
+                            |job_result: &JobResult| {
+                                if job_result.output.is_none() && job_result.job.meta.is_some() {
+                                    Some(&job_result.job)
+                                } else {
+                                    None
+                                }
+                            },
+                        ) {
+                            if failed_job.algo == job.algo
+                                && failed_job.costs == job.costs
+                                && failed_job.traceback == job.traceback
+                                && failed_job.meta.unwrap().0 == job.meta.unwrap().0
+                                && failed_job.meta.unwrap().1 <= job.meta.unwrap().1
+                                && failed_job.meta.unwrap().2 <= job.meta.unwrap().2
+                            {
+                                // skip this job.
+                                job_results
+                                    .lock()
+                                    .unwrap()
+                                    .push(JobResult { job, output: None });
+                                continue 'job_loop;
+                            }
+                        }
+                    }
+
                     let job_result =
                         run(runner, job, time_limit, mem_limit, Some(*id), show_stderr);
+
                     job_results.lock().unwrap().push(job_result);
                 }
             });
