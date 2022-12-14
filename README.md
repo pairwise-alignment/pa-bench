@@ -29,4 +29,5 @@ The following files will need to be updated:
 - `runner/src/wrapper/mod.rs`
 
 Then, the wrapper implementation for the aligner should be put into a new file
-in `runner/src/wrapper/`.
+in `runner/src/wrapper/`. Remember to crash the program for unsupported parameter
+configurations!
