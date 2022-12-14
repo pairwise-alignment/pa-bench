@@ -2,6 +2,7 @@ use pa_bench_types::*;
 use pa_types::*;
 
 mod block_aligner;
+mod edlib;
 mod parasail;
 
 pub trait AlignerParams {
@@ -35,5 +36,6 @@ pub fn get_aligner(
     match algo {
         BlockAligner(params) => Box::new(params.new(cm, trace, max_len)),
         ParasailStriped(params) => Box::new(params.new(cm, trace, max_len)),
+        Edlib(params) => Box::new(params.new(cm, trace, max_len)),
     }
 }
