@@ -58,18 +58,67 @@ impl Aligner for BlockAligner {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
         self.a.set_bytes::<NucMatrix>(a, self.params.max_size);
         self.b.set_bytes::<NucMatrix>(b, self.params.max_size);
-        if let BlockAlignerBlock::NoTrace(block) = &mut self.block {
-            block.align(
-                &self.a,
-                &self.b,
-                &self.matrix,
-                self.gaps,
-                self.params.min_size..=self.params.max_size,
-                0,
-            );
-            (-block.res().score, None)
-        } else {
-            unimplemented!("Trace is not implemented for BlockAligner.");
+        match &mut self.block {
+            BlockAlignerBlock::NoTrace(block) => {
+                block.align(
+                    &self.a,
+                    &self.b,
+                    &self.matrix,
+                    self.gaps,
+                    self.params.min_size..=self.params.max_size,
+                    0,
+                );
+                (-block.res().score, None)
+            }
+            BlockAlignerBlock::Trace(block) => {
+                block.align(
+                    &self.a,
+                    &self.b,
+                    &self.matrix,
+                    self.gaps,
+                    self.params.min_size..=self.params.max_size,
+                    0,
+                );
+
+                let mut ba_cigar = ::block_aligner::cigar::Cigar::new(self.a.len(), self.b.len());
+                block
+                    .trace()
+                    .cigar(self.a.len(), self.b.len(), &mut ba_cigar);
+                let (mut i, mut j) = (0, 0);
+                let cigar = Cigar {
+                    operations: ba_cigar
+                        .to_vec()
+                        .into_iter()
+                        .map(|oplen| {
+                            (
+                                match oplen.op {
+                                    ::block_aligner::cigar::Operation::Sentinel => panic!(),
+                                    ::block_aligner::cigar::Operation::M => {
+                                        let op = if a[i] == b[j] {
+                                            CigarOp::Match
+                                        } else {
+                                            CigarOp::Sub
+                                        };
+                                        i += 1;
+                                        j += 1;
+                                        op
+                                    }
+                                    ::block_aligner::cigar::Operation::I => {
+                                        i += 1;
+                                        CigarOp::Ins
+                                    }
+                                    ::block_aligner::cigar::Operation::D => {
+                                        j += 1;
+                                        CigarOp::Del
+                                    }
+                                },
+                                oplen.len as _,
+                            )
+                        })
+                        .collect(),
+                };
+                (-block.res().score, Some(cigar))
+            }
         }
     }
 }
