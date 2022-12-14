@@ -40,28 +40,29 @@ impl JobsGenerator {
             .into_iter()
             .flat_map(|d| d.generate(data_dir).into_iter());
         iproduct!(datasets, self.costs, self.traces, self.algos)
-            .map(|(dataset, costs, traceback, algo)| Job {
+            .map(|((dataset, meta), costs, traceback, algo)| Job {
                 dataset,
                 costs,
                 traceback,
                 algo,
+                meta,
             })
             .collect()
     }
 }
 
 impl Dataset {
-    pub fn generate(self, data_dir: &Path) -> Vec<PathBuf> {
+    pub fn generate(self, data_dir: &Path) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         match self {
             Dataset::Generate(generator) => generator.generate(data_dir),
-            Dataset::File(path) => vec![path.clone()],
+            Dataset::File(path) => vec![(path.clone(), None)],
         }
     }
 }
 
 impl DataGenerator {
     /// Generates missing `.seq` files in a directory and returns them.
-    pub fn generate(self, data_dir: &Path) -> Vec<PathBuf> {
+    pub fn generate(self, data_dir: &Path) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         let dir = data_dir.join(&self.prefix);
         fs::create_dir_all(&dir).unwrap();
 
@@ -82,7 +83,7 @@ impl DataGenerator {
                     }
                     .generate_file(&path);
                 }
-                path
+                (path, Some((error_model, error_rate, length)))
             })
             .collect()
     }
