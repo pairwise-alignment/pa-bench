@@ -5,9 +5,9 @@ use std::path::{Path, PathBuf};
 
 use itertools::iproduct;
 
+use pa_bench_types::*;
 use pa_generate::*;
 use pa_types::*;
-use pa_bench_types::*;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JobsGenerator {
@@ -35,7 +35,11 @@ pub struct DataGenerator {
 
 impl JobsGenerator {
     pub fn generate(self, data_dir: &Path) -> Vec<Job> {
-        let datasets = self.datasets.into_iter().map(|d| d.generate(data_dir).into_iter()).flatten();
+        let datasets = self
+            .datasets
+            .into_iter()
+            .map(|d| d.generate(data_dir).into_iter())
+            .flatten();
         iproduct!(datasets, self.costs, self.traces, self.algos)
             .map(|(dataset, costs, traceback, algo)| Job {
                 dataset,
@@ -43,7 +47,7 @@ impl JobsGenerator {
                 traceback,
                 algo,
             })
-        .collect()
+            .collect()
     }
 }
 
@@ -79,6 +83,6 @@ impl DataGenerator {
                 .generate_file(&path);
                 path
             })
-        .collect()
+            .collect()
     }
 }
