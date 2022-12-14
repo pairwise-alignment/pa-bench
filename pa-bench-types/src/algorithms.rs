@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub enum AlgorithmParams {
     BlockAligner(BlockAlignerParams),
     ParasailStriped(ParasailStripedParams),
+    Edlib(EdlibParams),
     // Add more algorithms here!
 }
 
@@ -16,3 +17,6 @@ pub struct BlockAlignerParams {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ParasailStripedParams;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EdlibParams;

@@ -20,3 +20,13 @@ job at a time and limits and measures the time and memory usage. The
 1. Clone this repo and make sure you have Rust installed.
 2. Build all crates in this repo with `cargo build --release`.
 3. `cargo run --release`.
+
+## Adding an aligner
+
+The following files will need to be updated:
+- `pa-bench-types/src/algorithms.rs`
+- `runner/src/Cargo.toml`
+- `runner/src/wrapper/mod.rs`
+
+Then, the wrapper implementation for the aligner should be put into a new file
+in `runner/src/wrapper/`.
