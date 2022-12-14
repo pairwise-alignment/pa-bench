@@ -1,7 +1,6 @@
 use super::*;
 
 use edlib_rs::edlibrs::*;
-use itertools::Itertools;
 
 pub struct Edlib {
     trace: bool,
@@ -29,24 +28,14 @@ impl Aligner for Edlib {
         let result = edlibAlignRs(a, b, &config);
         assert!(result.status == EDLIB_STATUS_OK);
         let score = -result.getDistance();
-        let cigar = result.getAlignment().map(|alignment| Cigar {
-            operations: alignment
-                .iter()
-                .group_by(|&&op| op)
-                .into_iter()
-                .map(|(op, group)| {
-                    (
-                        match op {
-                            0 => CigarOp::Match,
-                            1 => CigarOp::Ins,
-                            2 => CigarOp::Del,
-                            3 => CigarOp::Sub,
-                            _ => panic!("Edlib should only return operations 0..=3."),
-                        },
-                        group.count() as _,
-                    )
-                })
-                .collect(),
+        let cigar = result.getAlignment().map(|alignment| {
+            Cigar::from_ops(alignment.into_iter().map(|op| match op {
+                0 => CigarOp::Match,
+                1 => CigarOp::Ins,
+                2 => CigarOp::Del,
+                3 => CigarOp::Sub,
+                _ => panic!("Edlib should only return operations 0..=3."),
+            }))
         });
         (score, cigar)
     }
