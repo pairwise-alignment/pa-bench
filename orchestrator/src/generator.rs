@@ -38,8 +38,7 @@ impl JobsGenerator {
         let datasets = self
             .datasets
             .into_iter()
-            .map(|d| d.generate(data_dir).into_iter())
-            .flatten();
+            .flat_map(|d| d.generate(data_dir).into_iter());
         iproduct!(datasets, self.costs, self.traces, self.algos)
             .map(|(dataset, costs, traceback, algo)| Job {
                 dataset,
@@ -69,18 +68,20 @@ impl DataGenerator {
         iproduct!(self.error_models, self.error_rates, self.lengths)
             .map(|(error_model, error_rate, length)| {
                 let path = dir.join(format!("{error_model:?}-n{length}-e{error_rate}.seq"));
-                GenerateArgs {
-                    options: GenerateOptions {
-                        length,
-                        error_rate,
-                        error_model,
-                        pattern_length: None,
-                    },
-                    seed: Some(self.seed),
-                    cnt: None,
-                    size: Some(self.total_size),
+                if !path.exists() {
+                    GenerateArgs {
+                        options: GenerateOptions {
+                            length,
+                            error_rate,
+                            error_model,
+                            pattern_length: None,
+                        },
+                        seed: Some(self.seed),
+                        cnt: None,
+                        size: Some(self.total_size),
+                    }
+                    .generate_file(&path);
                 }
-                .generate_file(&path);
                 path
             })
             .collect()
