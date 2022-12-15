@@ -11,10 +11,18 @@ pub use crate::algorithms::*;
 /// Metadata for a generated file. When a method fails on a dataset, all
 /// datasets with the same `error_model` and larger `error_rate` and/or `length`
 /// are skipped.
-pub type DatasetMetadata = (ErrorModel, f32, usize);
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct DatasetMetadata {
+    pub error_model: ErrorModel,
+    pub error_rate: f32,
+    pub length: usize,
+}
+
+/// We promise that the `f32` error rate will never be NaN.
+impl Eq for DatasetMetadata {}
 
 /// An alignment job: a single task for the runner to execute and benchmark.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct Job {
     /// Path to a `.seq` file.
     pub dataset: PathBuf,
@@ -30,9 +38,6 @@ pub struct Job {
     pub meta: Option<DatasetMetadata>,
 }
 
-/// We promise that the `f32` error rate in `DatasetMetadata` will never be NaN.
-impl Eq for Job {}
-
 impl Job {
     /// Whether this job is larger than another job.
     pub fn is_larger(&self, o: &Self) -> bool {
@@ -41,9 +46,9 @@ impl Job {
         self.costs == o.costs
             && self.traceback == o.traceback
             && self.algo == o.algo
-            && self_meta.0 == other_meta.0
-            && self_meta.1 >= other_meta.1
-            && self_meta.2 >= other_meta.2
+            && self_meta.error_model == other_meta.error_model
+            && self_meta.error_rate >= other_meta.error_rate
+            && self_meta.length >= other_meta.length
     }
 }
 
