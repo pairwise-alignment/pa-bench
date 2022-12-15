@@ -1,18 +1,21 @@
 use std::time::{Duration, Instant};
 
 use libc;
+use pa_bench_types::Measured;
 use pa_types::Bytes;
 
-#[derive(Debug, Copy, Clone)]
-pub struct Measured {
-    pub runtime: Duration,
-    pub memory: Bytes,
+fn get_cpu_freq() -> Option<f32> {
+    let cur_cpu = unsafe { libc::sched_getcpu() };
+    // TODO(ragnar): check how accurate this returned value actually is.
+    // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
+    cpu_freq::get()[cur_cpu as usize].cur
 }
 
 pub fn measure<F>(f: F) -> Measured
 where
     F: FnOnce(),
 {
+    let cpu_freq_start = get_cpu_freq();
     let start_time = Instant::now();
     let initial_mem = get_maxrss();
 
@@ -21,6 +24,8 @@ where
     Measured {
         runtime: start_time.elapsed(),
         memory: get_maxrss().saturating_sub(initial_mem),
+        cpu_freq_start,
+        cpu_freq_end: get_cpu_freq(),
     }
 }
 

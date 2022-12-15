@@ -44,13 +44,20 @@ impl Job {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+pub struct Measured {
+    pub runtime: Duration,
+    pub memory: Bytes,
+    pub cpu_freq_start: Option<f32>,
+    pub cpu_freq_end: Option<f32>,
+}
+
 /// The output of an alignment job.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JobOutput {
-    pub runtime: Duration,
-    pub memory: Bytes,
     pub costs: Vec<Cost>,
     pub cigars: Vec<Cigar>,
+    pub measured: Measured,
 }
 
 /// The result of an alignment job, containing the input and output.
