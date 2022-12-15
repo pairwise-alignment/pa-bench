@@ -1,3 +1,5 @@
 /target
 /data
 /results
+/.ipynb_checkpoints/
+*.png
