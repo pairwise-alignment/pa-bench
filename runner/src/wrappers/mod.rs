@@ -5,6 +5,7 @@ mod block_aligner;
 mod edlib;
 mod parasail;
 mod triple_accel;
+mod wfa;
 
 pub trait AlignerParams {
     type Aligner: Aligner;
@@ -44,5 +45,6 @@ pub fn get_aligner(
         ParasailStriped(params) => Box::new(params.new(cm, trace, max_len)),
         Edlib(params) => Box::new(params.new(cm, trace, max_len)),
         TripleAccel(params) => Box::new(params.new(cm, trace, max_len)),
+        Wfa(params) => Box::new(params.new(cm, trace, max_len)),
     }
 }
