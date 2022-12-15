@@ -74,7 +74,7 @@ fn main() {
         args.runner.display()
     );
 
-    let job_results: Vec<JobResult> = if let Some(num_jobs) = args.num_jobs {
+    let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
             .unwrap()
             .into_iter()
@@ -89,31 +89,19 @@ fn main() {
         core_affinity::set_for_current(orchestrator_core);
 
         // Remaining (up to) #processes cores are for runners.
-        let runner_cores = cores.map(|c| c.id).collect();
-        run_with_threads(
-            &args.runner,
-            jobs,
-            args.time_limit,
-            args.mem_limit,
-            runner_cores,
-            args.nice,
-            args.stderr,
-        )
+        Some(cores.map(|c| c.id).collect())
     } else {
-        jobs.into_iter()
-            .map(|job| {
-                run(
-                    &args.runner,
-                    job,
-                    args.time_limit,
-                    args.mem_limit,
-                    None,
-                    args.nice,
-                    args.stderr,
-                )
-            })
-            .collect()
+        None
     };
+    let job_results = run_with_threads(
+        &args.runner,
+        jobs,
+        args.time_limit,
+        args.mem_limit,
+        runner_cores,
+        args.nice,
+        args.stderr,
+    );
 
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
@@ -129,12 +117,17 @@ fn run_with_threads(
     jobs: Vec<Job>,
     time_limit: Duration,
     mem_limit: Bytes,
-    cores: Vec<usize>,
+    cores: Option<Vec<usize>>,
     nice: Option<i32>,
     show_stderr: bool,
 ) -> Vec<JobResult> {
     let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
+
+    // Make a `Vec<Option<usize>>` which defaults to `[None]`.
+    let cores = cores
+        .map(|cores| cores.into_iter().map(Some).collect())
+        .unwrap_or(vec![None]);
 
     thread::scope(|scope| {
         for id in &cores {
@@ -157,15 +150,7 @@ fn run_with_threads(
                     let job_result = if skip {
                         JobResult { job, output: None }
                     } else {
-                        run(
-                            runner,
-                            job,
-                            time_limit,
-                            mem_limit,
-                            Some(*id),
-                            nice,
-                            show_stderr,
-                        )
+                        run_job(runner, job, time_limit, mem_limit, *id, nice, show_stderr)
                     };
 
                     job_results.lock().unwrap().push(job_result);
@@ -177,7 +162,7 @@ fn run_with_threads(
     job_results.into_inner().unwrap()
 }
 
-fn run(
+fn run_job(
     runner: &Path,
     job: Job,
     time_limit: Duration,
