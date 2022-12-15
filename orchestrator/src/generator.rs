@@ -68,7 +68,10 @@ impl DataGenerator {
 
         iproduct!(self.error_models, self.error_rates, self.lengths)
             .map(|(error_model, error_rate, length)| {
-                let path = dir.join(format!("{error_model:?}-n{length}-e{error_rate}.seq"));
+                let path = dir.join(format!(
+                    "{error_model:?}-t{}-n{length}-e{error_rate}.seq",
+                    self.total_size
+                ));
                 if !path.exists() {
                     GenerateArgs {
                         options: GenerateOptions {
