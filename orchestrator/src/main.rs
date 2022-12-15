@@ -165,7 +165,10 @@ fn run_with_threads(
     thread::scope(|scope| {
         for id in &cores {
             scope.spawn(|| {
-                while let Some(job) = jobs_iter.lock().unwrap().next() {
+                loop {
+                    let Some(job) = jobs_iter.lock().unwrap().next() else {
+                        break;
+                    };
                     if !running.load(Ordering::SeqCst) {
                         break;
                     }
