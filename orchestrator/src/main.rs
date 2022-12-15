@@ -42,6 +42,10 @@ struct Args {
     #[arg(short, long, value_parser = parse_bytes, default_value = "1GiB")]
     mem_limit: Bytes,
 
+    // process niceness. <0 for higher priority.
+    #[arg(long)]
+    nice: Option<i32>,
+
     /// Number of parallel jobs to use.
     ///
     /// Jobs are pinned to separate cores.
@@ -92,6 +96,7 @@ fn main() {
             args.time_limit,
             args.mem_limit,
             runner_cores,
+            args.nice,
             args.stderr,
         )
     } else {
@@ -103,6 +108,7 @@ fn main() {
                     args.time_limit,
                     args.mem_limit,
                     None,
+                    args.nice,
                     args.stderr,
                 )
             })
@@ -124,6 +130,7 @@ fn run_with_threads(
     time_limit: Duration,
     mem_limit: Bytes,
     cores: Vec<usize>,
+    nice: Option<i32>,
     show_stderr: bool,
 ) -> Vec<JobResult> {
     let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
@@ -150,7 +157,15 @@ fn run_with_threads(
                     let job_result = if skip {
                         JobResult { job, output: None }
                     } else {
-                        run(runner, job, time_limit, mem_limit, Some(*id), show_stderr)
+                        run(
+                            runner,
+                            job,
+                            time_limit,
+                            mem_limit,
+                            Some(*id),
+                            nice,
+                            show_stderr,
+                        )
                     };
 
                     job_results.lock().unwrap().push(job_result);
@@ -168,6 +183,7 @@ fn run(
     time_limit: Duration,
     mem_limit: Bytes,
     core_id: Option<usize>,
+    nice: Option<i32>,
     show_stderr: bool,
 ) -> JobResult {
     let mut cmd = Command::new(runner);
@@ -177,6 +193,10 @@ fn run(
         .arg(mem_limit.to_string());
     if let Some(id) = core_id {
         cmd.arg("--pin-core-id").arg(id.to_string());
+    }
+    if let Some(nice) = nice {
+        // negative numbers need to be passed with =.
+        cmd.arg(format!("--nice={nice}"));
     }
     cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
     if !show_stderr {

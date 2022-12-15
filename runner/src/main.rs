@@ -28,6 +28,9 @@ struct Args {
     mem_limit: Bytes,
     #[arg(short, long)]
     pin_core_id: Option<usize>,
+    // process niceness. <0 for higher priority.
+    #[arg(long)]
+    nice: Option<i32>,
 }
 
 fn main() {
@@ -36,8 +39,11 @@ fn main() {
     if let Some(id) = args.pin_core_id {
         assert!(
             core_affinity::set_for_current(core_affinity::CoreId { id }),
-            "Failed to set core id!"
+            "Failed to pin to core!"
         );
+    }
+    if let Some(nice) = args.nice {
+        rustix::process::nice(nice).unwrap();
     }
 
     let mut stdin_job = vec![];
