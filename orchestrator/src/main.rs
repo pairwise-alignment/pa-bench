@@ -5,7 +5,8 @@ use std::fs;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -129,10 +130,23 @@ fn run_with_threads(
         .map(|cores| cores.into_iter().map(Some).collect())
         .unwrap_or(vec![None]);
 
+    let running = Arc::new(AtomicBool::new(true));
+    {
+        let r = running.clone();
+        ctrlc::set_handler(move || {
+            eprintln!("Pressed Ctrl-C. Stopping running jobs.");
+            r.store(false, Ordering::SeqCst);
+        })
+        .expect("Error setting Ctrl-C handler");
+    }
+
     thread::scope(|scope| {
         for id in &cores {
             scope.spawn(|| {
                 while let Some(job) = jobs_iter.lock().unwrap().next() {
+                    if !running.load(Ordering::SeqCst) {
+                        break;
+                    }
                     // If a smaller job for the same algorithm failed, skip it.
                     let mut skip = false;
                     if job.meta.is_some() {
