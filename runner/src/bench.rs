@@ -16,7 +16,7 @@ where
     f();
 
     Measured {
-        runtime: start_time.elapsed(),
+        runtime: start_time.elapsed().as_secs_f32(),
         memory: get_maxrss().saturating_sub(initial_mem),
         cpu_freq_start,
         cpu_freq_end: get_cpu_freq(),

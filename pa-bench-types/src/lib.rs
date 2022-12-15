@@ -1,4 +1,4 @@
-use std::{path::PathBuf, time::Duration};
+use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
@@ -54,7 +54,8 @@ impl Job {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct Measured {
-    pub runtime: Duration,
+    /// Runtime in seconds.
+    pub runtime: f32,
     pub memory: Bytes,
     pub cpu_freq_start: Option<f32>,
     pub cpu_freq_end: Option<f32>,
