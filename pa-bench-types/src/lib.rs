@@ -14,7 +14,7 @@ pub use crate::algorithms::*;
 pub type DatasetMetadata = (ErrorModel, f32, usize);
 
 /// An alignment job: a single task for the runner to execute and benchmark.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Job {
     /// Path to a `.seq` file.
     pub dataset: PathBuf,
@@ -29,6 +29,9 @@ pub struct Job {
     /// This is used to skip larger jobs after a smaller one fails.
     pub meta: Option<DatasetMetadata>,
 }
+
+/// We promise that the `f32` error rate in `DatasetMetadata` will never be NaN.
+impl Eq for Job {}
 
 impl Job {
     /// Whether this job is larger than another job.
