@@ -77,7 +77,7 @@ fn main() {
     let mut costs = Vec::with_capacity(sequence_pairs.len());
     let mut cigars = Vec::with_capacity(sequence_pairs.len());
 
-    let Measured { runtime, memory } = measure(|| {
+    let measured = measure(|| {
         let mut aligner = get_aligner(job.algo, job.costs, job.traceback, max_len);
         sequence_pairs.into_iter().for_each(|(a, b)| {
             let (cost, cigar) = aligner.align(&a, &b);
@@ -89,10 +89,9 @@ fn main() {
     });
 
     let output = JobOutput {
-        runtime,
-        memory,
         costs,
         cigars,
+        measured,
     };
     println!("{}", serde_json::to_string(&output).unwrap());
 }
