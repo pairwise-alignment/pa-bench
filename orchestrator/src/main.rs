@@ -77,7 +77,7 @@ fn main() {
     let generator: JobsGenerator = serde_yaml::from_str(&jobs_yaml)
         .map_err(|err| format!("Failed to parse jobs generator yaml: {err}"))
         .unwrap();
-    let mut jobs = generator.generate(&args.data_dir);
+
     // Read the existing results file.
     let mut existing_job_results: Vec<JobResult> = if args.results.is_file() {
         serde_json::from_str(&fs::read_to_string(&args.results).unwrap()).unwrap()
@@ -85,18 +85,20 @@ fn main() {
         vec![]
     };
 
+    let jobs = generator.generate(&args.data_dir);
     // Remove jobs that were run before.
-    if args.incremental {
-        jobs = jobs
-            .into_iter()
+    let jobs = if args.incremental {
+        jobs.into_iter()
             .filter(|job| {
                 existing_job_results
                     .iter()
                     .find(|existing_job| &existing_job.job == job)
                     .is_none()
             })
-            .collect();
-    }
+            .collect()
+    } else {
+        jobs
+    };
 
     let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
@@ -117,6 +119,7 @@ fn main() {
     } else {
         None
     };
+
     let job_results = run_with_threads(
         &args.runner,
         jobs,
@@ -126,7 +129,6 @@ fn main() {
         args.nice,
         args.stderr,
     );
-
     // Remove jobs that were run from existing results.
     existing_job_results = existing_job_results
         .into_iter()
@@ -137,7 +139,6 @@ fn main() {
                 .is_none()
         })
         .collect();
-
     // Append new results to existing results.
     existing_job_results.extend(job_results);
 
