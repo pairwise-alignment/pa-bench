@@ -875,6 +875,7 @@ dependencies = [
  "rust-wfa2",
  "rustix",
  "serde_json",
+ "triple_accel",
 ]
 
 [[package]]
@@ -1048,6 +1049,11 @@ checksum = "1333c76748e868a4d9d1017b5ab53171dfd095f70c712fdb4653a406547f598f"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "triple_accel"
+version = "0.4.0"
+source = "git+https://github.com/Daniel-Liu-c0deb0t/triple_accel#0f2119a6bbc3e6f007bcca0051660408c47ee883"
 
 [[package]]
 name = "unicode-ident"
