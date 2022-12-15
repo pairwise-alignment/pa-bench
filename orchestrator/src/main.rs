@@ -142,6 +142,8 @@ fn main() {
     // Append new results to existing results.
     existing_job_results.extend(job_results);
 
+    verify_costs(&existing_job_results);
+
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
     }
@@ -153,6 +155,24 @@ fn main() {
         "Failed to write results to {}",
         args.results.display()
     ));
+}
+
+fn verify_costs(results: &[JobResult]) {
+    for (i, result) in results.iter().enumerate() {
+        if result.output.is_none() {
+            continue;
+        }
+        // Find the first job with the same input and compare costs.
+        for result2 in &results[..i] {
+            if result2.job.same_input(&result.job) && result2.output.is_some() {
+                assert_eq!(
+                    result.output.as_ref().unwrap().costs,
+                    result2.output.as_ref().unwrap().costs
+                );
+                break;
+            }
+        }
+    }
 }
 
 fn run_with_threads(

@@ -50,6 +50,10 @@ impl Job {
             && self_meta.error_rate >= other_meta.error_rate
             && self_meta.length >= other_meta.length
     }
+
+    pub fn same_input(&self, o: &Self) -> bool {
+        self.dataset == o.dataset && self.costs == o.costs && self.meta == o.meta
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
