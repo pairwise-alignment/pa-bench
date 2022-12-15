@@ -9,6 +9,7 @@ where
     F: FnOnce(),
 {
     let cpu_freq_start = get_cpu_freq();
+    let cpu_clock_start = get_cpu_clock();
     let start_time = Instant::now();
     let initial_mem = get_maxrss();
 
@@ -19,6 +20,7 @@ where
         memory: get_maxrss().saturating_sub(initial_mem),
         cpu_freq_start,
         cpu_freq_end: get_cpu_freq(),
+        cpu_clocks: get_cpu_clock().map(|c| c - cpu_clock_start.unwrap()),
     }
 }
 
@@ -59,4 +61,12 @@ fn get_cpu_freq() -> Option<f32> {
     // TODO(ragnar): check how accurate this returned value actually is.
     // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
     cpu_freq::get()[cur_cpu as usize].cur
+}
+
+fn get_cpu_clock() -> Option<u64> {
+    if cfg!(any(target_arch = "x86_64")) {
+        Some(unsafe { core::arch::x86_64::_rdtsc() })
+    } else {
+        None
+    }
 }
