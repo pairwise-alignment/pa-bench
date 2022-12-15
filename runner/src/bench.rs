@@ -4,13 +4,6 @@ use libc;
 use pa_bench_types::Measured;
 use pa_types::Bytes;
 
-fn get_cpu_freq() -> Option<f32> {
-    let cur_cpu = unsafe { libc::sched_getcpu() };
-    // TODO(ragnar): check how accurate this returned value actually is.
-    // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
-    cpu_freq::get()[cur_cpu as usize].cur
-}
-
 pub fn measure<F>(f: F) -> Measured
 where
     F: FnOnce(),
@@ -59,4 +52,11 @@ pub fn set_limits(time: Duration, mem: Bytes) {
     };
     set(libc::RLIMIT_CPU, time.as_secs());
     set(libc::RLIMIT_AS, mem / 1024);
+}
+
+fn get_cpu_freq() -> Option<f32> {
+    let cur_cpu = unsafe { libc::sched_getcpu() };
+    // TODO(ragnar): check how accurate this returned value actually is.
+    // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
+    cpu_freq::get()[cur_cpu as usize].cur
 }
