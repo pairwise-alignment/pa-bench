@@ -57,23 +57,45 @@ struct Args {
     /// Show stderr of runner process.
     #[arg(long)]
     stderr: bool,
+
+    /// Skip jobs already present in the results file.
+    #[arg(long)]
+    incremental: bool,
 }
 
 fn main() {
     let args = Args::parse();
-    let jobs_yaml = fs::read_to_string(&args.jobs)
-        .map_err(|err| format!("Failed to read jobs generator: {err}"))
-        .unwrap();
-    let generator: JobsGenerator = serde_yaml::from_str(&jobs_yaml)
-        .map_err(|err| format!("Failed to parse jobs generator yaml: {err}"))
-        .unwrap();
-    let jobs = generator.generate(&args.data_dir);
 
     assert!(
         args.runner.exists(),
         "{} does not exist!",
         args.runner.display()
     );
+
+    let jobs_yaml = fs::read_to_string(&args.jobs)
+        .map_err(|err| format!("Failed to read jobs generator: {err}"))
+        .unwrap();
+    let generator: JobsGenerator = serde_yaml::from_str(&jobs_yaml)
+        .map_err(|err| format!("Failed to parse jobs generator yaml: {err}"))
+        .unwrap();
+    let mut jobs = generator.generate(&args.data_dir);
+    // Filter out jobs already present.
+    let mut job_results = if args.incremental && args.results.is_file() {
+        let existing_results: Vec<JobResult> =
+            serde_json::from_str(&fs::read_to_string(&args.results).unwrap()).unwrap();
+        jobs = jobs
+            .into_iter()
+            .filter(|job| {
+                existing_results
+                    .iter()
+                    .find(|existing_job| &existing_job.job == job)
+                    .is_none()
+            })
+            .collect();
+        existing_results
+    } else {
+        vec![]
+    };
 
     let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
@@ -94,7 +116,7 @@ fn main() {
     } else {
         None
     };
-    let job_results = run_with_threads(
+    job_results.extend(run_with_threads(
         &args.runner,
         jobs,
         args.time_limit,
@@ -102,7 +124,7 @@ fn main() {
         runner_cores,
         args.nice,
         args.stderr,
-    );
+    ));
 
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
