@@ -5,7 +5,6 @@ use std::fs;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -152,12 +151,12 @@ fn run_with_threads(
         .map(|cores| cores.into_iter().map(Some).collect())
         .unwrap_or(vec![None]);
 
-    let running = Arc::new(AtomicBool::new(true));
+    let running = Arc::new(Mutex::new(true));
     {
         let r = running.clone();
         ctrlc::set_handler(move || {
             eprintln!("Pressed Ctrl-C. Stopping running jobs.");
-            r.store(false, Ordering::SeqCst);
+            *r.lock().unwrap() = false;
         })
         .expect("Error setting Ctrl-C handler");
     }
@@ -169,7 +168,7 @@ fn run_with_threads(
                     let Some(job) = jobs_iter.lock().unwrap().next() else {
                         break;
                     };
-                    if !running.load(Ordering::SeqCst) {
+                    if !*running.lock().unwrap() {
                         break;
                     }
                     // If a smaller job for the same algorithm failed, skip it.
@@ -192,7 +191,10 @@ fn run_with_threads(
                         run_job(runner, job, time_limit, mem_limit, *id, nice, show_stderr)
                     };
 
-                    job_results.lock().unwrap().push(job_result);
+                    // If the orchestrator was aborted, do not push failing job results.
+                    if job_result.output.is_some() || *running.lock().unwrap() {
+                        job_results.lock().unwrap().push(job_result);
+                    }
                 }
             });
         }
