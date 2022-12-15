@@ -26,8 +26,22 @@ pub struct Job {
     pub algo: AlgorithmParams,
 
     /// Metadata of the dataset.
-    /// This is used to skip strictly larger jobs after a smaller one fails.
+    /// This is used to skip larger jobs after a smaller one fails.
     pub meta: Option<DatasetMetadata>,
+}
+
+impl Job {
+    /// Whether this job is larger than another job.
+    pub fn is_larger(&self, o: &Self) -> bool {
+        let self_meta = self.meta.as_ref().unwrap();
+        let other_meta = o.meta.as_ref().unwrap();
+        self.costs == o.costs
+            && self.traceback == o.traceback
+            && self.algo == o.algo
+            && self_meta.0 == other_meta.0
+            && self_meta.1 >= other_meta.1
+            && self_meta.2 >= other_meta.2
+    }
 }
 
 /// The output of an alignment job.

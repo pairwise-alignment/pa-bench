@@ -126,44 +126,32 @@ fn run_with_threads(
     cores: Vec<usize>,
     show_stderr: bool,
 ) -> Vec<JobResult> {
-    let job_results = Mutex::new(Vec::with_capacity(jobs.len()));
+    let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
 
     thread::scope(|scope| {
         for id in &cores {
             scope.spawn(|| {
-                'job_loop: while let Some(job) = jobs_iter.lock().unwrap().next() {
+                while let Some(job) = jobs_iter.lock().unwrap().next() {
                     // If a smaller job for the same algorithm failed, skip it.
-
+                    let mut skip = false;
                     if job.meta.is_some() {
-                        for failed_job in job_results.lock().unwrap().iter().filter_map(
-                            |job_result: &JobResult| {
-                                if job_result.output.is_none() && job_result.job.meta.is_some() {
-                                    Some(&job_result.job)
-                                } else {
-                                    None
-                                }
-                            },
-                        ) {
-                            if failed_job.algo == job.algo
-                                && failed_job.costs == job.costs
-                                && failed_job.traceback == job.traceback
-                                && failed_job.meta.unwrap().0 == job.meta.unwrap().0
-                                && failed_job.meta.unwrap().1 <= job.meta.unwrap().1
-                                && failed_job.meta.unwrap().2 <= job.meta.unwrap().2
+                        for prev in job_results.lock().unwrap().iter() {
+                            if prev.output.is_none()
+                                && prev.job.meta.is_some()
+                                && job.is_larger(&prev.job)
                             {
-                                // skip this job.
-                                job_results
-                                    .lock()
-                                    .unwrap()
-                                    .push(JobResult { job, output: None });
-                                continue 'job_loop;
+                                skip = true;
+                                break;
                             }
                         }
                     }
 
-                    let job_result =
-                        run(runner, job, time_limit, mem_limit, Some(*id), show_stderr);
+                    let job_result = if skip {
+                        JobResult { job, output: None }
+                    } else {
+                        run(runner, job, time_limit, mem_limit, Some(*id), show_stderr)
+                    };
 
                     job_results.lock().unwrap().push(job_result);
                 }

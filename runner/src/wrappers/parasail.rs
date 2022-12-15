@@ -15,7 +15,8 @@ impl AlignerParams for ParasailStripedParams {
         Self::default(cm, trace, max_len)
     }
 
-    fn default(cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
+    fn default(cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+        assert!(!trace);
         let CostModel {
             r#match,
             sub,
