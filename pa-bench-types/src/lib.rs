@@ -60,7 +60,7 @@ pub struct Measured {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JobOutput {
     pub costs: Vec<Cost>,
-    pub cigars: Vec<Cigar>,
+    //pub cigars: Vec<Cigar>,
     pub measured: Measured,
 }
 

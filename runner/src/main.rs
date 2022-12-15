@@ -2,7 +2,7 @@ mod bench;
 mod wrappers;
 use crate::{bench::*, wrappers::*};
 
-use itertools::Itertools;
+use itertools::{izip, Itertools};
 use pa_bench_types::*;
 use pa_types::*;
 
@@ -85,18 +85,25 @@ fn main() {
 
     let measured = measure(|| {
         let mut aligner = get_aligner(job.algo, job.costs, job.traceback, max_len);
-        sequence_pairs.into_iter().for_each(|(a, b)| {
-            let (cost, cigar) = aligner.align(&a, &b);
+        sequence_pairs.iter().for_each(|(a, b)| {
+            let (cost, cigar) = aligner.align(a, b);
             costs.push(cost);
-            if let Some(cigar) = cigar {
-                cigars.push(cigar);
+            if job.traceback {
+                cigars.push(cigar.unwrap());
             }
         });
     });
 
+    // Verify the cigar strings, but do not return them as they are not used for further analysis and take a lot of space.
+    if job.traceback {
+        for ((a, b), &cost, cigar) in izip!(sequence_pairs, &costs, cigars) {
+            assert!(cigar.verify(&job.costs, a, b) == cost);
+        }
+    }
+
     let output = JobOutput {
         costs,
-        cigars,
+        //cigars,
         measured,
     };
     println!("{}", serde_json::to_string(&output).unwrap());
