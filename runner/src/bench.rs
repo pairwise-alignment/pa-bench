@@ -53,7 +53,7 @@ pub fn set_limits(time: Duration, mem: Bytes) {
         }
     };
     set(libc::RLIMIT_CPU, time.as_secs());
-    set(libc::RLIMIT_AS, mem / 1024);
+    set(libc::RLIMIT_DATA, mem);
 }
 
 fn get_cpu_freq() -> Option<f32> {
