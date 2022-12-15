@@ -11,10 +11,6 @@ pub struct ParasailStriped {
 impl AlignerParams for ParasailStripedParams {
     type Aligner = ParasailStriped;
 
-    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
-        Self::default(cm, trace, max_len)
-    }
-
     fn default(cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         assert!(!trace);
         let CostModel {

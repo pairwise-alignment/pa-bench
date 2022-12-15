@@ -9,7 +9,12 @@ pub trait AlignerParams {
     type Aligner: Aligner;
 
     /// Instantiate the aligner with a configuration.
-    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner;
+    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner
+    where
+        Self: Sized,
+    {
+        Self::default(cm, trace, max_len)
+    }
 
     /// Instantiate the aligner with a default configuration.
     fn default(_cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
