@@ -27,12 +27,12 @@ impl Aligner for Edlib {
         }
         let result = edlibAlignRs(a, b, &config);
         assert!(result.status == EDLIB_STATUS_OK);
-        let score = -result.getDistance();
+        let score = result.getDistance();
         let cigar = result.getAlignment().map(|alignment| {
             Cigar::from_ops(alignment.into_iter().map(|op| match op {
                 0 => CigarOp::Match,
-                1 => CigarOp::Ins,
-                2 => CigarOp::Del,
+                1 => CigarOp::Del,
+                2 => CigarOp::Ins,
                 3 => CigarOp::Sub,
                 _ => panic!("Edlib should only return operations 0..=3."),
             }))
