@@ -850,6 +850,7 @@ dependencies = [
  "parasailors",
  "parse_duration",
  "rust-wfa2",
+ "rustix",
  "serde_json",
 ]
 
