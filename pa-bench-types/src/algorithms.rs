@@ -7,6 +7,7 @@ pub enum AlgorithmParams {
     ParasailStriped(ParasailStripedParams),
     Edlib(EdlibParams),
     TripleAccel(TripleAccelParams),
+    Wfa(WfaParams),
     // Add more algorithms here!
 }
 
@@ -24,3 +25,6 @@ pub struct EdlibParams;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct TripleAccelParams;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct WfaParams;
