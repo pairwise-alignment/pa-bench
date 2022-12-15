@@ -12,7 +12,7 @@ datasets:
         - SymmetricRepeat
       error_rates: [0.001, 0.01, 0.05, 0.10, 0.15, 0.20]
       lengths: [100, 1000, 10000]
-traces: [false]
+traces: [false, true]
 costs:
   - { match: 0, sub: 1, open: 0, extend: 1 }
   - { match: 0, sub: 1, open: 0, extend: 2 }
