@@ -86,7 +86,14 @@ impl DataGenerator {
                     }
                     .generate_file(&path);
                 }
-                (path, Some((error_model, error_rate, length)))
+                (
+                    path,
+                    Some(DatasetMetadata {
+                        error_model,
+                        error_rate,
+                        length,
+                    }),
+                )
             })
             .collect()
     }
