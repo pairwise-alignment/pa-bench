@@ -97,7 +97,7 @@ fn main() {
     // Verify the cigar strings, but do not return them as they are not used for further analysis and take a lot of space.
     if job.traceback {
         for ((a, b), &cost, cigar) in izip!(sequence_pairs, &costs, cigars) {
-            assert!(cigar.verify(&job.costs, a, b) == cost);
+            assert_eq!(cigar.verify(&job.costs, a, b), cost);
         }
     }
 
