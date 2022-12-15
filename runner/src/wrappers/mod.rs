@@ -4,6 +4,7 @@ use pa_types::*;
 mod block_aligner;
 mod edlib;
 mod parasail;
+mod triple_accel;
 
 pub trait AlignerParams {
     type Aligner: Aligner;
@@ -42,5 +43,6 @@ pub fn get_aligner(
         BlockAligner(params) => Box::new(params.new(cm, trace, max_len)),
         ParasailStriped(params) => Box::new(params.new(cm, trace, max_len)),
         Edlib(params) => Box::new(params.new(cm, trace, max_len)),
+        TripleAccel(params) => Box::new(params.new(cm, trace, max_len)),
     }
 }
