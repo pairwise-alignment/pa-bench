@@ -78,23 +78,25 @@ fn main() {
         .map_err(|err| format!("Failed to parse jobs generator yaml: {err}"))
         .unwrap();
     let mut jobs = generator.generate(&args.data_dir);
-    // Filter out jobs already present.
-    let mut job_results = if args.incremental && args.results.is_file() {
-        let existing_results: Vec<JobResult> =
-            serde_json::from_str(&fs::read_to_string(&args.results).unwrap()).unwrap();
+    // Read the existing results file.
+    let mut existing_job_results: Vec<JobResult> = if args.results.is_file() {
+        serde_json::from_str(&fs::read_to_string(&args.results).unwrap()).unwrap()
+    } else {
+        vec![]
+    };
+
+    // Remove jobs that were run before.
+    if args.incremental {
         jobs = jobs
             .into_iter()
             .filter(|job| {
-                existing_results
+                existing_job_results
                     .iter()
                     .find(|existing_job| &existing_job.job == job)
                     .is_none()
             })
             .collect();
-        existing_results
-    } else {
-        vec![]
-    };
+    }
 
     let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
@@ -115,7 +117,7 @@ fn main() {
     } else {
         None
     };
-    job_results.extend(run_with_threads(
+    let job_results = run_with_threads(
         &args.runner,
         jobs,
         args.time_limit,
@@ -123,12 +125,30 @@ fn main() {
         runner_cores,
         args.nice,
         args.stderr,
-    ));
+    );
+
+    // Remove jobs that were run from existing results.
+    existing_job_results = existing_job_results
+        .into_iter()
+        .filter(|existing_job| {
+            job_results
+                .iter()
+                .find(|job| job.job == existing_job.job)
+                .is_none()
+        })
+        .collect();
+
+    // Append new results to existing results.
+    existing_job_results.extend(job_results);
 
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
     }
-    fs::write(&args.results, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
+    fs::write(
+        &args.results,
+        &serde_json::to_string(&existing_job_results).unwrap(),
+    )
+    .expect(&format!(
         "Failed to write results to {}",
         args.results.display()
     ));
