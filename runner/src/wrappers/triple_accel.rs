@@ -4,7 +4,7 @@ use super::*;
 use ::triple_accel::*;
 
 pub struct TripleAccel {
-    cost_model: CostModel,
+    costs: ::triple_accel::levenshtein::EditCosts,
     trace: bool,
 }
 
@@ -12,20 +12,20 @@ impl AlignerParams for TripleAccelParams {
     type Aligner = TripleAccel;
 
     fn default(cost_model: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
-        TripleAccel { cost_model, trace }
+        let costs = ::triple_accel::levenshtein::EditCosts::new(
+            cost_model.sub as _,
+            cost_model.extend as _,
+            cost_model.open as _,
+            None,
+        );
+        Self::Aligner { costs, trace }
     }
 }
 
 impl Aligner for TripleAccel {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
-        let costs = ::triple_accel::levenshtein::EditCosts::new(
-            self.cost_model.sub as _,
-            self.cost_model.extend as _,
-            self.cost_model.open as _,
-            None,
-        );
         let (cost, edits) =
-            ::triple_accel::levenshtein::levenshtein_exp_with_opts(a, b, self.trace, costs);
+            ::triple_accel::levenshtein::levenshtein_exp_with_opts(a, b, self.trace, self.costs);
 
         let cigar = edits.map(|edits| Cigar {
             operations: edits

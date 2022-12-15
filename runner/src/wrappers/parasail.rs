@@ -19,7 +19,7 @@ impl AlignerParams for ParasailStripedParams {
             open,
             extend,
         }: CostModel = cm;
-        ParasailStriped {
+        Self::Aligner {
             matrix: Matrix::create("ACGT", r#match as _, -sub as _),
             gap_open: open + extend,
             gap_extend: extend,

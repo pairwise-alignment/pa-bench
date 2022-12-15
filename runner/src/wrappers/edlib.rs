@@ -3,7 +3,7 @@ use super::*;
 use edlib_rs::edlibrs::*;
 
 pub struct Edlib {
-    trace: bool,
+    config: EdlibAlignConfigRs<'static>,
 }
 
 impl AlignerParams for EdlibParams {
@@ -11,17 +11,17 @@ impl AlignerParams for EdlibParams {
 
     fn default(cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         assert!(cm.is_unit());
-        Edlib { trace }
+        let mut config = EdlibAlignConfigRs::default();
+        if trace {
+            config.task = EdlibAlignTaskRs::EDLIB_TASK_PATH;
+        }
+        Self::Aligner { config }
     }
 }
 
 impl Aligner for Edlib {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
-        let mut config = EdlibAlignConfigRs::default();
-        if self.trace {
-            config.task = EdlibAlignTaskRs::EDLIB_TASK_PATH;
-        }
-        let result = edlibAlignRs(a, b, &config);
+        let result = edlibAlignRs(a, b, &self.config);
         assert!(result.status == EDLIB_STATUS_OK);
         let cost = result.getDistance();
         let cigar = result.getAlignment().map(|alignment| {
