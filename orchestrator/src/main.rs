@@ -179,7 +179,7 @@ fn verify_costs(results: &[JobResult]) {
                 assert_eq!(
                     result.output.as_ref().unwrap().costs,
                     result2.output.as_ref().unwrap().costs,
-                    "\nCosts of jobs are not the same!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts2: {:?}",
+                    "\nCosts of jobs are not the same!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}",
                     result.job,
                     result2.job,
                     result.output.as_ref().unwrap().costs,
