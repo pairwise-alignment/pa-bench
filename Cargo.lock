@@ -888,7 +888,7 @@ dependencies = [
 [[package]]
 name = "rust-wfa2"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/rust-wfa2#86467bd2e29df31e20f2314797b18b08f88b5e2c"
+source = "git+https://github.com/pairwise-alignment/rust-wfa2#07b958d4ef3ccca546c7ba12bc51926a96647a6e"
 dependencies = [
  "serde",
  "wfa2-sys",
@@ -922,18 +922,18 @@ checksum = "4501abdff3ae82a1c1b477a17252eb69cee9e66eb915c1abaa4f44d873df9f09"
 
 [[package]]
 name = "serde"
-version = "1.0.150"
+version = "1.0.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e326c9ec8042f1b5da33252c8a37e9ffbd2c9bef0155215b6e6c80c790e05f91"
+checksum = "97fed41fc1a24994d044e6db6935e69511a1153b52c15eb42493b26fa87feba0"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.150"
+version = "1.0.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42a3df25b0713732468deadad63ab9da1f1fd75a48a15024b50363f128db627e"
+checksum = "255abe9a125a985c05190d687b320c12f9b1f0b99445e608c21ba0782c719ad8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1108,7 +1108,7 @@ checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 [[package]]
 name = "wfa2-sys"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/rust-wfa2#86467bd2e29df31e20f2314797b18b08f88b5e2c"
+source = "git+https://github.com/pairwise-alignment/rust-wfa2#07b958d4ef3ccca546c7ba12bc51926a96647a6e"
 dependencies = [
  "bindgen 0.63.0",
  "cc",
