@@ -85,7 +85,10 @@ fn main() {
         vec![]
     };
 
+    println!("There are {} existing jobs!", existing_job_results.len());
+    println!("Generating jobs and datasets...");
     let jobs = generator.generate(&args.data_dir);
+    println!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
     let jobs = if args.incremental {
         jobs.into_iter()
@@ -99,6 +102,7 @@ fn main() {
     } else {
         jobs
     };
+    println!("Running {} jobs...", jobs.len());
 
     let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
@@ -139,8 +143,14 @@ fn main() {
                 .is_none()
         })
         .collect();
+    let job_results_len = job_results.len();
     // Append new results to existing results.
     existing_job_results.extend(job_results);
+    println!(
+        "Finished running {} jobs! Totaling {} job results.",
+        job_results_len,
+        existing_job_results.len()
+    );
 
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
