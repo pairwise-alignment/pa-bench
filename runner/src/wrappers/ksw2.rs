@@ -46,6 +46,7 @@ impl AlignerParams for Ksw2Params {
         Ksw2Params {
             // TODO: Or GlobalSuzukiSse?
             method: Ksw2Method::ExtensionSuzukiSse,
+            band_doubling: true,
         }
         .new(cm, trace, max_len)
     }
@@ -76,10 +77,13 @@ impl Aligner for Ksw2 {
                         m_cigar = 4;
                     }
 
-                    let function = match self.params.method {
-                        Ksw2Method::GlobalGreen => ksw_gg,
-                        Ksw2Method::GlobalSuzuki => ksw_gg2,
-                        Ksw2Method::GlobalSuzukiSse => ksw_gg2_sse,
+                    let function = match (self.params.band_doubling, self.params.method) {
+                        (false, Ksw2Method::GlobalGreen) => ksw_gg,
+                        (false, Ksw2Method::GlobalSuzuki) => ksw_gg2,
+                        (false, Ksw2Method::GlobalSuzukiSse) => ksw_gg2_sse,
+                        (true, Ksw2Method::GlobalGreen) => ksw_gg_band_doubling,
+                        (true, Ksw2Method::GlobalSuzuki) => ksw_gg2_band_doubling,
+                        (true, Ksw2Method::GlobalSuzukiSse) => ksw_gg2_sse_band_doubling,
                         _ => unreachable!(),
                     };
 
@@ -103,9 +107,15 @@ impl Aligner for Ksw2 {
                         (&mut ksw2_cigar) as *mut *mut u32,
                     );
                 }
+
                 Ksw2Method::ExtensionGreen => {
                     let mut output: ksw_extz_t = std::mem::zeroed();
-                    ksw_extz(
+                    let function = if self.params.band_doubling {
+                        ksw_extz_band_doubling
+                    } else {
+                        ksw_extz
+                    };
+                    function(
                         // don't use a kmalloc memory pool.
                         std::ptr::null_mut(),
                         // Input sequences
@@ -137,7 +147,12 @@ impl Aligner for Ksw2 {
                 }
                 Ksw2Method::ExtensionSuzukiSse => {
                     let mut output: ksw_extz_t = std::mem::zeroed();
-                    ksw_extz2_sse(
+                    let function = if self.params.band_doubling {
+                        ksw_extz2_sse_band_doubling
+                    } else {
+                        ksw_extz2_sse
+                    };
+                    function(
                         // don't use a kmalloc memory pool.
                         std::ptr::null_mut(),
                         // Input sequences
