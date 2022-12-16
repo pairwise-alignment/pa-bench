@@ -32,8 +32,6 @@ traces:
   - true
 costs:
   - { sub: 1, open: 0, extend: 1 }
-  # - { sub: 1, open: 0, extend: 2 }
-  # - { sub: 2, open: 3, extend: 2 }
 algos:
   - !BlockAligner
     min_size: 64
@@ -53,15 +51,12 @@ algos:
   - !Wfa
     memory_model: !MemoryHigh
     heuristic: !None
-      # - !Ksw2
-      #   method: !GlobalGreen
-      # - !Ksw2
-      #   method: !GlobalSuzuki
-      # - !Ksw2
-      #   method: !ExtensionGreen
-
-
   - !Ksw2
     method: !GlobalSuzukiSse
+    band_doubling: false
+  - !Ksw2
+    method: !GlobalSuzukiSse
+    band_doubling: true
   - !Ksw2
     method: !ExtensionSuzukiSse
+    band_doubling: false
