@@ -9,19 +9,20 @@ use rust_wfa2::{
 };
 
 pub struct Wfa {
+    cm: CostModel,
     aligner: WFAligner,
 }
 
 impl AlignerParams for WfaParams {
     type Aligner = Wfa;
 
-    fn new(self, cost_model: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         let scope = if trace {
             AlignmentScope::Alignment
         } else {
             AlignmentScope::Score
         };
-        let mut aligner = match cost_model {
+        let mut aligner = match cm {
             cm if cm.is_unit() => WFAlignerEdit::new(scope, self.memory_model),
             cm if cm.is_linear() => {
                 WFAlignerGapLinear::new(cm.sub, cm.extend, scope, self.memory_model)
@@ -32,7 +33,7 @@ impl AlignerParams for WfaParams {
             _ => unimplemented!("WFA does not support match bonus!"),
         };
         aligner.set_heuristic(self.heuristic);
-        Wfa { aligner }
+        Wfa { cm, aligner }
     }
 
     fn default(cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
@@ -55,6 +56,7 @@ impl Aligner for Wfa {
         } else {
             Some(Cigar::parse(&cigar, a, b))
         };
+        let cost = if self.cm.is_unit() { cost } else { -cost };
         (cost as _, cigar)
     }
 }
