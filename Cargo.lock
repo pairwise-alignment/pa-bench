@@ -454,7 +454,7 @@ checksum = "4217ad341ebadf8d8e724e264f13e593e0648f5b3e94b3896a5df283be015ecc"
 [[package]]
 name = "ksw2-sys"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/ksw2-sys#bcbd9f688a7375035b5e5cb1e4d829e005834b8b"
+source = "git+https://github.com/pairwise-alignment/ksw2-sys#8865fc644c31dcdcdf7aa697006269f1ebe98222"
 dependencies = [
  "bindgen 0.63.0",
 ]

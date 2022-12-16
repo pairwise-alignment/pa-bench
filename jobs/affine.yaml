@@ -37,7 +37,7 @@ algos:
     min_size: 32
     max_size: 1024
   - !ParasailStriped
-  - !Edlib
+  # - !Edlib
   - !TripleAccel
   - !Wfa
     memory_model: !MemoryUltraLow
@@ -53,5 +53,14 @@ algos:
     heuristic: !None
   - !Ksw2
     method: !GlobalSuzukiSse
+    band_doubling: false
+  - !Ksw2
+    method: !GlobalSuzukiSse
+    band_doubling: true
   - !Ksw2
     method: !ExtensionSuzukiSse
+    band_doubling: false
+  # This is broken for now.
+  # - !Ksw2
+  #   method: !ExtensionSuzukiSse
+  #   band_doubling: true
