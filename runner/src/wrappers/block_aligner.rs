@@ -18,27 +18,24 @@ pub struct BlockAligner {
     block: BlockAlignerBlock,
     a: PaddedBytes,
     b: PaddedBytes,
+    s: ScoreModel,
 }
 
 impl AlignerParams for BlockAlignerParams {
     type Aligner = BlockAligner;
 
     fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
+        assert!(cm.is_affine());
         let block = if trace {
             BlockAlignerBlock::Trace(Block::new(max_len, max_len, self.max_size))
         } else {
             BlockAlignerBlock::NoTrace(Block::new(max_len, max_len, self.max_size))
         };
-        let CostModel {
-            r#match,
-            sub,
-            open,
-            extend,
-        } = cm;
-        let matrix = NucMatrix::new_simple(r#match as i8, -sub as i8);
+        let s = ScoreModel::from_costs(cm);
+        let matrix = NucMatrix::new_simple(s.r#match as i8, s.sub as i8);
         let gaps = Gaps {
-            open: -(open + extend) as i8,
-            extend: -extend as i8,
+            open: (s.open + s.extend) as i8,
+            extend: s.extend as i8,
         };
         let a = PaddedBytes::new::<NucMatrix>(max_len, self.max_size);
         let b = PaddedBytes::new::<NucMatrix>(max_len, self.max_size);
@@ -50,6 +47,7 @@ impl AlignerParams for BlockAlignerParams {
             block,
             a,
             b,
+            s,
         }
     }
 }
@@ -68,7 +66,10 @@ impl Aligner for BlockAligner {
                     self.params.min_size..=self.params.max_size,
                     0,
                 );
-                (-block.res().score, None)
+                (
+                    self.s.global_cost(block.res().score, a.len(), b.len()),
+                    None,
+                )
             }
             BlockAlignerBlock::Trace(block) => {
                 block.align(
@@ -128,7 +129,10 @@ impl Aligner for BlockAligner {
                     }
                 }
 
-                (-block.res().score, Some(Cigar { operations }))
+                (
+                    self.s.global_cost(block.res().score, a.len(), b.len()),
+                    Some(Cigar { operations }),
+                )
             }
         }
     }
