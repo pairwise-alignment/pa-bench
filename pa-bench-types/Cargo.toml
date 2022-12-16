@@ -13,3 +13,4 @@ categories = ["science"]
 pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
 pa-generate = { git = "https://github.com/pairwise-alignment/pa-generate" }
 serde = { version = "^1.0", features = ["derive"] }
+rust-wfa2 = { git = "https://github.com/pairwise-alignment/rust-wfa2" }

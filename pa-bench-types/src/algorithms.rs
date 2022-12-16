@@ -28,7 +28,23 @@ pub struct EdlibParams;
 pub struct TripleAccelParams;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-pub struct WfaParams;
+pub struct WfaParams {
+    pub memory_model: rust_wfa2::aligner::MemoryModel,
+    pub heuristic: rust_wfa2::aligner::Heuristic,
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-pub struct Ksw2Params;
+pub enum Ksw2Method {
+    GlobalGreen,
+    GlobalSuzuki,
+    GlobalSuzukiSse,
+    ExtensionGreen,
+    ExtensionSuzukiSse,
+    DualAffineExtensionGreen,
+    DualAffineExtensionSuzukiSse,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct Ksw2Params {
+    pub method: Ksw2Method,
+}
