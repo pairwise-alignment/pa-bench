@@ -22,13 +22,17 @@ impl AlignerParams for WfaParams {
             AlignmentScope::Score
         };
         let mut aligner = match cost_model {
-            cm if cm.is_unit() => WFAlignerEdit::new(scope, MemoryModel::MemoryLow),
+            cm if cm.is_unit() => WFAlignerEdit::new(scope, MemoryModel::MemoryUltraLow),
             cm if cm.is_linear() => {
-                WFAlignerGapLinear::new(cm.sub, cm.extend, scope, MemoryModel::MemoryLow)
+                WFAlignerGapLinear::new(cm.sub, cm.extend, scope, MemoryModel::MemoryUltraLow)
             }
-            cm if cm.is_affine() => {
-                WFAlignerGapAffine::new(cm.sub, cm.open, cm.extend, scope, MemoryModel::MemoryLow)
-            }
+            cm if cm.is_affine() => WFAlignerGapAffine::new(
+                cm.sub,
+                cm.open,
+                cm.extend,
+                scope,
+                MemoryModel::MemoryUltraLow,
+            ),
             _ => unimplemented!("WFA does not support match bonus!"),
         };
         aligner.set_heuristic(aligner::Heuristic::None);
