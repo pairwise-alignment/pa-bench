@@ -452,6 +452,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4217ad341ebadf8d8e724e264f13e593e0648f5b3e94b3896a5df283be015ecc"
 
 [[package]]
+name = "ksw2-sys"
+version = "0.1.0"
+source = "git+https://github.com/rchikhi/ksw2-sys#59147e4124c18e0fae7d93753c4ba57111b2afb2"
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -867,6 +872,7 @@ dependencies = [
  "cpu-freq",
  "edlib_rs",
  "itertools",
+ "ksw2-sys",
  "libc",
  "pa-bench-types",
  "pa-types",
