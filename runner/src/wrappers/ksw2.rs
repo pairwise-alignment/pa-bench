@@ -7,8 +7,7 @@ pub struct Ksw2 {
     params: Ksw2Params,
     trace: bool,
     encoding: [u8; 256],
-    score_model: ScoreModel,
-    score_matrix: [i8; (M + 1) * (M + 1)],
+    score_matrix: [i8; M * M],
     open: i8,
     extend: i8,
 }
@@ -17,13 +16,10 @@ impl AlignerParams for Ksw2Params {
     type Aligner = Ksw2;
 
     fn new(self, cost_model: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
-        let score_model = ScoreModel::from_costs(cost_model);
-        let mut score_matrix = [0; (M + 1) * (M + 1)];
+        let mut score_matrix = [0; M * M];
         for i in 0..M {
             for j in 0..M {
-                score_matrix[((M + 1) * i + j) as usize] =
-                    //if i == j { 0 } else { -cost_model.sub as i8 };
-                    if i == j { score_model.r#match as i8} else { score_model.sub as i8 };
+                score_matrix[(M * i + j) as usize] = if i == j { 0 } else { -cost_model.sub as i8 };
             }
         }
 
@@ -36,12 +32,9 @@ impl AlignerParams for Ksw2Params {
             params: self,
             trace,
             encoding,
-            score_model,
             score_matrix,
-            // open: (cost_model.open + cost_model.extend) as _,
-            // extend: cost_model.extend as _,
-            open: -(score_model.open + score_model.extend) as _,
-            extend: -score_model.extend as _,
+            open: cost_model.open as _,
+            extend: cost_model.extend as _,
         }
     }
 
@@ -72,7 +65,7 @@ impl Aligner for Ksw2 {
                 a_mapped.as_ptr(),
                 b_mapped.len() as i32,
                 b_mapped.as_ptr(),
-                (M + 1) as i8,
+                M as i8,
                 // Scoring matrix and gap penalties
                 self.score_matrix.as_ptr(),
                 self.open,
@@ -93,9 +86,8 @@ impl Aligner for Ksw2 {
             let cigar = self.trace.then(|| {
                 // TODO: free output.cigar using the kfree function somehow
                 let cigar = std::slice::from_raw_parts_mut(output.cigar, output.n_cigar as usize);
-                eprintln!("REsolve cigar..\n");
                 Cigar::resolve_matches(
-                    cigar.into_iter().rev().map(|&mut val| {
+                    cigar.into_iter().map(|&mut val| {
                         let val = (
                             match val & 15 {
                                 // NOTE: This Match will be resolved to Match or Sub as needed.
@@ -108,18 +100,13 @@ impl Aligner for Ksw2 {
                             },
                             val / 16,
                         );
-                        eprintln!("{val:?}");
                         val
                     }),
                     &a_mapped,
                     &b_mapped,
                 )
             });
-            let cost = self.score_model.global_cost(output.score, a.len(), b.len());
-            eprintln!(
-                "{:?}\nscore: {} cost: {cost}",
-                self.score_model, output.score
-            );
+            let cost = -output.score;
             (cost, cigar)
         }
     }
