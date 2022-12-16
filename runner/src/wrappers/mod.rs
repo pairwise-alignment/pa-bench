@@ -3,6 +3,7 @@ use pa_types::*;
 
 mod block_aligner;
 mod edlib;
+mod ksw2;
 mod parasail;
 mod triple_accel;
 mod wfa;
@@ -46,5 +47,6 @@ pub fn get_aligner(
         Edlib(params) => Box::new(params.new(cm, trace, max_len)),
         TripleAccel(params) => Box::new(params.new(cm, trace, max_len)),
         Wfa(params) => Box::new(params.new(cm, trace, max_len)),
+        Ksw2(params) => Box::new(params.new(cm, trace, max_len)),
     }
 }

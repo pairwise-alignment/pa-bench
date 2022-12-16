@@ -665,6 +665,7 @@ version = "0.1.0"
 dependencies = [
  "pa-generate",
  "pa-types",
+ "rust-wfa2",
  "serde",
 ]
 
@@ -685,7 +686,7 @@ dependencies = [
 [[package]]
 name = "pa-types"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-types#5db732a9fac47cecc42a60e52d51f3b8644f0685"
+source = "git+https://github.com/pairwise-alignment/pa-types#5deedc31f68858ceb372ebce6c82fd8939f7803f"
 dependencies = [
  "itertools",
  "parse-size",
@@ -887,8 +888,9 @@ dependencies = [
 [[package]]
 name = "rust-wfa2"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/rust-wfa2#ed8e9b3df3afc794aaaffbb3b3a41b77d64e2536"
+source = "git+https://github.com/pairwise-alignment/rust-wfa2#86467bd2e29df31e20f2314797b18b08f88b5e2c"
 dependencies = [
+ "serde",
  "wfa2-sys",
 ]
 
@@ -1106,7 +1108,7 @@ checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 [[package]]
 name = "wfa2-sys"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/rust-wfa2#ed8e9b3df3afc794aaaffbb3b3a41b77d64e2536"
+source = "git+https://github.com/pairwise-alignment/rust-wfa2#86467bd2e29df31e20f2314797b18b08f88b5e2c"
 dependencies = [
  "bindgen 0.63.0",
  "cc",

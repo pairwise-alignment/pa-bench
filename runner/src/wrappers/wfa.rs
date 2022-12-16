@@ -15,28 +15,32 @@ pub struct Wfa {
 impl AlignerParams for WfaParams {
     type Aligner = Wfa;
 
-    fn default(cost_model: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(self, cost_model: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         let scope = if trace {
             AlignmentScope::Alignment
         } else {
             AlignmentScope::Score
         };
         let mut aligner = match cost_model {
-            cm if cm.is_unit() => WFAlignerEdit::new(scope, MemoryModel::MemoryUltraLow),
+            cm if cm.is_unit() => WFAlignerEdit::new(scope, self.memory_model),
             cm if cm.is_linear() => {
-                WFAlignerGapLinear::new(cm.sub, cm.extend, scope, MemoryModel::MemoryUltraLow)
+                WFAlignerGapLinear::new(cm.sub, cm.extend, scope, self.memory_model)
             }
-            cm if cm.is_affine() => WFAlignerGapAffine::new(
-                cm.sub,
-                cm.open,
-                cm.extend,
-                scope,
-                MemoryModel::MemoryUltraLow,
-            ),
+            cm if cm.is_affine() => {
+                WFAlignerGapAffine::new(cm.sub, cm.open, cm.extend, scope, self.memory_model)
+            }
             _ => unimplemented!("WFA does not support match bonus!"),
         };
-        aligner.set_heuristic(aligner::Heuristic::None);
+        aligner.set_heuristic(self.heuristic);
         Wfa { aligner }
+    }
+
+    fn default(cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
+        Self {
+            memory_model: MemoryModel::MemoryUltraLow,
+            heuristic: aligner::Heuristic::None,
+        }
+        .new(cm, trace, max_len)
     }
 }
 
