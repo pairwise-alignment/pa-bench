@@ -1,42 +1,51 @@
 datasets:
-  - !Generate
-    prefix: "generated"
-    seed: 31415
-    total_size: 10000
-    error_models:
-      - Uniform
-      # - NoisyInsert
-      # - NoisyDelete
-      # - NoisyMove
-      # - NoisyDuplicate
-      # - SymmetricRepeat
-    error_rates: [0.001, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
-    #error_rates: [0.1]
-    lengths: [
-        100,
-        200,
-        350,
-        500,
-        1000,
-        2000,
-        3500,
-        5000,
-        10000,
-        # 20000,
-        # 35000,
-        # 50000,
-        # 100000,
-      ]
   # - !Data
   #   - - CGCTGGCTGCTGCCACTAACTCCGTATAGTCTCACCAAGT
   #     - CGCTGGCTCGCCTGCCACGTAACTCCGTATAGTCTCACCAACTGTCAGTT
+     - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
+       - ACAGGTACACCACTATCACGACAAGTTGGGTC
+  # - !Generate
+  #   prefix: "generated"
+  #   seed: 31415
+  #   total_size: 1000000
+  #   error_models:
+  #     - Uniform
+  #     - NoisyInsert
+  #     # - NoisyDelete
+  #     # - NoisyMove
+  #     # - NoisyDuplicate
+  #     # - SymmetricRepeat
+  #   #error_rates: [0.01, 0.02, 0.05, 0.10, 0.20, 0.30]
+  #   error_rates: [0.25]
+  #   lengths: [
+  #       # 5,
+  #       # 10,
+  #       # 20,
+  #       # 30,
+  #       40,
+  #       # 50,
+  #       #60,
+  #       #100,
+  #       #200,
+  #       # 500,
+  #       # 1000,
+  #       # 2000,
+  #       # 5000,
+  #       # 10000,
+  #       # 20000,
+  #       # 50000,
+  #       # 100000,
+  #     ]
+
 traces:
-  - false
+  #- false
   - true
+
 costs:
   - { sub: 1, open: 0, extend: 1 }
-  - { sub: 1, open: 0, extend: 2 }
-  - { sub: 2, open: 3, extend: 2 }
+  #- { sub: 1, open: 0, extend: 2 }
+  #- { sub: 2, open: 3, extend: 2 }
+  #
 algos:
   # - !BlockAligner
   #   min_size: 64
@@ -47,13 +56,33 @@ algos:
   # - !Wfa
   #   memory_model: !MemoryUltraLow
   #   heuristic: !None
-  - !Ksw2
-    method: !GlobalGreen
-  - !Ksw2
-    method: !GlobalSuzuki
+  # - !Ksw2
+  #   method: !GlobalGreen
+  #   band_doubling: false
+  # - !Ksw2
+  #   method: !GlobalSuzuki
+  #   band_doubling: false
+  # - !Ksw2
+  #   method: !ExtensionGreen
+  #   band_doubling: false
   - !Ksw2
     method: !GlobalSuzukiSse
-  - !Ksw2
-    method: !ExtensionGreen
+    band_doubling: false
   - !Ksw2
     method: !ExtensionSuzukiSse
+    band_doubling: false
+  # - !Ksw2
+  #   method: !GlobalGreen
+  #   band_doubling: true
+  # - !Ksw2
+  #   method: !GlobalSuzuki
+  #   band_doubling: true
+  # - !Ksw2
+  #   method: !ExtensionGreen
+  #   band_doubling: true
+  - !Ksw2
+    method: !GlobalSuzukiSse
+    band_doubling: true
+  - !Ksw2
+    method: !ExtensionSuzukiSse
+    band_doubling: true
