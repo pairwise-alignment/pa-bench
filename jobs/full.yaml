@@ -5,11 +5,11 @@ datasets:
     total_size: 100000
     error_models:
       - Uniform
-      - NoisyInsert
-      - NoisyDelete
-      - NoisyMove
-      - NoisyDuplicate
-      - SymmetricRepeat
+      # - NoisyInsert
+      # - NoisyDelete
+      # - NoisyMove
+      # - NoisyDuplicate
+      # - SymmetricRepeat
     error_rates: [0.001, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
     lengths:
       [
@@ -32,8 +32,8 @@ traces:
   - true
 costs:
   - { sub: 1, open: 0, extend: 1 }
-  - { sub: 1, open: 0, extend: 2 }
-  - { sub: 2, open: 3, extend: 2 }
+  # - { sub: 1, open: 0, extend: 2 }
+  # - { sub: 2, open: 3, extend: 2 }
 algos:
   - !BlockAligner
     min_size: 64
