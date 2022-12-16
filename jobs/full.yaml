@@ -53,13 +53,15 @@ algos:
   - !Wfa
     memory_model: !MemoryHigh
     heuristic: !None
-  - !Ksw2
-    method: !GlobalGreen
-  - !Ksw2
-    method: !GlobalSuzuki
+      # - !Ksw2
+      #   method: !GlobalGreen
+      # - !Ksw2
+      #   method: !GlobalSuzuki
+      # - !Ksw2
+      #   method: !ExtensionGreen
+
+
   - !Ksw2
     method: !GlobalSuzukiSse
-  - !Ksw2
-    method: !ExtensionGreen
   - !Ksw2
     method: !ExtensionSuzukiSse
