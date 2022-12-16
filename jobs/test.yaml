@@ -31,9 +31,9 @@ traces:
   #- false
   - true
 costs:
-  - { match: 0, sub: 1, open: 0, extend: 1 }
-  #- { match: 0, sub: 1, open: 0, extend: 2 }
-  #- { match: 0, sub: 2, open: 3, extend: 2 }
+  - { sub: 1, open: 0, extend: 1 }
+  #- { sub: 1, open: 0, extend: 2 }
+  #- { sub: 2, open: 3, extend: 2 }
 algos:
   # - !BlockAligner
   #     min_size: 64
