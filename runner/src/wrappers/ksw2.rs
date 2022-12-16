@@ -72,7 +72,7 @@ impl Aligner for Ksw2 {
                 a_mapped.as_ptr(),
                 b_mapped.len() as i32,
                 b_mapped.as_ptr(),
-                M as i8,
+                (M + 1) as i8,
                 // Scoring matrix and gap penalties
                 self.score_matrix.as_ptr(),
                 self.open,
@@ -86,10 +86,12 @@ impl Aligner for Ksw2 {
                 // 0
                 // flag:
                 // https://github.com/lh3/ksw2/blob/master/ksw2.h#L8
+                // (seems like it can just be 0 for our use case)
                 if self.trace { 0 } else { 1 },
                 &mut output,
             );
             let cigar = self.trace.then(|| {
+                // TODO: free output.cigar using the kfree function somehow
                 let cigar = std::slice::from_raw_parts_mut(output.cigar, output.n_cigar as usize);
                 eprintln!("REsolve cigar..\n");
                 Cigar::resolve_matches(
