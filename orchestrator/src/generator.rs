@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use std::collections::hash_map::DefaultHasher;
 use std::fs;
+use std::hash::{Hash, Hasher};
+use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 
 use itertools::iproduct;
@@ -21,6 +24,7 @@ pub struct JobsGenerator {
 pub enum Dataset {
     Generate(DataGenerator),
     File(PathBuf),
+    Data(Vec<(String, String)>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -56,6 +60,18 @@ impl Dataset {
         match self {
             Dataset::Generate(generator) => generator.generate(data_dir),
             Dataset::File(path) => vec![(path.clone(), None)],
+            Dataset::Data(data) => {
+                let mut state = DefaultHasher::new();
+                data.hash(&mut state);
+                let path = data_dir.join(format!("manual/{}.seq", state.finish()));
+                std::fs::create_dir_all(&path.parent().unwrap()).unwrap();
+                let mut f = BufWriter::new(std::fs::File::create(&path).unwrap());
+                for (a, b) in data {
+                    writeln!(f, ">{a}").unwrap();
+                    writeln!(f, "<{b}").unwrap();
+                }
+                vec![(path, None)]
+            }
         }
     }
 }
