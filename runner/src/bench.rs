@@ -57,11 +57,15 @@ pub fn set_limits(time: Duration, mem: Bytes) {
 }
 
 fn get_cpu_freq() -> Option<f32> {
-    // TODO(ragnar): check how accurate this returned value actually is.
-    // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
-    // NOTE: When the process is pinned to a single core this always returns the frequency of core 0.
-    //let cur_cpu = unsafe { libc::sched_getcpu() };
-    cpu_freq::get()[0 as usize].cur
+    if cfg!(target_os = "macos") {
+        None
+    } else {
+        // TODO(ragnar): check how accurate this returned value actually is.
+        // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
+        // NOTE: When the process is pinned to a single core this always returns the frequency of core 0.
+        //let cur_cpu = unsafe { libc::sched_getcpu() };
+        cpu_freq::get()[0 as usize].cur
+    }
 }
 
 fn get_cpu_clock() -> Option<u64> {
