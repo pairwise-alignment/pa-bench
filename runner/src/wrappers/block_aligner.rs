@@ -117,13 +117,14 @@ impl Aligner for BlockAligner {
                             operations
                                 .push((if prev { CigarOp::Match } else { CigarOp::Sub }, curr_len));
                         }
+                        // I and D are opposite of Ins and Del
                         ::block_aligner::cigar::Operation::I => {
                             i += len;
-                            operations.push((CigarOp::Ins, len as _));
+                            operations.push((CigarOp::Del, len as _));
                         }
                         ::block_aligner::cigar::Operation::D => {
                             j += len;
-                            operations.push((CigarOp::Del, len as _));
+                            operations.push((CigarOp::Ins, len as _));
                         }
                         _ => (),
                     }

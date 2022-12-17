@@ -2,7 +2,7 @@ datasets:
   - !Generate
     prefix: "generated"
     seed: 31415
-    total_size: 10000
+    total_size: 100000
     error_models:
       - Uniform
       # - NoisyInsert
@@ -37,7 +37,7 @@ algos:
     min_size: 32
     max_size: 1024
   - !ParasailStriped
-  # - !Edlib
+  - !Edlib
   - !TripleAccel
   - !Wfa
     memory_model: !MemoryUltraLow
