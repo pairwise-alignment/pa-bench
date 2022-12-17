@@ -2,7 +2,7 @@ datasets:
   - !Generate
     prefix: "generated"
     seed: 31415
-    total_size: 100000
+    total_size: 10000
     error_models:
       - Uniform
       # - NoisyInsert
@@ -22,10 +22,10 @@ datasets:
         3500,
         5000,
         10000,
-        20000,
-        35000,
-        50000,
-        100000,
+        # 20000,
+        # 35000,
+        # 50000,
+        # 100000,
       ]
 traces:
   - false

@@ -689,7 +689,7 @@ dependencies = [
 [[package]]
 name = "pa-types"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-types#340dcb13442ef72dd934db29acf5f8eade0028e7"
+source = "git+https://github.com/pairwise-alignment/pa-types#4caf896c632102131bfbf54fe83f8eda6bceed31"
 dependencies = [
  "itertools",
  "parse-size",

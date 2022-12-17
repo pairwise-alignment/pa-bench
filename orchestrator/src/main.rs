@@ -60,6 +60,16 @@ struct Args {
     /// Skip jobs already present in the results file.
     #[arg(long)]
     incremental: bool,
+
+    /// Verbose runner outputs.
+    #[arg(short, long)]
+    verbose: bool,
+
+    /// Force rerun dataset generation and all jobs.
+    ///
+    /// Helpful for making sure all files are up to date.
+    #[arg(long)]
+    force_rerun: bool,
 }
 
 fn main() {
@@ -79,7 +89,7 @@ fn main() {
         .unwrap();
 
     // Read the existing results file.
-    let mut existing_job_results: Vec<JobResult> = if args.results.is_file() {
+    let mut existing_job_results: Vec<JobResult> = if !args.force_rerun && args.results.is_file() {
         serde_json::from_str(&fs::read_to_string(&args.results).unwrap()).unwrap()
     } else {
         vec![]
@@ -87,10 +97,10 @@ fn main() {
 
     eprintln!("There are {} existing jobs!", existing_job_results.len());
     eprintln!("Generating jobs and datasets...");
-    let jobs = generator.generate(&args.data_dir);
+    let jobs = generator.generate(&args.data_dir, args.force_rerun);
     eprintln!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
-    let jobs = if args.incremental {
+    let jobs = if args.incremental && !args.force_rerun {
         jobs.into_iter()
             .filter(|job| {
                 existing_job_results
@@ -132,17 +142,21 @@ fn main() {
         runner_cores,
         args.nice,
         args.stderr,
+        args.verbose,
     );
-    // Remove jobs that were run from existing results.
-    existing_job_results = existing_job_results
-        .into_iter()
-        .filter(|existing_job| {
-            job_results
-                .iter()
-                .find(|job| job.job == existing_job.job)
-                .is_none()
-        })
-        .collect();
+
+    if !args.force_rerun {
+        // Remove jobs that were run from existing results.
+        existing_job_results = existing_job_results
+            .into_iter()
+            .filter(|existing_job| {
+                job_results
+                    .iter()
+                    .find(|job| job.job == existing_job.job)
+                    .is_none()
+            })
+            .collect();
+    }
     let job_results_len = job_results.len();
     // Append new results to existing results.
     existing_job_results.extend(job_results);
@@ -199,6 +213,7 @@ fn run_with_threads(
     cores: Option<Vec<usize>>,
     nice: Option<i32>,
     show_stderr: bool,
+    verbose: bool,
 ) -> Vec<JobResult> {
     let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
@@ -245,7 +260,7 @@ fn run_with_threads(
                     let job_result = if skip {
                         JobResult { job, output: None }
                     } else {
-                        run_job(runner, job, time_limit, mem_limit, *id, nice, show_stderr)
+                        run_job(runner, job, time_limit, mem_limit, *id, nice, show_stderr, verbose)
                     };
 
                     // If the orchestrator was aborted, do not push failing job results.
@@ -268,6 +283,7 @@ fn run_job(
     core_id: Option<usize>,
     nice: Option<i32>,
     show_stderr: bool,
+    verbose: bool,
 ) -> JobResult {
     let mut cmd = Command::new(runner);
     cmd.arg("--time-limit")
@@ -280,6 +296,9 @@ fn run_job(
     if let Some(nice) = nice {
         // negative numbers need to be passed with =.
         cmd.arg(format!("--nice={nice}"));
+    }
+    if verbose {
+        cmd.arg("--verbose");
     }
     cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
     if !show_stderr {
