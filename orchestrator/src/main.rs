@@ -260,7 +260,16 @@ fn run_with_threads(
                     let job_result = if skip {
                         JobResult { job, output: None }
                     } else {
-                        run_job(runner, job, time_limit, mem_limit, *id, nice, show_stderr, verbose)
+                        run_job(
+                            runner,
+                            job,
+                            time_limit,
+                            mem_limit,
+                            *id,
+                            nice,
+                            show_stderr,
+                            verbose,
+                        )
                     };
 
                     // If the orchestrator was aborted, do not push failing job results.

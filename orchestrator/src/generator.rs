@@ -56,7 +56,11 @@ impl JobsGenerator {
 }
 
 impl Dataset {
-    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
+    pub fn generate(
+        self,
+        data_dir: &Path,
+        force_rerun: bool,
+    ) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         match self {
             Dataset::Generate(generator) => generator.generate(data_dir, force_rerun),
             Dataset::File(path) => vec![(path.clone(), None)],
@@ -78,7 +82,11 @@ impl Dataset {
 
 impl DataGenerator {
     /// Generates missing `.seq` files in a directory and returns them.
-    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
+    pub fn generate(
+        self,
+        data_dir: &Path,
+        force_rerun: bool,
+    ) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         let dir = data_dir.join(&self.prefix);
         fs::create_dir_all(&dir).unwrap();
 
