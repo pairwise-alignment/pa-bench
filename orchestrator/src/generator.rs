@@ -38,11 +38,11 @@ pub struct DataGenerator {
 }
 
 impl JobsGenerator {
-    pub fn generate(self, data_dir: &Path) -> Vec<Job> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Job> {
         let datasets = self
             .datasets
             .into_iter()
-            .flat_map(|d| d.generate(data_dir).into_iter());
+            .flat_map(|d| d.generate(data_dir, force_rerun).into_iter());
         iproduct!(datasets, self.costs, self.traces, self.algos)
             .map(|((dataset, meta), costs, traceback, algo)| Job {
                 dataset,
@@ -56,9 +56,9 @@ impl JobsGenerator {
 }
 
 impl Dataset {
-    pub fn generate(self, data_dir: &Path) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         match self {
-            Dataset::Generate(generator) => generator.generate(data_dir),
+            Dataset::Generate(generator) => generator.generate(data_dir, force_rerun),
             Dataset::File(path) => vec![(path.clone(), None)],
             Dataset::Data(data) => {
                 let mut state = DefaultHasher::new();
@@ -78,7 +78,7 @@ impl Dataset {
 
 impl DataGenerator {
     /// Generates missing `.seq` files in a directory and returns them.
-    pub fn generate(self, data_dir: &Path) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         let dir = data_dir.join(&self.prefix);
         fs::create_dir_all(&dir).unwrap();
 
@@ -88,7 +88,7 @@ impl DataGenerator {
                     "{error_model:?}-t{}-n{length}-e{error_rate}.seq",
                     self.total_size
                 ));
-                if !path.exists() {
+                if force_rerun || !path.exists() {
                     GenerateArgs {
                         options: GenerateOptions {
                             length,

@@ -31,6 +31,8 @@ struct Args {
     // process niceness. <0 for higher priority.
     #[arg(long)]
     nice: Option<i32>,
+    #[arg(short, long)]
+    verbose: bool,
 }
 
 fn main() {
@@ -60,6 +62,10 @@ fn main() {
         "Job dataset {} does not have extension .seq.",
         job.dataset.display()
     );
+
+    if args.verbose {
+        eprintln!("\nRunning job:\n{job:?}");
+    }
 
     // NOTE: Although we could read and process the pairs in the dataset in streaming
     // manner, that complicates the time and memory measurement.
