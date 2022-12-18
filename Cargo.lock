@@ -92,7 +92,7 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 [[package]]
 name = "block-aligner"
 version = "0.3.0"
-source = "git+https://github.com/Daniel-Liu-c0deb0t/block-aligner#31df4d210c7b1ad5cd6d5d05cde6de7fd0090a84"
+source = "git+https://github.com/Daniel-Liu-c0deb0t/block-aligner#eb523d267edc2f4bafda1802520a5d504adbfd0c"
 dependencies = [
  "cbindgen",
  "rand",

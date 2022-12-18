@@ -84,51 +84,21 @@ impl Aligner for BlockAligner {
                 let mut ba_cigar = ::block_aligner::cigar::Cigar::new(self.a.len(), self.b.len());
                 block
                     .trace()
-                    .cigar(self.a.len(), self.b.len(), &mut ba_cigar);
-                let (mut i, mut j) = (0, 0);
-                let mut operations = Vec::with_capacity(ba_cigar.len());
-
-                for idx in 0..ba_cigar.len() {
-                    let ::block_aligner::cigar::OpLen { op, len } = ba_cigar.get(idx);
-
-                    match op {
-                        ::block_aligner::cigar::Operation::M => {
-                            let mut prev = a[i] == b[j];
-                            let mut curr_len = 1;
-                            i += 1;
-                            j += 1;
-
-                            for _ in 1..len {
-                                let eq = a[i] == b[j];
-                                if prev == eq {
-                                    curr_len += 1;
-                                } else {
-                                    operations.push((
-                                        if prev { CigarOp::Match } else { CigarOp::Sub },
-                                        curr_len,
-                                    ));
-                                    prev = eq;
-                                    curr_len = 1;
-                                }
-                                i += 1;
-                                j += 1;
-                            }
-
-                            operations
-                                .push((if prev { CigarOp::Match } else { CigarOp::Sub }, curr_len));
-                        }
-                        // I and D are opposite of Ins and Del
-                        ::block_aligner::cigar::Operation::I => {
-                            i += len;
-                            operations.push((CigarOp::Del, len as _));
-                        }
-                        ::block_aligner::cigar::Operation::D => {
-                            j += len;
-                            operations.push((CigarOp::Ins, len as _));
-                        }
-                        _ => (),
-                    }
-                }
+                    .cigar_eq(&self.a, &self.b, self.a.len(), self.b.len(), &mut ba_cigar);
+                let operations = (0..ba_cigar.len())
+                    .map(|i| {
+                        ::block_aligner::cigar::OpLen { op, len } = ba_cigar.get(i);
+                        let op = match op {
+                            ::block_aligner::cigar::Operation::Eq => CigarOp::Match,
+                            ::block_aligner::cigar::Operation::X => CigarOp::Sub,
+                            // I and D are opposite of Ins and Del
+                            ::block_aligner::cigar::Operation::D => CigarOp::Ins,
+                            ::block_aligner::cigar::Operation::I => CigarOp::Del,
+                            _ => unreachable!(),
+                        };
+                        (op, len as _)
+                    })
+                    .collect();
 
                 (
                     self.s.global_cost(block.res().score, a.len(), b.len()),
