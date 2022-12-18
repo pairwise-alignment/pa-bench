@@ -9,6 +9,8 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
+use std::os::unix::process::ExitStatusExt;
+
 use serde_json;
 use serde_yaml;
 
@@ -332,6 +334,13 @@ fn run_job(
             ),
         }
     } else {
+        if show_stderr {
+            if let Some(code) = output.status.signal() {
+                if code == 24 {
+                    eprintln!("Time limit exceeded for {job:?}");
+                }
+            }
+        }
         JobResult { job, output: None }
     }
 }
