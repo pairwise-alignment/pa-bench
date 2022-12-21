@@ -109,9 +109,11 @@ fn main() {
 
     let mut costs = Vec::with_capacity(sequence_pairs.len());
     let mut cigars = Vec::with_capacity(sequence_pairs.len());
+    let mut exact = false;
 
     let measured = measure(|| {
-        let mut aligner = get_aligner(job.algo, job.costs, job.traceback, max_len);
+        let (mut aligner, is_exact) = get_aligner(job.algo, job.costs, job.traceback, max_len);
+        exact = is_exact;
         sequence_pairs.iter().for_each(|(a, b)| {
             let (cost, cigar) = aligner.align(a, b);
             costs.push(cost);
@@ -146,6 +148,7 @@ fn main() {
     let output = JobOutput {
         costs,
         //cigars,
+        exact,
         measured,
     };
     println!("{}", serde_json::to_string(&output).unwrap());

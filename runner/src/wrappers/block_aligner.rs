@@ -50,6 +50,10 @@ impl AlignerParams for BlockAlignerParams {
             s,
         }
     }
+
+    fn is_exact(&self) -> bool {
+        false
+    }
 }
 
 impl Aligner for BlockAligner {

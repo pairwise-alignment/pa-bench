@@ -22,6 +22,10 @@ impl AlignerParams for TripleAccelParams {
         );
         Self::Aligner { costs, trace }
     }
+
+    fn is_exact(&self) -> bool {
+        true
+    }
 }
 
 impl Aligner for TripleAccel {
