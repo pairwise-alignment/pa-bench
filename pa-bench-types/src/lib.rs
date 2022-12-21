@@ -127,6 +127,7 @@ pub struct Measured {
 pub struct JobOutput {
     pub costs: Vec<Cost>,
     //pub cigars: Vec<Cigar>,
+    pub exact: bool,
     pub measured: Measured,
 }
 

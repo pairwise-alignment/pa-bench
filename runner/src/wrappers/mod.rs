@@ -23,6 +23,9 @@ pub trait AlignerParams {
     fn default(_cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
         unimplemented!("This aligner does not support default parameters.");
     }
+
+    /// Is the aligner exact?
+    fn is_exact(&self) -> bool;
 }
 
 /// Generic pairwise global alignment interface.
@@ -39,14 +42,14 @@ pub fn get_aligner(
     cm: CostModel,
     trace: bool,
     max_len: usize,
-) -> Box<dyn Aligner> {
+) -> (Box<dyn Aligner>, bool) {
     use AlgorithmParams::*;
     match algo {
-        BlockAligner(params) => Box::new(params.new(cm, trace, max_len)),
-        ParasailStriped(params) => Box::new(params.new(cm, trace, max_len)),
-        Edlib(params) => Box::new(params.new(cm, trace, max_len)),
-        TripleAccel(params) => Box::new(params.new(cm, trace, max_len)),
-        Wfa(params) => Box::new(params.new(cm, trace, max_len)),
-        Ksw2(params) => Box::new(params.new(cm, trace, max_len)),
+        BlockAligner(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
+        ParasailStriped(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
+        Edlib(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
+        TripleAccel(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
+        Wfa(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
+        Ksw2(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
     }
 }

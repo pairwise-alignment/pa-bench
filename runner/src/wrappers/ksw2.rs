@@ -50,6 +50,10 @@ impl AlignerParams for Ksw2Params {
         }
         .new(cm, trace, max_len)
     }
+
+    fn is_exact(&self) -> bool {
+        true
+    }
 }
 
 impl Aligner for Ksw2 {

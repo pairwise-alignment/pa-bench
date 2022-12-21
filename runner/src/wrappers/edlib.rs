@@ -17,6 +17,10 @@ impl AlignerParams for EdlibParams {
         }
         Self::Aligner { config }
     }
+
+    fn is_exact(&self) -> bool {
+        true
+    }
 }
 
 impl Aligner for Edlib {

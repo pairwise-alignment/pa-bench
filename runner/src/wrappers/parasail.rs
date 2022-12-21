@@ -22,6 +22,10 @@ impl AlignerParams for ParasailStripedParams {
             s,
         }
     }
+
+    fn is_exact(&self) -> bool {
+        true
+    }
 }
 
 impl Aligner for ParasailStriped {
