@@ -213,7 +213,7 @@ fn verify_costs(mut results: Vec<JobResult>) -> Vec<JobResult> {
                         let mut res = result.clone();
                         res.output.as_mut().unwrap().exact_costs = Some(output2.costs.clone());
                         let num_correct = output.costs.iter().zip(&output2.costs).filter(|(&a, &b)| a == b).count();
-                        res.output.as_mut().unwrap().p_correct = (num_correct as f32) / (output.costs.len() as f32);
+                        res.output.as_mut().unwrap().p_correct = Some((num_correct as f32) / (output.costs.len() as f32));
                         return res;
                     }
                 }

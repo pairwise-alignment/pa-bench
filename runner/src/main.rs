@@ -150,7 +150,7 @@ fn main() {
         exact_costs: None,
         //cigars,
         exact,
-        p_correct: 1.0f32,
+        p_correct: None,
         measured,
     };
     println!("{}", serde_json::to_string(&output).unwrap());

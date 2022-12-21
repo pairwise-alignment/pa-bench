@@ -131,7 +131,7 @@ pub struct JobOutput {
     //pub cigars: Vec<Cigar>,
     pub exact: bool,
     /// Proportion of correct costs.
-    pub p_correct: f32,
+    pub p_correct: Option<f32>,
     pub measured: Measured,
 }
 
