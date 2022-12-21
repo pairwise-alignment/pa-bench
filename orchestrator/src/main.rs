@@ -168,43 +168,60 @@ fn main() {
         existing_job_results.len()
     );
 
+    let job_results = verify_costs(existing_job_results);
+
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
     }
-    fs::write(
-        &args.results,
-        &serde_json::to_string(&existing_job_results).unwrap(),
-    )
-    .expect(&format!(
+    fs::write(&args.results, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
         "Failed to write results to {}",
         args.results.display()
     ));
 
-    // Note: results are written before this check, to not discard useful data.
-    verify_costs(&existing_job_results);
+    println!("Orchestrator successfully finished!");
 }
 
-fn verify_costs(results: &[JobResult]) {
-    for (i, result) in results.iter().enumerate() {
+/// Verify costs for exact algorithms and count correct costs for approximate algorithms.
+fn verify_costs(mut results: Vec<JobResult>) -> Vec<JobResult> {
+    // Ensure exact algorithms are first in results.
+    results.sort_by_key(|res| !res.output.as_ref().map(|o| o.exact).unwrap_or(false));
+
+    results.iter().enumerate().map(|(i, result)| {
         if result.output.is_err() {
-            continue;
+            return result.clone();
         }
+        let output = result.output.as_ref().unwrap();
+
         // Find the first job with the same input and compare costs.
         for result2 in &results[..i] {
-            if result2.job.same_input(&result.job) && result2.output.is_ok() {
-                assert_eq!(
-                    result.output.as_ref().unwrap().costs,
-                    result2.output.as_ref().unwrap().costs,
-                    "\nCosts of jobs are not the same!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}",
-                    result.job,
-                    result2.job,
-                    result.output.as_ref().unwrap().costs,
-                    result2.output.as_ref().unwrap().costs,
-                );
-                break;
+            if result2.output.is_ok() && result2.job.same_input(&result.job) {
+                let output2 = result2.output.as_ref().unwrap();
+
+                if output2.exact {
+                    if output.exact {
+                        assert_eq!(
+                            output.costs,
+                            output2.costs,
+                            "\nIncorrect costs of exact algorithms!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}",
+                            result.job,
+                            result2.job,
+                            output.costs,
+                            output2.costs,
+                        );
+                        return result.clone();
+                    } else {
+                        let mut res = result.clone();
+                        res.output.as_mut().unwrap().exact_costs = Some(output2.costs.clone());
+                        let num_correct = output.costs.iter().zip(&output2.costs).filter(|(&a, &b)| a == b).count();
+                        res.output.as_mut().unwrap().p_correct = (num_correct as f32) / (output.costs.len() as f32);
+                        return res;
+                    }
+                }
             }
         }
-    }
+
+        result.clone()
+    }).collect()
 }
 
 fn run_with_threads(

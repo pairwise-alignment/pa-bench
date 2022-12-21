@@ -79,7 +79,7 @@ impl Dataset {
 }
 
 /// An alignment job: a single task for the runner to execute and benchmark.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Job {
     /// Path to a `.seq` file.
     pub dataset: Dataset,
@@ -123,16 +123,20 @@ pub struct Measured {
 }
 
 /// The output of an alignment job.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobOutput {
     pub costs: Vec<Cost>,
+    /// Corresponding exact costs if the job is approximate.
+    pub exact_costs: Option<Vec<Cost>>,
     //pub cigars: Vec<Cigar>,
     pub exact: bool,
+    /// Proportion of correct costs.
+    pub p_correct: f32,
     pub measured: Measured,
 }
 
 /// The result of an alignment job, containing the input and output.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobResult {
     pub job: Job,
     // TODO(ragnar): Make this a result with a specific error type that indicates the failure reason.
