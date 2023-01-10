@@ -8,51 +8,107 @@ use pa_types::*;
 mod algorithms;
 pub use crate::algorithms::*;
 
-/// Metadata for a generated file. When a method fails on a dataset, all
-/// datasets with the same `error_model` and larger `error_rate` and/or `length`
-/// are skipped.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct DatasetMetadata {
+pub struct GeneratedDataset {
+    pub prefix: PathBuf,
+    pub seed: u64,
     pub error_model: ErrorModel,
     pub error_rate: f32,
     pub length: usize,
+    pub total_size: usize,
+    pub pattern_length: Option<usize>,
 }
 
-/// We promise that the `f32` error rate will never be NaN.
-impl Eq for DatasetMetadata {}
+impl GeneratedDataset {
+    pub fn is_larger_than(&self, o: &Self) -> bool {
+        self.error_model == o.error_model
+            && self.pattern_length == o.pattern_length
+            && self.error_rate >= o.error_rate
+            && self.length >= o.length
+            && self.total_size >= o.total_size
+    }
+
+    pub fn path(&self) -> PathBuf {
+        self.prefix.join(format!(
+            "{:?}-t{}-n{}-e{}.seq",
+            self.error_model, self.total_size, self.length, self.error_rate
+        ))
+    }
+
+    pub fn to_generate_args(&self) -> GenerateArgs {
+        let Self {
+            seed,
+            error_model,
+            error_rate,
+            length,
+            total_size,
+            pattern_length,
+            ..
+        } = *self;
+        GenerateArgs {
+            options: GenerateOptions {
+                length,
+                error_rate,
+                error_model,
+                pattern_length,
+            },
+            seed: Some(seed),
+            cnt: None,
+            size: Some(total_size),
+        }
+    }
+}
+
+/// A dataset can be specified in several ways.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub enum Dataset {
+    /// Options to deterministically generate a dataset.
+    Generated(GeneratedDataset),
+    /// Path to a .seq file.
+    File(PathBuf),
+    /// The data itself.
+    /// NOTE: Only use this for testing small inputs.
+    Data(Vec<(String, String)>),
+}
+
+impl Dataset {
+    #[must_use]
+    pub fn is_generated(&self) -> bool {
+        matches!(self, Self::Generated(..))
+    }
+}
 
 /// An alignment job: a single task for the runner to execute and benchmark.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Job {
     /// Path to a `.seq` file.
-    pub dataset: PathBuf,
+    pub dataset: Dataset,
     /// The cost model to use.
     pub costs: CostModel,
     /// Return the full alignment/cigar?
     pub traceback: bool,
     /// The algorithm/parameters to use.
     pub algo: AlgorithmParams,
-
-    /// Metadata of the dataset.
-    /// This is used to skip larger jobs after a smaller one fails.
-    pub meta: Option<DatasetMetadata>,
 }
 
 impl Job {
     /// Whether this job is larger than another job.
+    /// Returns false when either job is not generated.
     pub fn is_larger(&self, o: &Self) -> bool {
-        let self_meta = self.meta.as_ref().unwrap();
-        let other_meta = o.meta.as_ref().unwrap();
+        let Dataset::Generated(self_args) = &self.dataset else {
+            return false;
+        };
+        let Dataset::Generated(o_args) = &o.dataset else {
+            return false;
+        };
         self.costs == o.costs
-            && self.traceback == o.traceback
             && self.algo == o.algo
-            && self_meta.error_model == other_meta.error_model
-            && self_meta.error_rate >= other_meta.error_rate
-            && self_meta.length >= other_meta.length
+            && self.traceback == o.traceback
+            && self_args.is_larger_than(o_args)
     }
 
     pub fn same_input(&self, o: &Self) -> bool {
-        self.dataset == o.dataset && self.costs == o.costs && self.meta == o.meta
+        self.dataset == o.dataset && self.costs == o.costs
     }
 }
 

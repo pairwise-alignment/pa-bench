@@ -54,32 +54,53 @@ fn main() {
         .expect("Error in reading from stdin!");
     let job: Job = serde_json::from_slice(&stdin_job).expect("Error in parsing input json!");
 
-    assert_eq!(
-        job.dataset
-            .extension()
-            .expect("Dataset does not have a file extension"),
-        "seq",
-        "Job dataset {} does not have extension .seq.",
-        job.dataset.display()
-    );
-
     if args.verbose {
         eprintln!("\nRunning job:\n{job:?}");
     }
 
     // NOTE: Although we could read and process the pairs in the dataset in streaming
-    // manner, that complicates the time and memory measurement.
-    let dataset = fs::read(&job.dataset).expect("Could not read dataset file");
-    let sequence_pairs: Vec<(Seq, Seq)> = dataset
-        .split(|&c| c == '\n' as u8)
-        .tuples()
-        .map(|(a, b)| {
-            (
-                a.strip_prefix(b">").expect("Odd lines must start with >"),
-                b.strip_prefix(b"<").expect("Even lines must start with <"),
-            )
-        })
-        .collect();
+    // manner, that complicates the time and memory measurement. Thus, all seqs are read up-front.
+
+    fn read_path<'a>(
+        path: &std::path::PathBuf,
+        file_data: &'a mut Vec<u8>,
+    ) -> Vec<(&'a [u8], &'a [u8])> {
+        assert_eq!(
+            path.extension()
+                .expect("Dataset does not have a file extension"),
+            "seq",
+            "Job dataset {} does not have extension .seq.",
+            path.display()
+        );
+        *file_data = fs::read(&path).expect("Could not read dataset file");
+        file_data
+            .split(|&c| c == '\n' as u8)
+            .tuples()
+            .map(|(a, b)| {
+                (
+                    a.strip_prefix(b">").expect("Odd lines must start with >"),
+                    b.strip_prefix(b"<").expect("Even lines must start with <"),
+                )
+            })
+            .collect()
+    }
+
+    // The seqs are references to the read file or direct input data.
+    // This way all data is stored within one big allocation instead of being spread over many Vecs.
+    let file_data = &mut vec![];
+    let input_data;
+    let sequence_pairs: Vec<(Seq, Seq)> = match &job.dataset {
+        Dataset::Generated(generated_dataset) => read_path(&generated_dataset.path(), file_data),
+        Dataset::File(path) => read_path(path, file_data),
+        Dataset::Data(data) => {
+            input_data = data.clone();
+            input_data
+                .iter()
+                .map(|(a, b)| (a.as_bytes(), b.as_bytes()))
+                .collect()
+        }
+    };
+
     let max_len = sequence_pairs
         .iter()
         .map(|(a, b)| max(a.len(), b.len()))

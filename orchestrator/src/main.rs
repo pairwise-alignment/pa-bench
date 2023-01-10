@@ -247,10 +247,10 @@ fn run_with_threads(
                     }
                     // If a smaller job for the same algorithm failed, skip it.
                     let mut skip = false;
-                    if job.meta.is_some() {
+                    if job.dataset.is_generated() {
                         for prev in job_results.lock().unwrap().iter() {
                             if prev.output.is_err()
-                                && prev.job.meta.is_some()
+                                && prev.job.dataset.is_generated()
                                 && job.is_larger(&prev.job)
                             {
                                 skip = true;

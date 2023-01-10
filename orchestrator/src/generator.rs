@@ -12,6 +12,7 @@ use pa_bench_types::*;
 use pa_generate::*;
 use pa_types::*;
 
+/// The main configuration object and root of the yaml file.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JobsConfig {
     datasets: Vec<DatasetConfig>,
@@ -44,26 +45,21 @@ impl JobsConfig {
             .into_iter()
             .flat_map(|d| d.generate(data_dir, force_rerun).into_iter());
         iproduct!(datasets, self.costs, self.traces, self.algos)
-            .map(|((dataset, meta), costs, traceback, algo)| Job {
+            .map(|(dataset, costs, traceback, algo)| Job {
                 dataset,
                 costs,
                 traceback,
                 algo,
-                meta,
             })
             .collect()
     }
 }
 
 impl DatasetConfig {
-    pub fn generate(
-        self,
-        data_dir: &Path,
-        force_rerun: bool,
-    ) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Dataset> {
         match self {
             DatasetConfig::Generated(generator) => generator.generate(data_dir, force_rerun),
-            DatasetConfig::File(path) => vec![(path.clone(), None)],
+            DatasetConfig::File(path) => vec![Dataset::File(path.clone())],
             DatasetConfig::Data(data) => {
                 let mut state = DefaultHasher::new();
                 data.hash(&mut state);
@@ -74,7 +70,7 @@ impl DatasetConfig {
                     writeln!(f, ">{a}").unwrap();
                     writeln!(f, "<{b}").unwrap();
                 }
-                vec![(path, None)]
+                vec![Dataset::File(path)]
             }
         }
     }
@@ -82,42 +78,26 @@ impl DatasetConfig {
 
 impl DatasetGeneratorConfig {
     /// Generates missing `.seq` files in a directory and returns them.
-    pub fn generate(
-        self,
-        data_dir: &Path,
-        force_rerun: bool,
-    ) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Dataset> {
         let dir = data_dir.join(&self.prefix);
         fs::create_dir_all(&dir).unwrap();
 
         iproduct!(self.error_models, self.error_rates, self.lengths)
             .map(|(error_model, error_rate, length)| {
-                let path = dir.join(format!(
-                    "{error_model:?}-t{}-n{length}-e{error_rate}.seq",
-                    self.total_size
-                ));
+                let generated_dataset = GeneratedDataset {
+                    prefix: dir.clone(),
+                    seed: self.seed,
+                    error_model,
+                    error_rate,
+                    length,
+                    total_size: self.total_size,
+                    pattern_length: None,
+                };
+                let path = generated_dataset.path();
                 if force_rerun || !path.exists() {
-                    GenerateArgs {
-                        options: GenerateOptions {
-                            length,
-                            error_rate,
-                            error_model,
-                            pattern_length: None,
-                        },
-                        seed: Some(self.seed),
-                        cnt: None,
-                        size: Some(self.total_size),
-                    }
-                    .generate_file(&path);
+                    generated_dataset.to_generate_args().generate_file(&path);
                 }
-                (
-                    path,
-                    Some(DatasetMetadata {
-                        error_model,
-                        error_rate,
-                        length,
-                    }),
-                )
+                Dataset::Generated(generated_dataset)
             })
             .collect()
     }
