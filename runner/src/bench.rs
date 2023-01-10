@@ -3,7 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use chrono::Timelike;
+use chrono::SubsecRound;
 use libc;
 use pa_bench_types::Measured;
 use pa_types::Bytes;
@@ -12,21 +12,29 @@ pub fn measure<F>(f: F) -> Measured
 where
     F: FnOnce(),
 {
-    let time_start = chrono::Utc::now().with_nanosecond(0).unwrap();
-    let cpu_freq_start = get_cpu_freq();
-    let start_time = Instant::now();
+    let cpu_start = unsafe { libc::sched_getcpu() };
+    let cpu_freq_start = get_cpu_freq(cpu_start);
     let initial_mem = get_maxrss();
+    let time_start = chrono::Utc::now().trunc_subsecs(3);
+    let start = Instant::now();
 
     f();
 
+    let runtime = start.elapsed().as_secs_f32();
+    let time_end = chrono::Utc::now().trunc_subsecs(3);
+    let memory = get_maxrss().saturating_sub(initial_mem);
+    let cpu_end = unsafe { libc::sched_getcpu() };
+    let cpu_freq_end = get_cpu_freq(cpu_end);
     Measured {
         // fill time-critical data first
-        runtime: start_time.elapsed().as_secs_f32(),
-        time_end: chrono::Utc::now().with_nanosecond(0).unwrap(),
-        memory: get_maxrss().saturating_sub(initial_mem),
-        cpu_freq_end: get_cpu_freq(),
+        runtime,
+        memory,
         time_start,
+        time_end,
+        cpu_start,
+        cpu_end,
         cpu_freq_start,
+        cpu_freq_end,
     }
 }
 
@@ -62,8 +70,7 @@ pub fn set_limits(time: Duration, mem: Bytes) {
     set(libc::RLIMIT_DATA, mem);
 }
 
-fn get_cpu_freq() -> Option<f32> {
-    let cur_cpu = unsafe { libc::sched_getcpu() };
+fn get_cpu_freq(cur_cpu: i32) -> Option<f32> {
     let path = format!("/sys/devices/system/cpu/cpu{cur_cpu}/cpufreq/scaling_cur_freq");
     let path = &Path::new(&path);
     if !path.exists() {
