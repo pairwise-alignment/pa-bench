@@ -19,8 +19,8 @@ use core_affinity;
 
 use clap::Parser;
 
-mod generator;
-use generator::*;
+mod config;
+use config::*;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
