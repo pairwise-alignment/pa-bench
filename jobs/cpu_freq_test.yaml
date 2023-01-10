@@ -1,6 +1,6 @@
 datasets:
   - !Generated
-    prefix: "generated"
+    prefix: generated
     seed: 31415
     total_size: 1000000
     error_models: [Uniform]
