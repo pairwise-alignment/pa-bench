@@ -53,7 +53,6 @@ configurations!
 **Output**
 
 - Runtime of processing input pairs, excluding startup and file io time.
-- Number of CPU clock cycles used.
 - Maximum memory usage, excluding the memory usage of the input data.
 - Start and end time of job, for logging purposes.
 - CPU frequency at start and end of job, as a sanity check.
@@ -167,10 +166,6 @@ orchestrator as root. Alternatively, you could add the following line to
 ```text
 <username> - nice -20
 ```
-
-**CPU clock cycles.**
-It seems that this always ticks at the nominal CPU frequency, not at the actual
-frequency. Needs more investigation.
 
 **CPU frequency**
 Because of a bug in the crated used to measure CPU frequencies when pinning to a

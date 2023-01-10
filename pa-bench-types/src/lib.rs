@@ -123,7 +123,6 @@ pub struct Measured {
     pub time_end: chrono::DateTime<chrono::Utc>,
     pub cpu_freq_start: Option<f32>,
     pub cpu_freq_end: Option<f32>,
-    pub cpu_clocks: Option<u64>,
 }
 
 /// The output of an alignment job.
