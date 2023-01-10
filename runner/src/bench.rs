@@ -1,4 +1,7 @@
-use std::time::{Duration, Instant};
+use std::{
+    path::Path,
+    time::{Duration, Instant},
+};
 
 use chrono::Timelike;
 use libc;
@@ -60,13 +63,13 @@ pub fn set_limits(time: Duration, mem: Bytes) {
 }
 
 fn get_cpu_freq() -> Option<f32> {
-    if cfg!(target_os = "macos") {
-        None
-    } else {
-        // TODO(ragnar): check how accurate this returned value actually is.
-        // TODO(ragnar): sanity check whether cur_cpu is the same as the pinned cpu.
-        // NOTE: When the process is pinned to a single core this always returns the frequency of core 0.
-        //let cur_cpu = unsafe { libc::sched_getcpu() };
-        cpu_freq::get()[0 as usize].cur
+    let cur_cpu = unsafe { libc::sched_getcpu() };
+    let path = format!("/sys/devices/system/cpu/cpu{cur_cpu}/cpufreq/scaling_cur_freq");
+    let path = &Path::new(&path);
+    if !path.exists() {
+        return None;
     }
+
+    let val = std::fs::read_to_string(path).ok()?;
+    Some(val.trim().parse::<f32>().ok()? / 1000.0)
 }

@@ -166,7 +166,3 @@ orchestrator as root. Alternatively, you could add the following line to
 ```text
 <username> - nice -20
 ```
-
-**CPU frequency**
-Because of a bug in the crated used to measure CPU frequencies when pinning to a
-single core, it is always the frequency of core `0` that is returned.

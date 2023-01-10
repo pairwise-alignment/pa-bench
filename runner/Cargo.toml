@@ -20,7 +20,6 @@ chrono = { version = "0.4.22", features = ["clock"], default-features = false }
 
 # Benchmarking utilities:
 core_affinity = "^0.7"
-cpu-freq = "^0.0.2"
 libc = "^0.2"
 rustix = { version = "0.36.5", features = ["process"] }
 
