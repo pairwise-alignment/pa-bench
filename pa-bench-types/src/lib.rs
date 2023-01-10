@@ -35,7 +35,7 @@ impl GeneratedDataset {
         ))
     }
 
-    pub fn to_generate_args(&self) -> GenerateArgs {
+    pub fn to_generator(&self) -> DatasetGenerator {
         let Self {
             seed,
             error_model,
@@ -45,8 +45,8 @@ impl GeneratedDataset {
             pattern_length,
             ..
         } = *self;
-        GenerateArgs {
-            options: GenerateOptions {
+        DatasetGenerator {
+            settings: SeqPairGenerator {
                 length,
                 error_rate,
                 error_model,

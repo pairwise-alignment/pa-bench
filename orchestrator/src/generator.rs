@@ -95,7 +95,7 @@ impl DatasetGeneratorConfig {
                 };
                 let path = generated_dataset.path();
                 if force_rerun || !path.exists() {
-                    generated_dataset.to_generate_args().generate_file(&path);
+                    generated_dataset.to_generator().generate_file(&path);
                 }
                 Dataset::Generated(generated_dataset)
             })
