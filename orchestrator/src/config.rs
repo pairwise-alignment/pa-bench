@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use walkdir::DirEntry;
 
 use std::collections::hash_map::DefaultHasher;
 use std::fs;
@@ -24,7 +25,10 @@ pub struct JobsConfig {
 #[derive(Serialize, Deserialize, Debug)]
 pub enum DatasetConfig {
     Generated(DatasetGeneratorConfig),
+    /// Path to a .seq file.
     File(PathBuf),
+    /// Scans all .seq files in the given directory.
+    Directory(PathBuf),
     Data(Vec<(String, String)>),
 }
 
@@ -60,6 +64,32 @@ impl DatasetConfig {
         match self {
             DatasetConfig::Generated(generator) => generator.generate(data_dir, force_rerun),
             DatasetConfig::File(path) => vec![Dataset::File(path.clone())],
+            DatasetConfig::Directory(dir) => {
+                assert!(dir.is_dir() && dir.exists());
+
+                fn is_hidden(entry: &DirEntry) -> bool {
+                    entry
+                        .file_name()
+                        .to_str()
+                        .map(|s| s.starts_with("."))
+                        .unwrap_or(false)
+                }
+
+                walkdir::WalkDir::new(dir)
+                    .into_iter()
+                    .filter_entry(|e| !is_hidden(e))
+                    .filter_map(|e| {
+                        let e = e.unwrap();
+                        if e.file_type().is_file()
+                            && e.path().extension().map_or(false, |ext| ext == "seq")
+                        {
+                            Some(Dataset::File(e.path().to_path_buf()))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            }
             DatasetConfig::Data(data) => {
                 let mut state = DefaultHasher::new();
                 data.hash(&mut state);
