@@ -1,5 +1,5 @@
 datasets:
-  - !Generate
+  - !Generated
     prefix: "generated"
     seed: 31415
     total_size: 100000
