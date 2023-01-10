@@ -191,7 +191,6 @@ impl Aligner for Ksw2 {
                 Ksw2Method::DualAffineExtensionSuzukiSse => todo!(),
             };
             let cigar = self.trace.then(|| {
-                // TODO: free output.cigar using the kfree function somehow
                 let cigar = std::slice::from_raw_parts_mut(ksw2_cigar, n_cigar as usize);
                 let cigar = Cigar::resolve_matches(
                     cigar.into_iter().map(|&mut val| {
