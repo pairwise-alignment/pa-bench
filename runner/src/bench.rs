@@ -11,7 +11,6 @@ where
 {
     let time_start = chrono::Utc::now().with_nanosecond(0).unwrap();
     let cpu_freq_start = get_cpu_freq();
-    let cpu_clock_start = get_cpu_clock();
     let start_time = Instant::now();
     let initial_mem = get_maxrss();
 
@@ -20,7 +19,6 @@ where
     Measured {
         // fill time-critical data first
         runtime: start_time.elapsed().as_secs_f32(),
-        cpu_clocks: get_cpu_clock().map(|c| c - cpu_clock_start.unwrap()),
         time_end: chrono::Utc::now().with_nanosecond(0).unwrap(),
         memory: get_maxrss().saturating_sub(initial_mem),
         cpu_freq_end: get_cpu_freq(),
@@ -70,13 +68,5 @@ fn get_cpu_freq() -> Option<f32> {
         // NOTE: When the process is pinned to a single core this always returns the frequency of core 0.
         //let cur_cpu = unsafe { libc::sched_getcpu() };
         cpu_freq::get()[0 as usize].cur
-    }
-}
-
-fn get_cpu_clock() -> Option<u64> {
-    if cfg!(any(target_arch = "x86_64")) {
-        Some(unsafe { core::arch::x86_64::_rdtsc() })
-    } else {
-        None
     }
 }
