@@ -72,9 +72,7 @@ struct Args {
     #[arg(short, long)]
     verbose: bool,
 
-    /// Force rerun dataset generation and all jobs.
-    ///
-    /// Helpful for making sure all files are up to date.
+    /// Ignore the existing results json and regenerate datasets.
     #[arg(long)]
     force_rerun: bool,
 }
@@ -104,20 +102,16 @@ fn main() {
 
     eprintln!("There are {} existing jobs!", existing_job_results.len());
     eprintln!("Generating jobs and datasets...");
-    let jobs = jobs_config.generate(&args.data_dir, args.force_rerun);
+    let mut jobs = jobs_config.generate(&args.data_dir, args.force_rerun);
     eprintln!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
-    let jobs = if args.incremental && !args.force_rerun {
-        jobs.into_iter()
-            .filter(|job| {
-                existing_job_results
-                    .iter()
-                    .find(|existing_job| &existing_job.job == job)
-                    .is_none()
-            })
-            .collect()
-    } else {
-        jobs
+    if args.incremental {
+        jobs.retain(|job| {
+            existing_job_results
+                .iter()
+                .find(|existing_job| &existing_job.job == job)
+                .is_none()
+        });
     };
     eprintln!("Running {} jobs...", jobs.len());
 
@@ -168,18 +162,13 @@ fn main() {
             .expect(&format!("Failed to write logs to {}", logs_path.display()));
     }
 
-    if !args.force_rerun {
-        // Remove jobs that were run from existing results.
-        existing_job_results = existing_job_results
-            .into_iter()
-            .filter(|existing_job| {
-                job_results
-                    .iter()
-                    .find(|job| job.job == existing_job.job)
-                    .is_none()
-            })
-            .collect();
-    }
+    // Remove jobs that were run from existing results.
+    existing_job_results.retain(|existing_job| {
+        job_results
+            .iter()
+            .find(|job| job.job == existing_job.job)
+            .is_none()
+    });
 
     // Append new results to existing results.
     existing_job_results.extend(job_results);
