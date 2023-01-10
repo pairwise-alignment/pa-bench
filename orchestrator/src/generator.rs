@@ -13,22 +13,22 @@ use pa_generate::*;
 use pa_types::*;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct JobsGenerator {
-    datasets: Vec<Dataset>,
+pub struct JobsConfig {
+    datasets: Vec<DatasetConfig>,
     traces: Vec<bool>,
     costs: Vec<CostModel>,
     algos: Vec<AlgorithmParams>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub enum Dataset {
-    Generate(DataGenerator),
+pub enum DatasetConfig {
+    Generated(DatasetGeneratorConfig),
     File(PathBuf),
     Data(Vec<(String, String)>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DataGenerator {
+pub struct DatasetGeneratorConfig {
     prefix: String,
     seed: u64,
     error_models: Vec<ErrorModel>,
@@ -37,7 +37,7 @@ pub struct DataGenerator {
     total_size: usize,
 }
 
-impl JobsGenerator {
+impl JobsConfig {
     pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Job> {
         let datasets = self
             .datasets
@@ -55,16 +55,16 @@ impl JobsGenerator {
     }
 }
 
-impl Dataset {
+impl DatasetConfig {
     pub fn generate(
         self,
         data_dir: &Path,
         force_rerun: bool,
     ) -> Vec<(PathBuf, Option<DatasetMetadata>)> {
         match self {
-            Dataset::Generate(generator) => generator.generate(data_dir, force_rerun),
-            Dataset::File(path) => vec![(path.clone(), None)],
-            Dataset::Data(data) => {
+            DatasetConfig::Generated(generator) => generator.generate(data_dir, force_rerun),
+            DatasetConfig::File(path) => vec![(path.clone(), None)],
+            DatasetConfig::Data(data) => {
                 let mut state = DefaultHasher::new();
                 data.hash(&mut state);
                 let path = data_dir.join(format!("manual/{}.seq", state.finish()));
@@ -80,7 +80,7 @@ impl Dataset {
     }
 }
 
-impl DataGenerator {
+impl DatasetGeneratorConfig {
     /// Generates missing `.seq` files in a directory and returns them.
     pub fn generate(
         self,
