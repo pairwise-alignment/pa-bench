@@ -117,10 +117,13 @@ pub struct Measured {
     /// Runtime in seconds.
     pub runtime: f32,
     pub memory: Bytes,
-    /// Formatted UTC time when run was started.
+    /// Formatted UTC time when run was started/ended.
     pub time_start: chrono::DateTime<chrono::Utc>,
-    /// Formatted UTC time when run was ended.
     pub time_end: chrono::DateTime<chrono::Utc>,
+    /// Cpu core running this process at start/end.
+    pub cpu_start: i32,
+    pub cpu_end: i32,
+    /// Cpu frequency at start/end.
     pub cpu_freq_start: Option<f32>,
     pub cpu_freq_end: Option<f32>,
 }

@@ -5,12 +5,9 @@ datasets:
     total_size: 1000000
     error_models: [Uniform]
     error_rates: [0.25]
-    lengths: [100000]
+    lengths: [1000000]
 traces: [false]
 costs:
   - { sub: 1, open: 0, extend: 1 }
 algos:
   - !Edlib
-  - !Wfa
-    memory_model: !MemoryHigh
-    heuristic: !None
