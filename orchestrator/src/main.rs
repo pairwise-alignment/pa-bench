@@ -86,7 +86,7 @@ fn main() {
     let jobs_yaml = fs::read_to_string(&args.jobs)
         .map_err(|err| format!("Failed to read jobs generator: {err}"))
         .unwrap();
-    let generator: JobsGenerator = serde_yaml::from_str(&jobs_yaml)
+    let jobs_config: JobsConfig = serde_yaml::from_str(&jobs_yaml)
         .map_err(|err| format!("Failed to parse jobs generator yaml: {err}"))
         .unwrap();
 
@@ -99,7 +99,7 @@ fn main() {
 
     eprintln!("There are {} existing jobs!", existing_job_results.len());
     eprintln!("Generating jobs and datasets...");
-    let jobs = generator.generate(&args.data_dir, args.force_rerun);
+    let jobs = jobs_config.generate(&args.data_dir, args.force_rerun);
     eprintln!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
     let jobs = if args.incremental && !args.force_rerun {
