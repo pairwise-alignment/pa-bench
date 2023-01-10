@@ -129,7 +129,7 @@ pub struct JobOutput {
     /// Corresponding exact costs if the job is approximate.
     pub exact_costs: Option<Vec<Cost>>,
     //pub cigars: Vec<Cigar>,
-    pub exact: bool,
+    pub is_exact: bool,
     /// Proportion of correct costs.
     pub p_correct: Option<f32>,
     pub measured: Measured,

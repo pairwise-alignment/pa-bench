@@ -184,7 +184,7 @@ fn main() {
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
 fn verify_costs(mut results: Vec<JobResult>) -> Vec<JobResult> {
     // Ensure exact algorithms are first in results.
-    results.sort_by_key(|res| !res.output.as_ref().map(|o| o.exact).unwrap_or(false));
+    results.sort_by_key(|res| !res.output.as_ref().map(|o| o.is_exact).unwrap_or(false));
 
     results.iter().enumerate().map(|(i, result)| {
         if result.output.is_err() {
@@ -197,8 +197,8 @@ fn verify_costs(mut results: Vec<JobResult>) -> Vec<JobResult> {
             if result2.output.is_ok() && result2.job.same_input(&result.job) {
                 let output2 = result2.output.as_ref().unwrap();
 
-                if output2.exact {
-                    if output.exact {
+                if output2.is_exact {
+                    if output.is_exact {
                         assert_eq!(
                             output.costs,
                             output2.costs,
