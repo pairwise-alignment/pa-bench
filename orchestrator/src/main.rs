@@ -186,12 +186,12 @@ fn main() {
 
 fn verify_costs(results: &[JobResult]) {
     for (i, result) in results.iter().enumerate() {
-        if result.output.is_none() {
+        if result.output.is_err() {
             continue;
         }
         // Find the first job with the same input and compare costs.
         for result2 in &results[..i] {
-            if result2.job.same_input(&result.job) && result2.output.is_some() {
+            if result2.job.same_input(&result.job) && result2.output.is_ok() {
                 assert_eq!(
                     result.output.as_ref().unwrap().costs,
                     result2.output.as_ref().unwrap().costs,
@@ -249,7 +249,7 @@ fn run_with_threads(
                     let mut skip = false;
                     if job.meta.is_some() {
                         for prev in job_results.lock().unwrap().iter() {
-                            if prev.output.is_none()
+                            if prev.output.is_err()
                                 && prev.job.meta.is_some()
                                 && job.is_larger(&prev.job)
                             {
@@ -260,7 +260,10 @@ fn run_with_threads(
                     }
 
                     let job_result = if skip {
-                        JobResult { job, output: None }
+                        JobResult {
+                            job,
+                            output: Err(()),
+                        }
                     } else {
                         run_job(
                             runner,
@@ -275,7 +278,7 @@ fn run_with_threads(
                     };
 
                     // If the orchestrator was aborted, do not push failing job results.
-                    if job_result.output.is_some() || *running.lock().unwrap() {
+                    if job_result.output.is_ok() || *running.lock().unwrap() {
                         job_results.lock().unwrap().push(job_result);
                     }
                 }
@@ -327,11 +330,9 @@ fn run_job(
     if output.status.success() {
         JobResult {
             job,
-            output: Some(
-                serde_json::from_slice(&output.stdout)
-                    .map_err(|err| format!("Error reading output json: {err}"))
-                    .unwrap(),
-            ),
+            output: Ok(serde_json::from_slice(&output.stdout)
+                .map_err(|err| format!("Error reading output json: {err}"))
+                .unwrap()),
         }
     } else {
         if show_stderr {
@@ -341,6 +342,9 @@ fn run_job(
                 }
             }
         }
-        JobResult { job, output: None }
+        JobResult {
+            job,
+            output: Err(()),
+        }
     }
 }

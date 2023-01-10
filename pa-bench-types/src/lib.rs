@@ -79,5 +79,5 @@ pub struct JobOutput {
 pub struct JobResult {
     pub job: Job,
     // TODO(ragnar): Make this a result with a specific error type that indicates the failure reason.
-    pub output: Option<JobOutput>,
+    pub output: Result<JobOutput, ()>,
 }
