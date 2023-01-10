@@ -146,6 +146,7 @@ fn main() {
         args.stderr,
         args.verbose,
     );
+    let number_of_jobs_run = job_results.len();
 
     if !args.force_rerun {
         // Remove jobs that were run from existing results.
@@ -159,16 +160,18 @@ fn main() {
             })
             .collect();
     }
-    let job_results_len = job_results.len();
+
     // Append new results to existing results.
     existing_job_results.extend(job_results);
+    let mut job_results = existing_job_results;
+
     eprintln!(
-        "Finished running {} jobs! Totaling {} job results.",
-        job_results_len,
-        existing_job_results.len()
+        "Finished running {} jobs! Totalling {} job results.",
+        number_of_jobs_run,
+        job_results.len()
     );
 
-    let job_results = verify_costs(existing_job_results);
+    verify_costs(&mut job_results);
 
     if let Some(dir) = args.results.parent() {
         fs::create_dir_all(dir).unwrap();
@@ -182,46 +185,63 @@ fn main() {
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
-fn verify_costs(mut results: Vec<JobResult>) -> Vec<JobResult> {
+fn verify_costs(results: &mut Vec<JobResult>) {
     // Ensure exact algorithms are first in results.
     results.sort_by_key(|res| !res.output.as_ref().map(|o| o.is_exact).unwrap_or(false));
 
-    results.iter().enumerate().map(|(i, result)| {
-        if result.output.is_err() {
-            return result.clone();
-        }
-        let output = result.output.as_ref().unwrap();
+    for i in 0..results.len() {
+        let (earlier_results, result) = results.split_at_mut(i);
+        let result = &mut result[0];
 
-        // Find the first job with the same input and compare costs.
-        for result2 in &results[..i] {
-            if result2.output.is_ok() && result2.job.same_input(&result.job) {
-                let output2 = result2.output.as_ref().unwrap();
+        let Ok(output) = result.output.as_mut() else {
+            // Nothing to do for failed jobs.
+            continue;
+        };
 
-                if output2.is_exact {
-                    if output.is_exact {
-                        assert_eq!(
+        // Find the first exact job with the same input and compare costs.
+        for reference_result in earlier_results {
+            if !reference_result.job.same_input(&result.job) {
+                continue;
+            }
+            let Ok(reference_output) = reference_result.output.as_ref() else {
+                continue;
+            };
+            if !reference_output.is_exact {
+                continue;
+            }
+            assert_eq!(
+                output.costs.len(),
+                reference_output.costs.len(),
+                "\nDifferent number of costs!\nJob 1: {:?}\nJob 2: {:?}\nLen costs 1: {:?}\nLen costs 2: {:?}",
+                result.job,
+                reference_result.job,
+                output.costs.len(),
+                reference_output.costs.len(),
+            );
+            if output.is_exact {
+                // For exact jobs, simply check they give the same result.
+                assert_eq!(
                             output.costs,
-                            output2.costs,
+                            reference_output.costs,
                             "\nIncorrect costs of exact algorithms!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}",
                             result.job,
-                            result2.job,
+                            reference_result.job,
                             output.costs,
-                            output2.costs,
+                            reference_output.costs,
                         );
-                        return result.clone();
-                    } else {
-                        let mut res = result.clone();
-                        res.output.as_mut().unwrap().exact_costs = Some(output2.costs.clone());
-                        let num_correct = output.costs.iter().zip(&output2.costs).filter(|(&a, &b)| a == b).count();
-                        res.output.as_mut().unwrap().p_correct = Some((num_correct as f32) / (output.costs.len() as f32));
-                        return res;
-                    }
-                }
+            } else {
+                // For inexact jobs, add the correct ones and the fraction of correct results.
+                output.exact_costs = Some(reference_output.costs.clone());
+                let num_correct = output
+                    .costs
+                    .iter()
+                    .zip(&reference_output.costs)
+                    .filter(|(&a, &b)| a == b)
+                    .count();
+                output.p_correct = Some((num_correct as f32) / (output.costs.len() as f32));
             }
         }
-
-        result.clone()
-    }).collect()
+    }
 }
 
 fn run_with_threads(
