@@ -16,6 +16,7 @@ pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
 pa-bench-types = { path = "../pa-bench-types" }
 parse_duration = "^2.1"
 itertools = "^0.10"
+chrono = { version = "0.4.22", features = ["clock"], default-features = false }
 
 # Benchmarking utilities:
 core_affinity = "^0.7"

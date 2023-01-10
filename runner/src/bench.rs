@@ -1,5 +1,6 @@
 use std::time::{Duration, Instant};
 
+use chrono::Timelike;
 use libc;
 use pa_bench_types::Measured;
 use pa_types::Bytes;
@@ -8,6 +9,7 @@ pub fn measure<F>(f: F) -> Measured
 where
     F: FnOnce(),
 {
+    let time_start = chrono::Utc::now().with_nanosecond(0).unwrap();
     let cpu_freq_start = get_cpu_freq();
     let cpu_clock_start = get_cpu_clock();
     let start_time = Instant::now();
@@ -16,15 +18,18 @@ where
     f();
 
     Measured {
+        // fill time-critical data first
         runtime: start_time.elapsed().as_secs_f32(),
-        memory: get_maxrss().saturating_sub(initial_mem),
-        cpu_freq_start,
-        cpu_freq_end: get_cpu_freq(),
         cpu_clocks: get_cpu_clock().map(|c| c - cpu_clock_start.unwrap()),
+        time_end: chrono::Utc::now().with_nanosecond(0).unwrap(),
+        memory: get_maxrss().saturating_sub(initial_mem),
+        cpu_freq_end: get_cpu_freq(),
+        time_start,
+        cpu_freq_start,
     }
 }
 
-/// Returns the maximum resident set size, ie the physical memory the program
+/// Returns the maximum resident set size, i.e. the physical memory the program
 /// uses, in bytes.
 pub fn get_maxrss() -> Bytes {
     let rusage = unsafe {

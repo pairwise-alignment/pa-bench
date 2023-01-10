@@ -112,11 +112,15 @@ impl Job {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Measured {
     /// Runtime in seconds.
     pub runtime: f32,
     pub memory: Bytes,
+    /// Formatted UTC time when run was started.
+    pub time_start: chrono::DateTime<chrono::Utc>,
+    /// Formatted UTC time when run was ended.
+    pub time_end: chrono::DateTime<chrono::Utc>,
     pub cpu_freq_start: Option<f32>,
     pub cpu_freq_end: Option<f32>,
     pub cpu_clocks: Option<u64>,
