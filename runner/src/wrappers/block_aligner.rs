@@ -87,7 +87,7 @@ impl Aligner for BlockAligner {
                     .cigar_eq(&self.a, &self.b, self.a.len(), self.b.len(), &mut ba_cigar);
                 let operations = (0..ba_cigar.len())
                     .map(|i| {
-                        ::block_aligner::cigar::OpLen { op, len } = ba_cigar.get(i);
+                        let ::block_aligner::cigar::OpLen { op, len } = ba_cigar.get(i);
                         let op = match op {
                             ::block_aligner::cigar::Operation::Eq => CigarOp::Match,
                             ::block_aligner::cigar::Operation::X => CigarOp::Sub,
