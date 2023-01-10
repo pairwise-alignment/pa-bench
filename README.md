@@ -79,9 +79,9 @@ datasets:
     - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
       - ACAGGTACACCACTATCACGACAAGTTGGGTC
   # Path to a single .seq file.
-  - !File "path/to/sequences.seq"
+  - !File path/to/sequences.seq
   # Recursively finds all non-hidden .seq files in a directory.
-  - !Directory "path/to/directory"
+  - !Directory path/to/directory
   # Generated data
   - !Generated
     prefix: "generated" # Prefix of the generated file path.
