@@ -1,3 +1,4 @@
+use chrono::Timelike;
 use pa_bench_types::*;
 use pa_types::*;
 
@@ -33,6 +34,10 @@ struct Args {
     /// Path to the data directory.
     #[arg(short, long, default_value = "data")]
     data_dir: PathBuf,
+
+    /// Path to the logs directory.
+    #[arg(short, long, default_value = "results/.logs")]
+    logs_dir: PathBuf,
 
     /// Path to the runner binary.
     #[arg(short, long, default_value = "target/release/runner")]
@@ -147,6 +152,21 @@ fn main() {
         args.verbose,
     );
     let number_of_jobs_run = job_results.len();
+
+    {
+        let logs_path = args.logs_dir.join(format!(
+            "{}_{}.json",
+            args.jobs.file_name().unwrap().to_str().unwrap(),
+            chrono::Local::now()
+                .with_nanosecond(0)
+                .unwrap()
+                .to_rfc3339()
+        ));
+        // Write results to persistent log.
+        fs::create_dir_all(args.logs_dir).unwrap();
+        fs::write(&logs_path, &serde_json::to_string(&job_results).unwrap())
+            .expect(&format!("Failed to write logs to {}", logs_path.display()));
+    }
 
     if !args.force_rerun {
         // Remove jobs that were run from existing results.
