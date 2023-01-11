@@ -98,10 +98,10 @@ impl DatasetConfig {
             DatasetConfig::Directory(dir) => collect_dir(&data_dir.join(&dir)),
             DatasetConfig::Download { url, dir } => {
                 let target_dir = data_dir.join(&dir);
-                if target_dir
+                let dir_empty = target_dir
                     .read_dir()
-                    .map_or(true, |mut d| d.next().is_none())
-                {
+                    .map_or(true, |mut d| d.next().is_none());
+                if force_rerun || dir_empty {
                     fs::create_dir_all(&target_dir).unwrap();
                     // download the url
                     let mut data = vec![];
