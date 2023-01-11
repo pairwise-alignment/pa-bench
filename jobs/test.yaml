@@ -5,7 +5,6 @@ datasets:
     - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
       - ACAGGTACACCACTATCACGACAAGTTGGGTC
   # - !Generated
-  #   prefix: "generated"
   #   seed: 31415
   #   total_size: 1000000
   #   error_models:

@@ -87,9 +87,7 @@ datasets:
     url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
     dir: human/chm13/
   # Generated data
-  - !Generated
-    prefix: "generated" # Prefix of the generated file path.
-    # Seed for the RNG.
+  - !Generated # Seed for the RNG.
     seed: 31415
     # The approximate total length of the input sequences.
     total_size: 100000

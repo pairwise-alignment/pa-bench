@@ -43,7 +43,6 @@ pub enum DatasetConfig {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DatasetGeneratorConfig {
-    prefix: String,
     seed: u64,
     error_models: Vec<ErrorModel>,
     error_rates: Vec<f32>,
@@ -150,7 +149,7 @@ impl DatasetConfig {
 impl DatasetGeneratorConfig {
     /// Generates missing `.seq` files in a directory and returns them.
     pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Dataset> {
-        let dir = data_dir.join(&self.prefix);
+        let dir = data_dir.join("generated");
         fs::create_dir_all(&dir).unwrap();
 
         iproduct!(self.error_models, self.error_rates, self.lengths)
