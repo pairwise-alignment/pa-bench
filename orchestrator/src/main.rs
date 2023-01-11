@@ -87,16 +87,16 @@ fn main() {
         args.runner.display()
     );
 
-    let jobs_yaml = fs::read_to_string(&args.jobs)
-        .map_err(|err| format!("Failed to read jobs generator: {err}"))
-        .unwrap();
-    let jobs_config: JobsConfig = serde_yaml::from_str(&jobs_yaml)
-        .map_err(|err| format!("Failed to parse jobs generator yaml: {err}"))
-        .unwrap();
+    let jobs_yaml = fs::read_to_string(&args.jobs).expect("Failed to read jobs generator:");
+    let jobs_config: JobsConfig =
+        serde_yaml::from_str(&jobs_yaml).expect("Failed to parse jobs generator yaml:");
 
     // Read the existing results file.
     let mut existing_job_results: Vec<JobResult> = if !args.force_rerun && args.results.is_file() {
-        serde_json::from_str(&fs::read_to_string(&args.results).unwrap()).unwrap()
+        serde_json::from_str(
+            &fs::read_to_string(&args.results).expect("Error reading existing results file"),
+        )
+        .expect("Error parsing existing results")
     } else {
         vec![]
     };
@@ -377,9 +377,7 @@ fn run_job(
     if output.status.success() {
         JobResult {
             job,
-            output: Ok(serde_json::from_slice(&output.stdout)
-                .map_err(|err| format!("Error reading output json: {err}"))
-                .unwrap()),
+            output: Ok(serde_json::from_slice(&output.stdout).expect("Error reading output json:")),
         }
     } else {
         if show_stderr {
