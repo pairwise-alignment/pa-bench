@@ -29,15 +29,15 @@ struct Args {
     experiment: PathBuf,
 
     /// Path to the output json file.
-    #[arg(default_value = "results/results.json")]
+    #[arg(default_value = "evals/results.json")]
     results: PathBuf,
 
     /// Path to the data directory.
-    #[arg(short, long, default_value = "data")]
+    #[arg(short, long, default_value = "evals/data")]
     data_dir: PathBuf,
 
     /// Path to the logs directory.
-    #[arg(short, long, default_value = "results/.logs")]
+    #[arg(short, long, default_value = "evals/.results")]
     logs_dir: PathBuf,
 
     /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
