@@ -21,7 +21,7 @@ Results are incrementally accumulated in a `json` file.
 
 1. Clone this repo and make sure you have Rust installed.
 2. Build all crates in this repo with `cargo build --release`.
-3. `cargo run --release`. See the [usage](#usage) below for details.
+3. Run `cargo run --release` in the `evals` directory. See the [usage](#usage) below for details.
 
 ## Adding an aligner
 
@@ -130,22 +130,22 @@ algos:
 
 ## Usage
 
-Minimal usage from the repository root: first build the `runner` in release mode
-and then run the orchestrator on an input file.
+Minimal usage: first build the `runner` in release mode
+and then run the orchestrator in the `evals` directory on an input file.
 
 ```sh
 cargo build --release
-cargo run --release -- jobs/test.yaml results/test.json
+cd evals && cargo run --release -- jobs/test.yaml results/test.json
 ```
 
 Full help:
 
 ```text
-Usage: orchestrator [OPTIONS] <JOBS> <RESULTS>
+Usage: orchestrator [OPTIONS] <JOBS> [RESULTS]
 
 Arguments:
   <JOBS>     Path to a yaml file with a list of parameters
-  <RESULTS>  Path to the output json file
+  [RESULTS]  Path to the output json file [default: results/results.json]
 
 Options:
   -d, --data-dir <DATA_DIR>      Path to the data directory [default: data]
@@ -159,6 +159,8 @@ Options:
       --incremental              Skip jobs already present in the results file
   -v, --verbose                  Verbose runner outputs
       --force-rerun              Ignore the existing results json and regenerate datasets
+  -h, --help                     Print help information (use `--help` for more detail)
+  -V, --version                  Print version information
 ```
 
 ## Notes on benchmarking

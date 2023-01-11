@@ -1,5 +1,5 @@
 /target
-/data
-/results
-analysis/.ipynb_checkpoints
-analysis/*.png
+/evals/data
+/evals/results
+/evals/analysis/.ipynb_checkpoints
+/evals/analysis/*.png

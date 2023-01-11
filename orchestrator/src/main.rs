@@ -29,6 +29,7 @@ struct Args {
     jobs: PathBuf,
 
     /// Path to the output json file.
+    #[arg(default_value = "results/results.json")]
     results: PathBuf,
 
     /// Path to the data directory.
@@ -40,7 +41,7 @@ struct Args {
     logs_dir: PathBuf,
 
     /// Path to the runner binary.
-    #[arg(short, long, default_value = "target/release/runner")]
+    #[arg(short, long, default_value = "../target/release/runner")]
     runner: PathBuf,
 
     #[arg(short, long, value_parser = parse_duration::parse, default_value = "1h")]
