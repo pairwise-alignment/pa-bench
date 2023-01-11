@@ -25,8 +25,8 @@ use config::*;
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
 struct Args {
-    /// Path to a yaml file with a list of parameters.
-    jobs: PathBuf,
+    /// Path to an experiment yaml file.
+    experiment: PathBuf,
 
     /// Path to the output json file.
     #[arg(default_value = "results/results.json")]
@@ -87,9 +87,10 @@ fn main() {
         args.runner.display()
     );
 
-    let jobs_yaml = fs::read_to_string(&args.jobs).expect("Failed to read jobs generator:");
-    let jobs_config: JobsConfig =
-        serde_yaml::from_str(&jobs_yaml).expect("Failed to parse jobs generator yaml:");
+    let experiment_yaml =
+        fs::read_to_string(&args.experiment).expect("Failed to read jobs generator:");
+    let experiment: Experiment =
+        serde_yaml::from_str(&experiment_yaml).expect("Failed to parse jobs generator yaml:");
 
     // Read the existing results file.
     let mut existing_job_results: Vec<JobResult> = if !args.force_rerun && args.results.is_file() {
@@ -103,7 +104,7 @@ fn main() {
 
     eprintln!("There are {} existing jobs!", existing_job_results.len());
     eprintln!("Generating jobs and datasets...");
-    let mut jobs = jobs_config.generate(&args.data_dir, args.force_rerun);
+    let mut jobs = experiment.generate(&args.data_dir, args.force_rerun);
     eprintln!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
     if args.incremental {
@@ -151,7 +152,7 @@ fn main() {
     {
         let logs_path = args.logs_dir.join(format!(
             "{}_{}.json",
-            args.jobs.file_name().unwrap().to_str().unwrap(),
+            args.experiment.file_stem().unwrap().to_str().unwrap(),
             chrono::Local::now()
                 .with_nanosecond(0)
                 .unwrap()
