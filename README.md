@@ -82,6 +82,10 @@ datasets:
   - !File path/to/sequences.seq
   # Recursively finds all non-hidden .seq files in a directory.
   - !Directory path/to/directory
+  # Download and extract a zip file containing .seq files.
+  - !Download
+    url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+    dir: human/chm13/
   # Generated data
   - !Generated
     prefix: "generated" # Prefix of the generated file path.
