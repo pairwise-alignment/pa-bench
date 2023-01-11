@@ -6,24 +6,24 @@ datasets:
   # A*PA sets
   - !Download
     url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-    dir: human/astarpa/ont-ul-500k
+    dir: astarpa/ont-ul-500k
   - !Download
     url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-    dir: human/astarpa/ont-minion-ul-500k
+    dir: astarpa/ont-minion-ul-500k
 
   # BiWFA sets
   - !Download
     url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.2000.tar.gz
-    dir: human/biwfa/ont-minion-ul
+    dir: biwfa/ont-minion-ul
   - !Download
     url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.10kbps.5000.tar.gz
-    dir: human/biwfa/ont-minion-ul-10k
+    dir: biwfa/ont-minion-ul-10k
   - !Download
     url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.500kbps.48.tar.gz
-    dir: human/biwfa/ont-minion-ul-500k
+    dir: biwfa/ont-minion-ul-500k
   - !Download
     url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.50kbps.10000.tar.gz
-    dir: human/biwfa/ont-minion-ul-50k
+    dir: biwfa/ont-minion-ul-50k
 
 traces: []
 costs: []

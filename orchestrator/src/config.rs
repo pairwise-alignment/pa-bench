@@ -100,7 +100,7 @@ impl DatasetConfig {
             DatasetConfig::File(path) => vec![Dataset::File(data_dir.join(&path))],
             DatasetConfig::Directory(dir) => collect_dir(&data_dir.join(&dir)),
             DatasetConfig::Download { url, dir } => {
-                let target_dir = &data_dir.join(&dir);
+                let target_dir = &data_dir.join("download").join(&dir);
                 let dir_empty = target_dir
                     .read_dir()
                     .map_or(true, |mut d| d.next().is_none());
@@ -131,9 +131,12 @@ impl DatasetConfig {
                 collect_dir(target_dir)
             }
             DatasetConfig::Data(data) => {
-                let mut state = DefaultHasher::new();
-                data.hash(&mut state);
-                let path = data_dir.join(format!("manual/{}.seq", state.finish()));
+                let hash = {
+                    let mut state = DefaultHasher::new();
+                    data.hash(&mut state);
+                    state.finish()
+                };
+                let path = data_dir.join(format!("manual/{hash}.seq"));
                 std::fs::create_dir_all(&path.parent().unwrap()).unwrap();
                 let mut f = BufWriter::new(std::fs::File::create(&path).unwrap());
                 for (a, b) in data {
