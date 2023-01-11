@@ -1,4 +1,6 @@
+use flate2::bufread::GzDecoder;
 use serde::{Deserialize, Serialize};
+use tar::Archive;
 use walkdir::DirEntry;
 
 use std::collections::hash_map::DefaultHasher;
@@ -29,7 +31,8 @@ pub enum DatasetConfig {
     File(PathBuf),
     /// Scans all .seq files in the given directory, relative to `--data-dir`.
     Directory(PathBuf),
-    /// Download `url`, which must be a zip, and extract to `dir` relative to `--data-dir`.
+    /// Download `url`, and extract to `dir` relative to `--data-dir`.
+    /// `url` must end in either `.zip` or `.tar.gz`.
     Download {
         url: String,
         dir: PathBuf,
@@ -97,12 +100,12 @@ impl DatasetConfig {
             DatasetConfig::File(path) => vec![Dataset::File(data_dir.join(&path))],
             DatasetConfig::Directory(dir) => collect_dir(&data_dir.join(&dir)),
             DatasetConfig::Download { url, dir } => {
-                let target_dir = data_dir.join(&dir);
+                let target_dir = &data_dir.join(&dir);
                 let dir_empty = target_dir
                     .read_dir()
                     .map_or(true, |mut d| d.next().is_none());
                 if force_rerun || dir_empty {
-                    fs::create_dir_all(&target_dir).unwrap();
+                    fs::create_dir_all(target_dir).unwrap();
                     // download the url
                     let mut data = vec![];
                     eprintln!("Downloading {}: {url}", dir.display());
@@ -113,9 +116,19 @@ impl DatasetConfig {
                         .read_to_end(&mut data)
                         .unwrap();
                     eprintln!("Extracting to {}", target_dir.display());
-                    zip_extract::extract(Cursor::new(data), &target_dir, true).unwrap();
+                    match url {
+                        url if url.ends_with(".zip") => {
+                            zip_extract::extract(Cursor::new(data), target_dir, true).unwrap()
+                        }
+                        url if url.ends_with(".tar.gz") => {
+                            let tar = GzDecoder::new(Cursor::new(data));
+                            let mut archive = Archive::new(tar);
+                            archive.unpack(target_dir).unwrap();
+                        }
+                        _ => panic!("Download url must end in .zip or .tar.gz."),
+                    };
                 }
-                collect_dir(&target_dir)
+                collect_dir(target_dir)
             }
             DatasetConfig::Data(data) => {
                 let mut state = DefaultHasher::new();

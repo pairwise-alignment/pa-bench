@@ -27,3 +27,5 @@ chrono = { version = "0.4.22", features = ["clock"], default-features = false }
 walkdir = "2.3.2"
 zip-extract = "0.1.1"
 ureq = "2.6.1"
+tar = "0.4.38"
+flate2 = "1.0.25"
