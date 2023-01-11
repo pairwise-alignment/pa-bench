@@ -4,7 +4,7 @@ use walkdir::DirEntry;
 use std::collections::hash_map::DefaultHasher;
 use std::fs;
 use std::hash::{Hash, Hasher};
-use std::io::{BufWriter, Write};
+use std::io::{BufWriter, Cursor, Write};
 use std::path::{Path, PathBuf};
 
 use itertools::iproduct;
@@ -25,10 +25,16 @@ pub struct JobsConfig {
 #[derive(Serialize, Deserialize, Debug)]
 pub enum DatasetConfig {
     Generated(DatasetGeneratorConfig),
-    /// Path to a .seq file.
+    /// Path to a .seq file, relative to `--data-dir`.
     File(PathBuf),
-    /// Scans all .seq files in the given directory.
+    /// Scans all .seq files in the given directory, relative to `--data-dir`.
     Directory(PathBuf),
+    /// Download `url`, which must be a zip, and extract to `dir` relative to `--data-dir`.
+    Download {
+        url: String,
+        dir: PathBuf,
+    },
+    /// The data itself.
     Data(Vec<(String, String)>),
 }
 
@@ -61,34 +67,55 @@ impl JobsConfig {
 
 impl DatasetConfig {
     pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Dataset> {
+        fn collect_dir(dir: &Path) -> Vec<Dataset> {
+            assert!(dir.is_dir() && dir.exists());
+            fn is_hidden(entry: &DirEntry) -> bool {
+                entry
+                    .file_name()
+                    .to_str()
+                    .map(|s| s.starts_with("."))
+                    .unwrap_or(false)
+            }
+            walkdir::WalkDir::new(dir)
+                .into_iter()
+                .filter_entry(|e| !is_hidden(e))
+                .filter_map(|e| {
+                    let e = e.unwrap();
+                    if e.file_type().is_file()
+                        && e.path().extension().map_or(false, |ext| ext == "seq")
+                    {
+                        Some(Dataset::File(e.path().to_path_buf()))
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        }
+
         match self {
             DatasetConfig::Generated(generator) => generator.generate(data_dir, force_rerun),
-            DatasetConfig::File(path) => vec![Dataset::File(path.clone())],
-            DatasetConfig::Directory(dir) => {
-                assert!(dir.is_dir() && dir.exists());
-
-                fn is_hidden(entry: &DirEntry) -> bool {
-                    entry
-                        .file_name()
-                        .to_str()
-                        .map(|s| s.starts_with("."))
-                        .unwrap_or(false)
+            DatasetConfig::File(path) => vec![Dataset::File(data_dir.join(&path))],
+            DatasetConfig::Directory(dir) => collect_dir(&data_dir.join(&dir)),
+            DatasetConfig::Download { url, dir } => {
+                let target_dir = data_dir.join(&dir);
+                if target_dir
+                    .read_dir()
+                    .map_or(true, |mut d| d.next().is_none())
+                {
+                    fs::create_dir_all(&target_dir).unwrap();
+                    // download the url
+                    let mut data = vec![];
+                    eprintln!("Downloading {}: {url}", dir.display());
+                    ureq::get(&url)
+                        .call()
+                        .unwrap()
+                        .into_reader()
+                        .read_to_end(&mut data)
+                        .unwrap();
+                    eprintln!("Extracting to {}", target_dir.display());
+                    zip_extract::extract(Cursor::new(data), &target_dir, true).unwrap();
                 }
-
-                walkdir::WalkDir::new(dir)
-                    .into_iter()
-                    .filter_entry(|e| !is_hidden(e))
-                    .filter_map(|e| {
-                        let e = e.unwrap();
-                        if e.file_type().is_file()
-                            && e.path().extension().map_or(false, |ext| ext == "seq")
-                        {
-                            Some(Dataset::File(e.path().to_path_buf()))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect()
+                collect_dir(&target_dir)
             }
             DatasetConfig::Data(data) => {
                 let mut state = DefaultHasher::new();
@@ -125,6 +152,7 @@ impl DatasetGeneratorConfig {
                 };
                 let path = generated_dataset.path();
                 if force_rerun || !path.exists() {
+                    eprintln!("Generating dataset {}", path.display());
                     generated_dataset.to_generator().generate_file(&path);
                 }
                 Dataset::Generated(generated_dataset)

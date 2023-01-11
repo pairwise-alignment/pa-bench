@@ -25,3 +25,5 @@ itertools = "^0.10"
 ctrlc = "3.2.4"
 chrono = { version = "0.4.22", features = ["clock"], default-features = false }
 walkdir = "2.3.2"
+zip-extract = "0.1.1"
+ureq = "2.6.1"
