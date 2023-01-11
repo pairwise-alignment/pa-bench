@@ -29,8 +29,19 @@ pub struct TripleAccelParams;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WfaParams {
+    #[serde(default = "WfaParams::default_memory_model")]
     pub memory_model: rust_wfa2::aligner::MemoryModel,
+    #[serde(default = "WfaParams::default_heuristic")]
     pub heuristic: rust_wfa2::aligner::Heuristic,
+}
+
+impl WfaParams {
+    const fn default_memory_model() -> rust_wfa2::aligner::MemoryModel {
+        rust_wfa2::aligner::MemoryModel::MemoryUltraLow
+    }
+    const fn default_heuristic() -> rust_wfa2::aligner::Heuristic {
+        rust_wfa2::aligner::Heuristic::None
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]

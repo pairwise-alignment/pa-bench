@@ -18,7 +18,7 @@ impl AlignerParams for WfaParams {
 
     fn new(self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         // memory model does not matter if score only
-        assert!(trace || self.memory_model == MemoryModel::MemoryHigh);
+        assert!(trace || self.memory_model == MemoryModel::MemoryUltraLow);
         let scope = if trace {
             AlignmentScope::Alignment
         } else {
