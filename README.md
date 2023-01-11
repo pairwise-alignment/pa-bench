@@ -135,22 +135,22 @@ and then run the orchestrator in the `evals` directory on an input file.
 
 ```sh
 cargo build --release
-cd evals && cargo run --release -- jobs/test.yaml results/test.json
+cd evals && cargo run --release -- experiments/test.yaml results/test.json
 ```
 
 Full help:
 
 ```text
-Usage: orchestrator [OPTIONS] <JOBS> [RESULTS]
+Usage: orchestrator [OPTIONS] <EXPERIMENT> [RESULTS]
 
 Arguments:
-  <JOBS>     Path to a yaml file with a list of parameters
-  [RESULTS]  Path to the output json file [default: results/results.json]
+  <EXPERIMENT>  Path to an experiment yaml file
+  [RESULTS]     Path to the output json file [default: results/results.json]
 
 Options:
   -d, --data-dir <DATA_DIR>      Path to the data directory [default: data]
   -l, --logs-dir <LOGS_DIR>      Path to the logs directory [default: results/.logs]
-  -r, --runner <RUNNER>          Path to the runner binary [default: target/release/runner]
+  -r, --runner <RUNNER>          Path to the runner binary [default: ../target/release/runner]
   -t, --time-limit <TIME_LIMIT>  [default: 1h]
   -m, --mem-limit <MEM_LIMIT>    [default: 1GiB]
       --nice <NICE>
@@ -159,8 +159,6 @@ Options:
       --incremental              Skip jobs already present in the results file
   -v, --verbose                  Verbose runner outputs
       --force-rerun              Ignore the existing results json and regenerate datasets
-  -h, --help                     Print help information (use `--help` for more detail)
-  -V, --version                  Print version information
 ```
 
 ## Notes on benchmarking

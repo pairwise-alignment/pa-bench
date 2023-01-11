@@ -17,7 +17,7 @@ use pa_types::*;
 
 /// The main configuration object and root of the yaml file.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct JobsConfig {
+pub struct Experiment {
     datasets: Vec<DatasetConfig>,
     traces: Vec<bool>,
     costs: Vec<CostModel>,
@@ -50,7 +50,7 @@ pub struct DatasetGeneratorConfig {
     total_size: usize,
 }
 
-impl JobsConfig {
+impl Experiment {
     pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Job> {
         let datasets = self
             .datasets
