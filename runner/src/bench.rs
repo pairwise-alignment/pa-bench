@@ -12,8 +12,8 @@ pub fn measure<F>(f: F) -> Measured
 where
     F: FnOnce(),
 {
-    let cpu_start = unsafe { libc::sched_getcpu() };
-    let cpu_freq_start = get_cpu_freq(cpu_start);
+    let cpu_start = get_cpu();
+    let cpu_freq_start = cpu_start.and_then(|c| get_cpu_freq(c));
     let initial_mem = get_maxrss();
     let time_start = chrono::Utc::now().trunc_subsecs(3);
     let start = Instant::now();
@@ -23,8 +23,8 @@ where
     let runtime = start.elapsed().as_secs_f32();
     let time_end = chrono::Utc::now().trunc_subsecs(3);
     let memory = get_maxrss().saturating_sub(initial_mem);
-    let cpu_end = unsafe { libc::sched_getcpu() };
-    let cpu_freq_end = get_cpu_freq(cpu_end);
+    let cpu_end = get_cpu();
+    let cpu_freq_end = cpu_end.and_then(|c| get_cpu_freq(c));
     Measured {
         // fill time-critical data first
         runtime,
@@ -79,4 +79,12 @@ fn get_cpu_freq(cur_cpu: i32) -> Option<f32> {
 
     let val = std::fs::read_to_string(path).ok()?;
     Some(val.trim().parse::<f32>().ok()? / 1000.0)
+}
+
+fn get_cpu() -> Option<i32> {
+    #[cfg(not(target_os = "macos"))]
+    {
+        return Some(unsafe { libc::sched_getcpu() });
+    }
+    None
 }
