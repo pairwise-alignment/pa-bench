@@ -1,6 +1,6 @@
 use super::*;
 
-use edlib_rs::edlibrs::*;
+use edlib_rs::*;
 
 pub struct Edlib {
     config: EdlibAlignConfigRs<'static>,
@@ -26,7 +26,7 @@ impl AlignerParams for EdlibParams {
 impl Aligner for Edlib {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
         let result = edlibAlignRs(a, b, &self.config);
-        assert!(result.status == EDLIB_STATUS_OK);
+        assert!(result.status == EDLIB_RS_STATUS_OK);
         let cost = result.getDistance();
         let cigar = result.getAlignment().map(|alignment| {
             Cigar::from_ops(alignment.into_iter().map(|op| match op {
