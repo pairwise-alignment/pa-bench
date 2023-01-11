@@ -9,7 +9,7 @@ use std::hash::{Hash, Hasher};
 use std::io::{BufWriter, Cursor, Write};
 use std::path::{Path, PathBuf};
 
-use itertools::iproduct;
+use itertools::{iproduct, Itertools};
 
 use pa_bench_types::*;
 use pa_generate::*;
@@ -56,7 +56,8 @@ impl JobsConfig {
         let datasets = self
             .datasets
             .into_iter()
-            .flat_map(|d| d.generate(data_dir, force_rerun).into_iter());
+            .flat_map(|d| d.generate(data_dir, force_rerun).into_iter())
+            .collect_vec();
         iproduct!(datasets, self.costs, self.traces, self.algos)
             .map(|(dataset, costs, traceback, algo)| Job {
                 dataset,
