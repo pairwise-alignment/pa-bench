@@ -84,7 +84,10 @@ fn get_cpu_freq(cur_cpu: i32) -> Option<f32> {
 fn get_cpu() -> Option<i32> {
     #[cfg(not(target_os = "macos"))]
     {
-        return Some(unsafe { libc::sched_getcpu() });
+        Some(unsafe { libc::sched_getcpu() })
     }
-    None
+    #[cfg(target_os = "macos")]
+    {
+        None
+    }
 }
