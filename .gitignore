@@ -1,5 +1,6 @@
 /target
 /evals/data
-/evals/results
+/evals/results.json
+/evals/.results
 /evals/analysis/.ipynb_checkpoints
 /evals/analysis/*.png
