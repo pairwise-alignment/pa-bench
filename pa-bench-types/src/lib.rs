@@ -28,11 +28,15 @@ impl GeneratedDataset {
             && self.total_size >= o.total_size
     }
 
-    pub fn path(&self) -> PathBuf {
-        self.prefix.join(format!(
+    pub fn name(&self) -> String {
+        format!(
             "{:?}-t{}-n{}-e{}.seq",
             self.error_model, self.total_size, self.length, self.error_rate
-        ))
+        )
+    }
+
+    pub fn path(&self) -> PathBuf {
+        self.prefix.join(self.name())
     }
 
     pub fn to_generator(&self) -> DatasetGenerator {
