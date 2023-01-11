@@ -33,9 +33,9 @@ ksw2-sys = { git = "https://github.com/pairwise-alignment/ksw2-sys" }
 
 # TODO(ragnar): Can this feature detection not be moved into the block aligner crate?
 [target.'cfg(target_arch = "x86_64")'.dependencies]
-block-aligner = { git = "https://github.com/Daniel-Liu-c0deb0t/block-aligner", features = ["simd_avx2"] }
+block-aligner = { git = "https://github.com/RagnarGrootKoerkamp/block-aligner", branch = "cbindgen_feature", features = ["simd_avx2"], default-features = false }
 [target.'cfg(target_arch = "aarch64")'.dependencies]
-block-aligner = { git = "https://github.com/Daniel-Liu-c0deb0t/block-aligner", features = ["simd_neon"] }
+block-aligner = { git = "https://github.com/RagnarGrootKoerkamp/block-aligner", branch = "cbindgen_feature", features = ["simd_neon"], default-features = false }
 
 [features]
 default = ["parasailors"]
