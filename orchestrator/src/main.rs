@@ -40,9 +40,9 @@ struct Args {
     #[arg(short, long, default_value = "results/.logs")]
     logs_dir: PathBuf,
 
-    /// Path to the runner binary.
-    #[arg(short, long, default_value = "../target/release/runner")]
-    runner: PathBuf,
+    /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
+    #[arg(short, long)]
+    runner: Option<PathBuf>,
 
     #[arg(short, long, value_parser = parse_duration::parse, default_value = "1h")]
     time_limit: Duration,
@@ -79,12 +79,17 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse();
+    let mut args = Args::parse();
+    if args.runner.is_none() {
+        let dir = std::env::var("CARGO_MANIFEST_DIR")
+            .expect("Neither --runner nor CARGO_MANIFEST_DIR env var is set.");
+        args.runner = Some(Path::new(&dir).join("../target/release/runner"));
+    }
 
     assert!(
-        args.runner.exists(),
+        args.runner.as_ref().unwrap().exists(),
         "{} does not exist!",
-        args.runner.display()
+        args.runner.unwrap().display()
     );
 
     let experiment_yaml =
@@ -138,7 +143,7 @@ fn main() {
     };
 
     let job_results = run_with_threads(
-        &args.runner,
+        &args.runner.unwrap(),
         jobs,
         args.time_limit,
         args.mem_limit,
