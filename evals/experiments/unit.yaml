@@ -60,4 +60,6 @@ algos:
     method: !ExtensionSuzukiSse
     band_doubling: false
   - !AstarPA
-    heuristic: !SH
+    diagonal_transition: true
+    heuristic:
+      heuristic: !None
