@@ -18,13 +18,13 @@ pub struct BlockAlignerParams {
     pub max_size: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct ParasailStripedParams;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct EdlibParams;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct TripleAccelParams;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,10 +44,20 @@ impl WfaParams {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+impl Default for WfaParams {
+    fn default() -> Self {
+        Self {
+            memory_model: rust_wfa2::aligner::MemoryModel::MemoryUltraLow,
+            heuristic: rust_wfa2::aligner::Heuristic::None,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Ksw2Method {
     GlobalGreen,
     GlobalSuzuki,
+    #[default]
     GlobalSuzukiSse,
     ExtensionGreen,
     ExtensionSuzukiSse,
@@ -57,6 +67,20 @@ pub enum Ksw2Method {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Ksw2Params {
+    #[serde(default)]
     pub method: Ksw2Method,
+    #[serde(default = "band_doubling_enabled")]
     pub band_doubling: bool,
+}
+fn band_doubling_enabled() -> bool {
+    true
+}
+
+impl Default for Ksw2Params {
+    fn default() -> Self {
+        Ksw2Params {
+            method: Ksw2Method::GlobalSuzukiSse,
+            band_doubling: true,
+        }
+    }
 }

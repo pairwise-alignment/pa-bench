@@ -6,7 +6,7 @@ use pa_generate::*;
 use pa_types::*;
 
 mod algorithms;
-pub use crate::algorithms::*;
+pub use algorithms::*;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct GeneratedDataset {
