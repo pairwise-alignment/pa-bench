@@ -9,6 +9,7 @@ pub enum AlgorithmParams {
     TripleAccel(TripleAccelParams),
     Wfa(WfaParams),
     Ksw2(Ksw2Params),
+    AstarPA(astar_pairwise_aligner::aligners::astar::AstarPAParams),
     // Add more algorithms here!
 }
 

@@ -1,6 +1,7 @@
 use pa_bench_types::*;
 use pa_types::*;
 
+mod astarpa;
 mod block_aligner;
 mod edlib;
 mod ksw2;
