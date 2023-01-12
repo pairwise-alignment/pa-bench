@@ -62,4 +62,4 @@
     - !AstarPA
       diagonal_transition: true
       heuristic:
-        heuristic: !None
+        type: !None

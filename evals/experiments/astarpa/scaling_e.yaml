@@ -32,19 +32,19 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !SH
+        type: !SH
         r: 1
         k: 9
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !CSH
+        type: !CSH
         r: 1
         k: 9
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !CSH
+        type: !CSH
         gap_cost: true
         r: 1
         k: 9
@@ -52,19 +52,19 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !SH
+        type: !SH
         r: 2
         k: 9
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !CSH
+        type: !CSH
         r: 2
         k: 9
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !CSH
+        type: !CSH
         gap_cost: true
         r: 2
         k: 9
