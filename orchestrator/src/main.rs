@@ -136,12 +136,16 @@ fn main() {
 
     eprintln!("There are {} existing jobs.", existing_job_results.len());
 
-    // Remove jobs that were run before.
+    // Skip jobs that succeeded before, or were attempted with at least as many resources.
     if args.incremental {
         jobs.retain(|job| {
             existing_job_results
                 .iter()
-                .find(|existing_job| &existing_job.job == job)
+                .find(|existing_job| {
+                    existing_job.job.is_same_as(job)
+                        && (existing_job.output.is_ok()
+                            || existing_job.job.has_more_resources_than(job))
+                })
                 .is_none()
         });
     };
@@ -196,7 +200,7 @@ fn main() {
     existing_job_results.retain(|existing_job| {
         job_results
             .iter()
-            .find(|job| job.job == existing_job.job)
+            .find(|job| job.job.is_same_as(&existing_job.job))
             .is_none()
     });
 

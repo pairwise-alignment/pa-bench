@@ -83,7 +83,7 @@ impl Dataset {
 }
 
 /// An alignment job: a single task for the runner to execute and benchmark.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Job {
     /// The maximum cpu time in seconds for the job.
     /// E.g. 1h. Parsed using parse_duration::parse.
@@ -104,6 +104,24 @@ pub struct Job {
 }
 
 impl Job {
+    /// Whether the jobs are the same, ignoring resources.
+    pub fn is_same_as(&self, o: &Self) -> bool {
+        self.dataset == o.dataset
+            && self.costs == o.costs
+            && self.traceback == o.traceback
+            && self.algo == o.algo
+    }
+
+    /// Whether this job is larger than another job.
+    /// Returns false when either job is not generated.
+    pub fn has_more_resources_than(&self, o: &Self) -> bool {
+        self.time_limit >= o.time_limit && self.mem_limit >= o.mem_limit
+    }
+
+    pub fn same_input(&self, o: &Self) -> bool {
+        self.dataset == o.dataset && self.costs == o.costs
+    }
+
     /// Whether this job is larger than another job.
     /// Returns false when either job is not generated.
     pub fn is_larger(&self, o: &Self) -> bool {
@@ -122,10 +140,6 @@ impl Job {
             && self.mem_limit <= o.mem_limit
             // parameters must be more
             && self_args.is_larger_than(o_args)
-    }
-
-    pub fn same_input(&self, o: &Self) -> bool {
-        self.dataset == o.dataset && self.costs == o.costs
     }
 }
 
