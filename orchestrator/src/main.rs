@@ -44,11 +44,13 @@ struct Args {
     #[arg(short, long)]
     runner: Option<PathBuf>,
 
-    #[arg(short, long, value_parser = parse_duration::parse, default_value = "1h")]
-    time_limit: Duration,
+    /// Time limit. Defaults to value in experiment yaml or 1m.
+    #[arg(short, long, value_parser = parse_duration::parse)]
+    time_limit: Option<Duration>,
 
-    #[arg(short, long, value_parser = parse_bytes, default_value = "1GiB")]
-    mem_limit: Bytes,
+    /// Memory limit. Defaults to value in experiment yaml or 1GiB.
+    #[arg(short, long, value_parser = parse_bytes)]
+    mem_limit: Option<Bytes>,
 
     // process niceness. <0 for higher priority.
     #[arg(long)]
@@ -102,14 +104,19 @@ fn main() {
         serde_json::from_str(
             &fs::read_to_string(&args.results).expect("Error reading existing results file"),
         )
-        .expect("Error parsing existing results")
+        .expect("Error parsing existing results.json")
     } else {
         vec![]
     };
 
     eprintln!("There are {} existing jobs!", existing_job_results.len());
     eprintln!("Generating jobs and datasets...");
-    let mut jobs = experiments.generate(&args.data_dir, args.force_rerun);
+    let mut jobs = experiments.generate(
+        &args.data_dir,
+        args.force_rerun,
+        args.time_limit,
+        args.mem_limit,
+    );
     eprintln!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
     if args.incremental {
@@ -145,8 +152,6 @@ fn main() {
     let job_results = run_with_threads(
         &args.runner.unwrap(),
         jobs,
-        args.time_limit,
-        args.mem_limit,
         runner_cores,
         args.nice,
         args.stderr,
@@ -263,8 +268,6 @@ fn verify_costs(results: &mut Vec<JobResult>) {
 fn run_with_threads(
     runner: &Path,
     jobs: Vec<Job>,
-    time_limit: Duration,
-    mem_limit: Bytes,
     cores: Option<Vec<usize>>,
     nice: Option<i32>,
     show_stderr: bool,
@@ -318,16 +321,7 @@ fn run_with_threads(
                             output: Err(()),
                         }
                     } else {
-                        run_job(
-                            runner,
-                            job,
-                            time_limit,
-                            mem_limit,
-                            *id,
-                            nice,
-                            show_stderr,
-                            verbose,
-                        )
+                        run_job(runner, job, *id, nice, show_stderr, verbose)
                     };
 
                     // If the orchestrator was aborted, do not push failing job results.
@@ -345,18 +339,12 @@ fn run_with_threads(
 fn run_job(
     runner: &Path,
     job: Job,
-    time_limit: Duration,
-    mem_limit: Bytes,
     core_id: Option<usize>,
     nice: Option<i32>,
     show_stderr: bool,
     verbose: bool,
 ) -> JobResult {
     let mut cmd = Command::new(runner);
-    cmd.arg("--time-limit")
-        .arg(time_limit.as_secs().to_string())
-        .arg("--mem-limit")
-        .arg(mem_limit.to_string());
     if let Some(id) = core_id {
         cmd.arg("--pin-core-id").arg(id.to_string());
     }

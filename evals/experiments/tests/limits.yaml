@@ -1,0 +1,14 @@
+- time_limit: 1h
+  mem_limit: 1GiB
+  datasets:
+    - !Data
+      - [A, C]
+  traces: [false]
+  costs: [{sub: 1, open: 0, extend: 1}]
+  algos: [!Edlib ]
+- datasets:
+    - !Data
+      - [A, C]
+  traces: [false]
+  costs: [{sub: 1, open: 0, extend: 1}]
+  algos: [!Edlib ]

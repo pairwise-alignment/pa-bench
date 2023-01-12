@@ -85,6 +85,14 @@ impl Dataset {
 /// An alignment job: a single task for the runner to execute and benchmark.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Job {
+    /// The maximum cpu time in seconds for the job.
+    /// E.g. 1h. Parsed using parse_duration::parse.
+    /// Set using RLIMIT_CPU.
+    pub time_limit: u64,
+    /// The maximum total memory usage for the job.
+    /// Includes startup overhead, which is excluded from the measured memory usage.
+    /// Set using RLIMIT_DATA.
+    pub mem_limit: Bytes,
     /// Path to a `.seq` file.
     pub dataset: Dataset,
     /// The cost model to use.
@@ -105,9 +113,14 @@ impl Job {
         let Dataset::Generated(o_args) = &o.dataset else {
             return false;
         };
+        // inputs must be the same
         self.costs == o.costs
             && self.algo == o.algo
             && self.traceback == o.traceback
+            // resources must be less
+            && self.time_limit <= o.time_limit
+            && self.mem_limit <= o.mem_limit
+            // parameters must be more
             && self_args.is_larger_than(o_args)
     }
 
