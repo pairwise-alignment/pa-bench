@@ -15,3 +15,4 @@ pa-generate = { git = "https://github.com/pairwise-alignment/pa-generate" }
 serde = { version = "^1.0", features = ["derive"] }
 rust-wfa2 = { git = "https://github.com/pairwise-alignment/rust-wfa2" }
 chrono = { version = "0.4.23", default-features = false, features = ["serde"] }
+astar-pairwise-aligner = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", default-features = false }
