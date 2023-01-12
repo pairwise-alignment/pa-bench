@@ -10,7 +10,6 @@ use std::{
     cmp::max,
     fs,
     io::{self, prelude::*},
-    time::Duration,
 };
 
 use serde_json;
@@ -22,10 +21,6 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
 struct Args {
-    #[arg(short, long, value_parser = parse_duration::parse, default_value = "1h")]
-    time_limit: Duration,
-    #[arg(short, long, value_parser = parse_bytes, default_value = "1GiB")]
-    mem_limit: Bytes,
     #[arg(short, long)]
     pin_core_id: Option<usize>,
     // process niceness. <0 for higher priority.
@@ -37,7 +32,6 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    set_limits(args.time_limit, args.mem_limit);
     if let Some(id) = args.pin_core_id {
         assert!(
             core_affinity::set_for_current(core_affinity::CoreId { id }),
@@ -53,6 +47,7 @@ fn main() {
         .read_to_end(&mut stdin_job)
         .expect("Error in reading from stdin!");
     let job: Job = serde_json::from_slice(&stdin_job).expect("Error in parsing input json!");
+    set_limits(job.time_limit, job.mem_limit);
 
     if args.verbose {
         eprintln!("\nRunning job:\n{job:?}");

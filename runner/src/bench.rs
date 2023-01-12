@@ -1,7 +1,4 @@
-use std::{
-    path::Path,
-    time::{Duration, Instant},
-};
+use std::{path::Path, time::Instant};
 
 use chrono::SubsecRound;
 use libc;
@@ -56,7 +53,7 @@ pub fn get_maxrss() -> Bytes {
     }
 }
 
-pub fn set_limits(time: Duration, mem: Bytes) {
+pub fn set_limits(time: u64, mem: Bytes) {
     let set = |res, limit| {
         let rlimit = libc::rlimit {
             rlim_cur: limit as _,
@@ -66,7 +63,7 @@ pub fn set_limits(time: Duration, mem: Bytes) {
             libc::setrlimit(res, &rlimit);
         }
     };
-    set(libc::RLIMIT_CPU, time.as_secs());
+    set(libc::RLIMIT_CPU, time);
     set(libc::RLIMIT_DATA, mem);
 }
 

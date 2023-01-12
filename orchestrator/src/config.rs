@@ -8,6 +8,7 @@ use std::fs;
 use std::hash::{Hash, Hasher};
 use std::io::{BufWriter, Cursor, Write};
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use itertools::{iproduct, Itertools};
 
@@ -25,6 +26,16 @@ pub struct Experiments(Vec<Experiment>);
 /// each of the specified datasets.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Experiment {
+    /// Parsed using parse_duration::parse.
+    /// Default: 1m.
+    /// Can be overridden by command line flag.
+    #[serde(default)]
+    time_limit: Option<String>,
+    /// Parsed using parse_bytes.
+    /// Default: 1GiB.
+    /// Can be overridden by command line flag.
+    #[serde(default)]
+    mem_limit: Option<String>,
     datasets: Vec<DatasetConfig>,
     traces: Vec<bool>,
     costs: Vec<CostModel>,
@@ -58,17 +69,21 @@ pub struct DatasetGeneratorConfig {
 }
 
 impl Experiments {
-    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Job> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool, time_limit: Option<Duration>, mem_limit: Option<Bytes>) -> Vec<Job> {
         self.0
             .into_iter()
             .flat_map(|product| {
+                let time_limit = time_limit.unwrap_or(parse_duration::parse(&product.time_limit.unwrap_or("1m".into())).expect("Could not parse time limit")).as_secs();
+                let mem_limit = mem_limit.unwrap_or(parse_bytes(&product.mem_limit.unwrap_or("1m".into())).expect("Could not parse memory limit"));
                 let datasets = product
                     .datasets
                     .into_iter()
                     .flat_map(|d| d.generate(data_dir, force_rerun).into_iter())
                     .collect_vec();
                 iproduct!(datasets, product.costs, product.traces, product.algos).map(
-                    |(dataset, costs, traceback, algo)| Job {
+                    move |(dataset, costs, traceback, algo)| Job {
+                        time_limit,
+                        mem_limit,
                         dataset,
                         costs,
                         traceback,
