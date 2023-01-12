@@ -1,4 +1,6 @@
-- datasets:
+- comment: |
+    scaling with error rate with k=9
+  datasets:
     - !Generated
       seed: 31415
       error_rates:
