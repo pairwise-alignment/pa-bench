@@ -9,7 +9,7 @@ pub struct Edlib {
 impl AlignerParams for EdlibParams {
     type Aligner = Edlib;
 
-    fn default(cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         assert!(cm.is_unit());
         let mut config = EdlibAlignConfigRs::default();
         if trace {
