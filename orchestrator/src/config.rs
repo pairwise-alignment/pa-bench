@@ -25,16 +25,15 @@ pub struct Experiments(Vec<Experiment>);
 /// A SingleExperiment runs each algo for each cost model with each trace on
 /// each of the specified datasets.
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct Experiment {
     /// Parsed using parse_duration::parse.
     /// Default: 1m.
     /// Can be overridden by command line flag.
-    #[serde(default)]
     time_limit: Option<String>,
     /// Parsed using parse_bytes.
     /// Default: 1GiB.
     /// Can be overridden by command line flag.
-    #[serde(default)]
     mem_limit: Option<String>,
     datasets: Vec<DatasetConfig>,
     traces: Vec<bool>,
@@ -43,6 +42,7 @@ pub struct Experiment {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub enum DatasetConfig {
     Generated(DatasetGeneratorConfig),
     /// Path to a .seq file, relative to `--data-dir`.
@@ -60,6 +60,7 @@ pub enum DatasetConfig {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct DatasetGeneratorConfig {
     seed: u64,
     error_models: Vec<ErrorModel>,

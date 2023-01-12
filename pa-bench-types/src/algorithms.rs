@@ -29,6 +29,7 @@ pub struct EdlibParams;
 pub struct TripleAccelParams;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct WfaParams {
     #[serde(default = "WfaParams::default_memory_model")]
     pub memory_model: rust_wfa2::aligner::MemoryModel,
@@ -67,6 +68,7 @@ pub enum Ksw2Method {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct Ksw2Params {
     #[serde(default)]
     pub method: Ksw2Method,
