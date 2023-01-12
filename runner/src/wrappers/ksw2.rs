@@ -16,14 +16,13 @@ pub struct Ksw2 {
 
 impl AlignerParams for Ksw2Params {
     type Aligner = Ksw2;
-
-    fn new(self, cost_model: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         // NOTE: The score matrix isn't actually used: only m[0]=match and
         // m[1]=mismatch are used, unless the flag KSW_EZ_GENERIC_SC=0x04 is set which says the matrix is arbitrary.
         let mut score_matrix = [0; M * M];
         for i in 0..M - 1 {
             for j in 0..M - 1 {
-                score_matrix[(M * i + j) as usize] = if i == j { 0 } else { -cost_model.sub as i8 };
+                score_matrix[(M * i + j) as usize] = if i == j { 0 } else { -cm.sub as i8 };
             }
         }
 
@@ -33,22 +32,13 @@ impl AlignerParams for Ksw2Params {
         encoding[b'G' as usize] = 2;
         encoding[b'T' as usize] = 3;
         Self::Aligner {
-            params: self,
+            params: self.clone(),
             trace,
             encoding,
             score_matrix,
-            open: cost_model.open as _,
-            extend: cost_model.extend as _,
+            open: cm.open as _,
+            extend: cm.extend as _,
         }
-    }
-
-    fn default(cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
-        Ksw2Params {
-            // TODO: Or GlobalSuzukiSse?
-            method: Ksw2Method::ExtensionSuzukiSse,
-            band_doubling: true,
-        }
-        .new(cm, trace, max_len)
     }
 
     fn is_exact(&self) -> bool {

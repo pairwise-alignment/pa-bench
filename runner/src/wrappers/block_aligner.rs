@@ -24,7 +24,7 @@ pub struct BlockAligner {
 impl AlignerParams for BlockAlignerParams {
     type Aligner = BlockAligner;
 
-    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
+    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
         assert!(cm.is_affine());
         let block = if trace {
             BlockAlignerBlock::Trace(Block::new(max_len, max_len, self.max_size))
@@ -41,7 +41,7 @@ impl AlignerParams for BlockAlignerParams {
         let b = PaddedBytes::new::<NucMatrix>(max_len, self.max_size);
 
         Self::Aligner {
-            params: self,
+            params: self.clone(),
             matrix,
             gaps,
             block,

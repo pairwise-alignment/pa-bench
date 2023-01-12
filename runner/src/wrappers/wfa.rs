@@ -16,7 +16,7 @@ pub struct Wfa {
 impl AlignerParams for WfaParams {
     type Aligner = Wfa;
 
-    fn new(self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
         // memory model does not matter if score only
         assert!(trace || self.memory_model == MemoryModel::MemoryUltraLow);
         let scope = if trace {
@@ -35,15 +35,7 @@ impl AlignerParams for WfaParams {
             _ => unimplemented!("WFA does not support match bonus!"),
         };
         aligner.set_heuristic(self.heuristic);
-        Wfa { cm, aligner }
-    }
-
-    fn default(cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
-        Self {
-            memory_model: MemoryModel::MemoryUltraLow,
-            heuristic: aligner::Heuristic::None,
-        }
-        .new(cm, trace, max_len)
+        Self::Aligner { cm, aligner }
     }
 
     fn is_exact(&self) -> bool {

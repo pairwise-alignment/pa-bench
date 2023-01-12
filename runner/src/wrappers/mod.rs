@@ -8,21 +8,12 @@ mod parasail;
 mod triple_accel;
 mod wfa;
 
+/// Parameters for an aligner, with a `new` method to instantiate the aligner.
 pub trait AlignerParams {
     type Aligner: Aligner;
 
     /// Instantiate the aligner with a configuration.
-    fn new(self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner
-    where
-        Self: Sized,
-    {
-        Self::default(cm, trace, max_len)
-    }
-
-    /// Instantiate the aligner with a default configuration.
-    fn default(_cm: CostModel, _trace: bool, _max_len: usize) -> Self::Aligner {
-        unimplemented!("This aligner does not support default parameters.");
-    }
+    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner;
 
     /// Is the aligner exact?
     fn is_exact(&self) -> bool;

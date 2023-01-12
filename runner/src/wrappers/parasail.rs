@@ -14,7 +14,7 @@ mod with_parasailors {
     impl AlignerParams for ParasailStripedParams {
         type Aligner = ParasailStriped;
 
-        fn default(cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+        fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
             assert!(!trace);
             let s = ScoreModel::from_costs(cm);
             Self::Aligner {
