@@ -1,0 +1,8 @@
+- datasets:
+  traces:
+  costs:
+  algos:
+    - !Wfa
+    - !AstarPA
+      diagonal_transition: false
+      heuristic: !None

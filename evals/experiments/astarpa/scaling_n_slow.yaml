@@ -12,27 +12,27 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !None
+        type: !None
         r: 1
         k: 15
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !SH
+        type: !SH
         no_prune: true
         r: 1
         k: 15
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !CSH
+        type: !CSH
         no_prune: true
         r: 1
         k: 15
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        heuristic: !CSH
+        type: !CSH
         gap_cost: true
         no_prune: true
         r: 1
