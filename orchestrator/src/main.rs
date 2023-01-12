@@ -1,25 +1,22 @@
-use chrono::Timelike;
-use pa_bench_types::*;
-use pa_types::*;
+mod config;
 
+use chrono::Timelike;
+use clap::Parser;
+use core_affinity;
+use serde_json;
+use serde_yaml;
 use std::fs;
 use std::io::prelude::*;
+use std::os::unix::process::ExitStatusExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use std::os::unix::process::ExitStatusExt;
+use pa_bench_types::*;
+use pa_types::*;
 
-use serde_json;
-use serde_yaml;
-
-use core_affinity;
-
-use clap::Parser;
-
-mod config;
 use config::*;
 
 #[derive(Debug, Parser)]
@@ -28,16 +25,17 @@ struct Args {
     /// Path to an experiment yaml file.
     experiment: PathBuf,
 
-    /// Path to the output json file.
-    #[arg(default_value = "evals/results.json")]
-    results: PathBuf,
+    /// Path to the output json file. By default mirrors the `experiments` dir in `results`.
+    results: Option<PathBuf>,
 
     /// Path to the data directory.
     #[arg(short, long, default_value = "evals/data")]
     data_dir: PathBuf,
 
     /// Path to the logs directory.
-    #[arg(short, long, default_value = "evals/.results")]
+    ///
+    /// Results of all runs are stored here.
+    #[arg(short, long, default_value = "evals/results/.log")]
     logs_dir: PathBuf,
 
     /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
@@ -68,7 +66,7 @@ struct Args {
     stderr: bool,
 
     /// Skip jobs already present in the results file.
-    #[arg(long)]
+    #[arg(short, long)]
     incremental: bool,
 
     /// Verbose runner outputs.
@@ -99,25 +97,45 @@ fn main() {
     let experiments: Experiments =
         serde_yaml::from_str(&experiment_yaml).expect("Failed to parse jobs generator yaml:");
 
-    // Read the existing results file.
-    let mut existing_job_results: Vec<JobResult> = if !args.force_rerun && args.results.is_file() {
-        serde_json::from_str(
-            &fs::read_to_string(&args.results).expect("Error reading existing results file"),
-        )
-        .expect("Error parsing existing results.json")
-    } else {
-        vec![]
-    };
-
-    eprintln!("There are {} existing jobs!", existing_job_results.len());
-    eprintln!("Generating jobs and datasets...");
+    let results_path = args.results.unwrap_or_else(|| {
+        // Mirror the structure of experiments in results.
+        // To be precise: replace the last directory named "experiments" by "results".
+        let mut found = false;
+        args.experiment
+            .with_extension("json")
+            .iter()
+            .rev()
+            .map(|c| {
+                if c == "experiments" && !found {
+                    found = true;
+                    "results"
+                } else {
+                    c.to_str().unwrap()
+                }
+            })
+            .rev()
+            .collect()
+    });
     let mut jobs = experiments.generate(
         &args.data_dir,
         args.force_rerun,
         args.time_limit,
         args.mem_limit,
     );
-    eprintln!("Generated {} jobs!", jobs.len());
+    eprintln!("Generated {} jobs.", jobs.len());
+
+    // Read the existing results file.
+    let mut existing_job_results: Vec<JobResult> = if !args.force_rerun && results_path.is_file() {
+        serde_json::from_str(
+            &fs::read_to_string(&results_path).expect("Error reading existing results file"),
+        )
+        .expect("Error parsing existing results.json")
+    } else {
+        vec![]
+    };
+
+    eprintln!("There are {} existing jobs.", existing_job_results.len());
+
     // Remove jobs that were run before.
     if args.incremental {
         jobs.retain(|job| {
@@ -194,12 +212,13 @@ fn main() {
 
     verify_costs(&mut job_results);
 
-    if let Some(dir) = args.results.parent() {
+    if let Some(dir) = results_path.parent() {
         fs::create_dir_all(dir).unwrap();
     }
-    fs::write(&args.results, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
+    eprintln!("Writing jobs to {}...", results_path.display());
+    fs::write(&results_path, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
         "Failed to write results to {}",
-        args.results.display()
+        results_path.display()
     ));
 
     println!("Orchestrator successfully finished!");
