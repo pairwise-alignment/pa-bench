@@ -94,7 +94,7 @@ fn main() {
 
     let experiment_yaml =
         fs::read_to_string(&args.experiment).expect("Failed to read jobs generator:");
-    let experiment: Experiment =
+    let experiments: Experiments =
         serde_yaml::from_str(&experiment_yaml).expect("Failed to parse jobs generator yaml:");
 
     // Read the existing results file.
@@ -109,7 +109,7 @@ fn main() {
 
     eprintln!("There are {} existing jobs!", existing_job_results.len());
     eprintln!("Generating jobs and datasets...");
-    let mut jobs = experiment.generate(&args.data_dir, args.force_rerun);
+    let mut jobs = experiments.generate(&args.data_dir, args.force_rerun);
     eprintln!("Generated {} jobs!", jobs.len());
     // Remove jobs that were run before.
     if args.incremental {

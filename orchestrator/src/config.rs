@@ -15,7 +15,14 @@ use pa_bench_types::*;
 use pa_generate::*;
 use pa_types::*;
 
-/// The main configuration object and root of the yaml file.
+/// This is the root type of the yaml configuration file.
+/// It consists of multiple Experiments, each of which is the Cartesian product
+/// of a set of datasets and parameters.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Experiments(Vec<Experiment>);
+
+/// A SingleExperiment runs each algo for each cost model with each trace on
+/// each of the specified datasets.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Experiment {
     datasets: Vec<DatasetConfig>,
@@ -50,19 +57,24 @@ pub struct DatasetGeneratorConfig {
     total_size: usize,
 }
 
-impl Experiment {
+impl Experiments {
     pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Job> {
-        let datasets = self
-            .datasets
+        self.0
             .into_iter()
-            .flat_map(|d| d.generate(data_dir, force_rerun).into_iter())
-            .collect_vec();
-        iproduct!(datasets, self.costs, self.traces, self.algos)
-            .map(|(dataset, costs, traceback, algo)| Job {
-                dataset,
-                costs,
-                traceback,
-                algo,
+            .flat_map(|product| {
+                let datasets = product
+                    .datasets
+                    .into_iter()
+                    .flat_map(|d| d.generate(data_dir, force_rerun).into_iter())
+                    .collect_vec();
+                iproduct!(datasets, product.costs, product.traces, product.algos).map(
+                    |(dataset, costs, traceback, algo)| Job {
+                        dataset,
+                        costs,
+                        traceback,
+                        algo,
+                    },
+                )
             })
             .collect()
     }
