@@ -23,16 +23,16 @@ core_affinity = "^0.7"
 libc = "^0.2"
 rustix = { version = "0.36.5", features = ["process"] }
 
-# Rust aligners:
+# Aligners:
 triple_accel = { git = "https://github.com/Daniel-Liu-c0deb0t/triple_accel" }
 astar-pairwise-aligner = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", default-features = false }
 
-# Aligner wrappers:
-# Parasail requires the corresponding feature to be set to avoid slow build times.
-parasailors = { git = "https://github.com/Daniel-Liu-c0deb0t/parasailors-new", optional=true }
+# Wrappers:
 edlib_rs = { git = "https://github.com/pairwise-alignment/edlib-rs" }
 rust-wfa2 = { git = "https://github.com/pairwise-alignment/rust-wfa2" }
 ksw2-sys = { git = "https://github.com/pairwise-alignment/ksw2-sys" }
+# Parasail requires the corresponding feature to be set to avoid slow build times.
+parasailors = { git = "https://github.com/Daniel-Liu-c0deb0t/parasailors-new", optional=true }
 
 # TODO(ragnar): Can this feature detection not be moved into the block aligner crate?
 [target.'cfg(target_arch = "x86_64")'.dependencies]
