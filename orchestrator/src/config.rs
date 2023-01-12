@@ -27,6 +27,8 @@ pub struct Experiments(Vec<Experiment>);
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Experiment {
+    /// A comment about the dataset
+    comment: Option<String>,
     /// Parsed using parse_duration::parse.
     /// Default: 1m.
     /// Can be overridden by command line flag.
@@ -70,12 +72,26 @@ pub struct DatasetGeneratorConfig {
 }
 
 impl Experiments {
-    pub fn generate(self, data_dir: &Path, force_rerun: bool, time_limit: Option<Duration>, mem_limit: Option<Bytes>) -> Vec<Job> {
+    pub fn generate(
+        self,
+        data_dir: &Path,
+        force_rerun: bool,
+        time_limit: Option<Duration>,
+        mem_limit: Option<Bytes>,
+    ) -> Vec<Job> {
         self.0
             .into_iter()
             .flat_map(|product| {
-                let time_limit = time_limit.unwrap_or(parse_duration::parse(&product.time_limit.unwrap_or("1m".into())).expect("Could not parse time limit")).as_secs();
-                let mem_limit = mem_limit.unwrap_or(parse_bytes(&product.mem_limit.unwrap_or("1m".into())).expect("Could not parse memory limit"));
+                let time_limit = time_limit
+                    .unwrap_or(
+                        parse_duration::parse(&product.time_limit.unwrap_or("1m".into()))
+                            .expect("Could not parse time limit"),
+                    )
+                    .as_secs();
+                let mem_limit = mem_limit.unwrap_or(
+                    parse_bytes(&product.mem_limit.unwrap_or("1m".into()))
+                        .expect("Could not parse memory limit"),
+                );
                 let datasets = product
                     .datasets
                     .into_iter()
