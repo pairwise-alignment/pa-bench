@@ -1,70 +1,70 @@
-datasets:
-  - !Generated
-    seed: 31415
-    error_rates:
-      [
-        0.01,
-        0.02,
-        0.04,
-        0.06,
-        0.08,
-        0.10,
-        0.12,
-        0.14,
-        0.16,
-        0.18,
-        0.20,
-        0.22,
-        0.24,
-        0.26,
-        0.28,
-        0.30,
-        0.32,
-        0.34,
-      ]
-    error_models: [Uniform]
-    lengths: [10000]
-    total_size: 1000000
-traces: [true]
-costs:
-  - { sub: 1, open: 0, extend: 1 }
-algos:
-  - !AstarPA
-    diagonal_transition: false
-    heuristic:
-      heuristic: !SH
-      r: 1
-      k: 9
-  - !AstarPA
-    diagonal_transition: false
-    heuristic:
-      heuristic: !CSH
-      r: 1
-      k: 9
-  - !AstarPA
-    diagonal_transition: false
-    heuristic:
-      heuristic: !CSH
-      gap_cost: true
-      r: 1
-      k: 9
+- datasets:
+    - !Generated
+      seed: 31415
+      error_rates:
+        [
+          0.01,
+          0.02,
+          0.04,
+          0.06,
+          0.08,
+          0.10,
+          0.12,
+          0.14,
+          0.16,
+          0.18,
+          0.20,
+          0.22,
+          0.24,
+          0.26,
+          0.28,
+          0.30,
+          0.32,
+          0.34,
+        ]
+      error_models: [Uniform]
+      lengths: [10000]
+      total_size: 1000000
+  traces: [true]
+  costs:
+    - { sub: 1, open: 0, extend: 1 }
+  algos:
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        heuristic: !SH
+        r: 1
+        k: 9
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        heuristic: !CSH
+        r: 1
+        k: 9
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        heuristic: !CSH
+        gap_cost: true
+        r: 1
+        k: 9
 
-  - !AstarPA
-    diagonal_transition: false
-    heuristic:
-      heuristic: !SH
-      r: 2
-      k: 9
-  - !AstarPA
-    diagonal_transition: false
-    heuristic:
-      heuristic: !CSH
-      r: 2
-      k: 9
-  - !AstarPA
-    diagonal_transition: false
-    heuristic:
-      heuristic: !CSH
-      gap_cost: true
-      r: 2
-      k: 9
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        heuristic: !SH
+        r: 2
+        k: 9
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        heuristic: !CSH
+        r: 2
+        k: 9
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        heuristic: !CSH
+        gap_cost: true
+        r: 2
+        k: 9
