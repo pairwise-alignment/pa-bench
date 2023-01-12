@@ -19,6 +19,20 @@ pub trait AlignerParams {
     fn is_exact(&self) -> bool;
 }
 
+/// A type-erased helper trait that returns a `dyn Aligner`.
+pub trait TypeErasedAlignerParams {
+    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Box<dyn Aligner>;
+    fn is_exact(&self) -> bool;
+}
+impl<A: Aligner + 'static, T: AlignerParams<Aligner = A>> TypeErasedAlignerParams for T {
+    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Box<dyn Aligner> {
+        Box::new(self.new(cm, trace, max_len))
+    }
+    fn is_exact(&self) -> bool {
+        self.is_exact()
+    }
+}
+
 /// Generic pairwise global alignment interface.
 pub trait Aligner {
     /// An alignment of sequences `a` and `b`.
@@ -29,18 +43,20 @@ pub trait Aligner {
 
 /// Get an instance of the corresponding wrapper based on the algorithm.
 pub fn get_aligner(
-    algo: AlgorithmParams,
+    algo: &AlgorithmParams,
     cm: CostModel,
     trace: bool,
     max_len: usize,
 ) -> (Box<dyn Aligner>, bool) {
     use AlgorithmParams::*;
-    match algo {
-        BlockAligner(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
-        ParasailStriped(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
-        Edlib(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
-        TripleAccel(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
-        Wfa(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
-        Ksw2(params) => (Box::new(params.new(cm, trace, max_len)), params.is_exact()),
-    }
+    let params: &dyn TypeErasedAlignerParams = match algo {
+        BlockAligner(params) => params,
+        ParasailStriped(params) => params,
+        Edlib(params) => params,
+        TripleAccel(params) => params,
+        Wfa(params) => params,
+        Ksw2(params) => params,
+        AstarPA(_) => todo!(),
+    };
+    (params.new(cm, trace, max_len), params.is_exact())
 }

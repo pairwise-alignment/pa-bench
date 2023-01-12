@@ -113,7 +113,7 @@ fn main() {
 
     let measured = measure(|| {
         let mut aligner;
-        (aligner, is_exact) = get_aligner(job.algo, job.costs, job.traceback, max_len);
+        (aligner, is_exact) = get_aligner(&job.algo, job.costs, job.traceback, max_len);
         sequence_pairs.iter().for_each(|(a, b)| {
             let (cost, cigar) = aligner.align(a, b);
             costs.push(cost);
