@@ -3,3 +3,5 @@ traces:
 costs:
 algos:
   - !Wfa
+  - !AstarPA
+    heuristic: !None
