@@ -1,22 +1,22 @@
-datasets:
-  - !Data
-    - - CGCTGGCTGCTGCCACTAACTCCGTATAGTCTCACCAAGT
-      - CGCTGGCTCGCCTGCCACGTAACTCCGTATAGTCTCACCAACTGTCAGTT
-    - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
-      - ACAGGTACACCACTATCACGACAAGTTGGGTC
-  - !Generated
-    seed: 31415
-    total_size: 100000
-    error_models: [Uniform]
-    error_rates: [0.25]
-    lengths: [1000]
-  - !File manual/1189516942891102444.seq
-  - !Directory manual
-  - !Download
-    url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-    dir: human/chm13/
-traces: [false]
-costs:
-  - { sub: 1, open: 0, extend: 1 }
-algos:
-  - !Edlib
+- datasets:
+    - !Data
+      - - CGCTGGCTGCTGCCACTAACTCCGTATAGTCTCACCAAGT
+        - CGCTGGCTCGCCTGCCACGTAACTCCGTATAGTCTCACCAACTGTCAGTT
+      - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
+        - ACAGGTACACCACTATCACGACAAGTTGGGTC
+    - !Generated
+      seed: 31415
+      total_size: 100000
+      error_models: [Uniform]
+      error_rates: [0.25]
+      lengths: [1000]
+    - !File manual/1189516942891102444.seq
+    - !Directory manual
+    - !Download
+      url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      dir: human/chm13/
+  traces: [false]
+  costs:
+    - { sub: 1, open: 0, extend: 1 }
+  algos:
+    - !Edlib

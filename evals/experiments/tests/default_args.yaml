@@ -1,7 +1,7 @@
-datasets:
-traces:
-costs:
-algos:
-  - !Wfa
-  - !AstarPA
-    heuristic: !None
+- datasets:
+  traces:
+  costs:
+  algos:
+    - !Wfa
+    - !AstarPA
+      heuristic: !None
