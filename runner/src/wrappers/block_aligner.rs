@@ -89,7 +89,7 @@ impl Aligner for BlockAligner {
                 block
                     .trace()
                     .cigar_eq(&self.a, &self.b, self.a.len(), self.b.len(), &mut ba_cigar);
-                let operations = (0..ba_cigar.len())
+                let ops = (0..ba_cigar.len())
                     .map(|i| {
                         let ::block_aligner::cigar::OpLen { op, len } = ba_cigar.get(i);
                         let op = match op {
@@ -100,13 +100,13 @@ impl Aligner for BlockAligner {
                             ::block_aligner::cigar::Operation::I => CigarOp::Del,
                             _ => unreachable!(),
                         };
-                        (op, len as _)
+                        CigarElem { op, cnt: len as _ }
                     })
                     .collect();
 
                 (
                     self.s.global_cost(block.res().score, a.len(), b.len()),
-                    Some(Cigar { operations }),
+                    Some(Cigar { ops }),
                 )
             }
         }

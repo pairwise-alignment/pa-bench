@@ -34,19 +34,17 @@ impl Aligner for TripleAccel {
             ::triple_accel::levenshtein::levenshtein_exp_with_opts(a, b, self.trace, self.costs);
 
         let cigar = edits.map(|edits| Cigar {
-            operations: edits
+            ops: edits
                 .into_iter()
-                .map(|edit| {
-                    (
-                        match edit.edit {
-                            EditType::Match => CigarOp::Match,
-                            EditType::Mismatch => CigarOp::Sub,
-                            EditType::AGap => CigarOp::Ins,
-                            EditType::BGap => CigarOp::Del,
-                            EditType::Transpose => unimplemented!(),
-                        },
-                        edit.count as _,
-                    )
+                .map(|edit| CigarElem {
+                    op: match edit.edit {
+                        EditType::Match => CigarOp::Match,
+                        EditType::Mismatch => CigarOp::Sub,
+                        EditType::AGap => CigarOp::Ins,
+                        EditType::BGap => CigarOp::Del,
+                        EditType::Transpose => unimplemented!(),
+                    },
+                    cnt: edit.count as _,
                 })
                 .collect(),
         });
