@@ -172,7 +172,7 @@ pub struct JobOutput {
     pub measured: Measured,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum JobError {
     // Skipped because a smaller job failed before it.
     Skipped,
