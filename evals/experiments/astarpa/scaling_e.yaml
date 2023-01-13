@@ -1,5 +1,8 @@
 - comment: |
-    scaling with error rate with k=9
+    Scaling with error rate with k=9
+
+    This runs in around 1 hour in total.
+  time_limit: 20min
   datasets:
     - !Generated
       seed: 31415
@@ -26,11 +29,18 @@
         ]
       error_models: [Uniform]
       lengths: [10000]
-      total_size: 1000000
+      # TODO: Revert this
+      # total_size: 1000000
+      total_size: 100000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !None
+
     - !AstarPA
       diagonal_transition: false
       heuristic:

@@ -1,5 +1,6 @@
 - comment: |
     Fast tools with total size 10^8.
+  time_limit: 1h
   datasets:
     - !Generated
       seed: 31415
@@ -32,13 +33,17 @@
         k: 15
 - comment: |
     Slow tools (dijkstra, A* without pruning) with total size 10^6.
+  time_limit: 1h
+  mem_limit: 10GiB
   datasets:
     - !Generated
       seed: 31415
       error_rates: [0.05]
       error_models: [Uniform]
       lengths: [100, 300, 1000, 3000, 10000, 30000, 100000]
-      total_size: 1000000
+      # TODO: BUMP
+      #total_size: 1000000
+      total_size: 100000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
