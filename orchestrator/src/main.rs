@@ -66,6 +66,9 @@ struct Args {
     stderr: bool,
 
     /// Skip jobs already present in the results file.
+    ///
+    /// This skips any already-present job that either succeeded or had at least
+    /// as many resources as the new job.
     #[arg(short, long)]
     incremental: bool,
 
@@ -135,15 +138,15 @@ fn main() {
         serde_json::from_str(
             &fs::read_to_string(&results_path).expect("Error reading existing results file"),
         )
-        .expect("Error parsing existing results.json")
+        .expect("Error parsing results json file")
     } else {
         vec![]
     };
 
-    eprintln!("There are {} existing jobs.", existing_job_results.len());
-
     // Skip jobs that succeeded before, or were attempted with at least as many resources.
     if args.incremental {
+        eprintln!("Existing jobs: {}", existing_job_results.len());
+        let num_jobs_before = jobs.len();
         jobs.retain(|job| {
             existing_job_results
                 .iter()
@@ -155,8 +158,9 @@ fn main() {
                 })
                 .is_none()
         });
+        eprintln!("Reused jobs: {}", num_jobs_before - jobs.len());
+        eprintln!("Running {} jobs...", jobs.len());
     };
-    eprintln!("Running {} jobs...", jobs.len());
 
     let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
@@ -186,7 +190,6 @@ fn main() {
         args.stderr,
         args.verbose,
     );
-    let number_of_jobs_run = job_results.len();
 
     {
         let logs_path = args.logs_dir.join(format!(
@@ -215,24 +218,16 @@ fn main() {
     existing_job_results.extend(job_results);
     let mut job_results = existing_job_results;
 
-    eprintln!(
-        "Finished running {} jobs! Totalling {} job results.",
-        number_of_jobs_run,
-        job_results.len()
-    );
-
     verify_costs(&mut job_results);
 
     if let Some(dir) = results_path.parent() {
         fs::create_dir_all(dir).unwrap();
     }
-    eprintln!("Writing jobs to {}...", results_path.display());
+    eprintln!("Output: {}", results_path.display());
     fs::write(&results_path, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
         "Failed to write results to {}",
         results_path.display()
     ));
-
-    println!("Orchestrator successfully finished!");
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
@@ -303,6 +298,7 @@ fn run_with_threads(
     show_stderr: bool,
     verbose: bool,
 ) -> Vec<JobResult> {
+    let num_jobs = jobs.len();
     let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
 
@@ -320,6 +316,16 @@ fn run_with_threads(
         })
         .expect("Error setting Ctrl-C handler");
     }
+
+    #[derive(Default)]
+    struct Counts {
+        done: usize,
+        success: usize,
+        failed: usize,
+        skipped: usize,
+    }
+
+    let counts = Mutex::new(Counts::default());
 
     thread::scope(|scope| {
         for id in &cores {
@@ -354,6 +360,24 @@ fn run_with_threads(
                         run_job(runner, job, *id, nice, show_stderr, verbose)
                     };
 
+                    let mut counts = counts.lock().unwrap();
+                    counts.done += 1;
+                    if job_result.output.is_ok() {
+                        counts.success += 1;
+                    } else if skip {
+                        counts.skipped += 1;
+                    } else if job_result.output.as_ref().unwrap_err().1 != JobError::Interrupted {
+                        counts.failed += 1;
+                        eprintln!("\nFailed job:\n{}\nResult: {:?}", serde_json::to_string(&job_result.job).unwrap(), job_result.output);
+                    };
+                    let Counts {
+                        done,
+                        success,
+                        failed,
+                        skipped,
+                    } = *counts;
+                    eprint!("Processed: {done:3} / {num_jobs:3}. Success {success:3}, Failed {failed:3}, Skipped {skipped}\r");
+
                     // If the orchestrator was aborted, do not push failing job results.
                     if job_result.output.is_ok() || *running.lock().unwrap() {
                         job_results.lock().unwrap().push(job_result);
@@ -362,6 +386,8 @@ fn run_with_threads(
             });
         }
     });
+    // Print a newline after the last count message
+    eprintln!();
 
     job_results.into_inner().unwrap()
 }
