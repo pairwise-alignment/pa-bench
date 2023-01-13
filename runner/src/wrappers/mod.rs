@@ -57,7 +57,7 @@ pub fn get_aligner(
         TripleAccel(params) => params,
         Wfa(params) => params,
         Ksw2(params) => params,
-        AstarPA(_) => todo!(),
+        AstarPA(params) => params,
     };
     (params.new(cm, trace, max_len), params.is_exact())
 }
