@@ -31,22 +31,27 @@ impl Aligner for AstarPA {
         if self.trace {
             let (cost, cigar) = self.aligner.align(a, b);
             let cigar = Cigar {
-                operations: cigar
+                ops: cigar
                     .into_iter()
-                    .filter_map(|&CigarElement { command, length }| match command {
-                        astar_pairwise_aligner::aligners::cigar::CigarOp::Match => {
-                            Some((CigarOp::Match, length as _))
-                        }
-                        astar_pairwise_aligner::aligners::cigar::CigarOp::Sub => {
-                            Some((CigarOp::Sub, length as _))
-                        }
-                        astar_pairwise_aligner::aligners::cigar::CigarOp::Ins => {
-                            Some((CigarOp::Ins, length as _))
-                        }
-                        astar_pairwise_aligner::aligners::cigar::CigarOp::Del => {
-                            Some((CigarOp::Del, length as _))
-                        }
-                        _ => None,
+                    .filter_map(|&CigarElement { command, length }| {
+                        Some(CigarElem {
+                            op: match command {
+                                astar_pairwise_aligner::aligners::cigar::CigarOp::Match => {
+                                    Some(CigarOp::Match)
+                                }
+                                astar_pairwise_aligner::aligners::cigar::CigarOp::Sub => {
+                                    Some(CigarOp::Sub)
+                                }
+                                astar_pairwise_aligner::aligners::cigar::CigarOp::Ins => {
+                                    Some(CigarOp::Ins)
+                                }
+                                astar_pairwise_aligner::aligners::cigar::CigarOp::Del => {
+                                    Some(CigarOp::Del)
+                                }
+                                _ => None,
+                            }?,
+                            cnt: length as _,
+                        })
                     })
                     .collect(),
             };

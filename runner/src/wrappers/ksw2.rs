@@ -184,8 +184,8 @@ impl Aligner for Ksw2 {
                 let cigar = std::slice::from_raw_parts_mut(ksw2_cigar, n_cigar as usize);
                 let cigar = Cigar::resolve_matches(
                     cigar.into_iter().map(|&mut val| {
-                        (
-                            match val & 15 {
+                        CigarElem {
+                            op: match val & 15 {
                                 // NOTE: This Match will be resolved to Match or Sub as needed.
                                 0 => CigarOp::Match,
                                 1 => CigarOp::Del,
@@ -194,8 +194,8 @@ impl Aligner for Ksw2 {
                                 8 => CigarOp::Sub,
                                 _ => panic!(),
                             },
-                            val / 16,
-                        )
+                            cnt: val as I / 16,
+                        }
                     }),
                     &a_mapped,
                     &b_mapped,
