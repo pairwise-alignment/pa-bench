@@ -69,6 +69,12 @@ struct Args {
     #[arg(short, long)]
     incremental: bool,
 
+    /// In combination with --incremental, rerun all failed jobs.
+    ///
+    /// This also reruns jobs that had at least as many resources. Useful when code changed.
+    #[arg(short, long)]
+    rerun_failed: bool,
+
     /// Verbose runner outputs.
     #[arg(short, long)]
     verbose: bool,
@@ -144,7 +150,8 @@ fn main() {
                 .find(|existing_job| {
                     existing_job.job.is_same_as(job)
                         && (existing_job.output.is_ok()
-                            || existing_job.job.has_more_resources_than(job))
+                            || (!args.rerun_failed
+                                && existing_job.job.has_more_resources_than(job)))
                 })
                 .is_none()
         });
