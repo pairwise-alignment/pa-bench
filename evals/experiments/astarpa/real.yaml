@@ -1,0 +1,49 @@
+- comment: |
+    A*, Edlib, and Wfa on real sequencing data
+
+    The time limit is low and cuts of excessively slow A*PA runs, but sufficient
+    for most Edlib and BiWFA runs.
+  time_limit: 100s
+  mem_limit: 5GiB
+  datasets:
+    # A*PA sets
+    - !Download
+      url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      dir: astarpa/ont-ul-500k
+    - !Download
+      url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
+      dir: astarpa/ont-minion-ul-500k
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+    - !Edlib
+    - !Wfa
+
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !SH
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        gap_cost: true
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        gap_cost: true
