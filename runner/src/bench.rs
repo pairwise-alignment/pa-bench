@@ -2,8 +2,7 @@ use std::{path::Path, time::Instant};
 
 use chrono::SubsecRound;
 use libc;
-use pa_bench_types::Measured;
-use pa_types::Bytes;
+use pa_bench_types::{Bytes, Measured};
 
 pub fn measure<F>(f: F) -> Measured
 where

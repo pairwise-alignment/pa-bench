@@ -15,7 +15,6 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use pa_bench_types::*;
-use pa_types::*;
 
 use config::*;
 
