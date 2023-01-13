@@ -82,13 +82,26 @@ impl Dataset {
     }
 }
 
+/// A duration in seconds.
+pub type Seconds = u64;
+
+/// A size, in bytes. Used for measuring memory usage.
+pub type Bytes = u64;
+
+/// Parse a string like `"1GiB"` into a number of bytes.
+///
+/// Wrapper function is needed to avoid compile errors when using with clap.
+pub fn parse_bytes(s: &str) -> Result<u64, parse_size::Error> {
+    parse_size::parse_size(s)
+}
+
 /// An alignment job: a single task for the runner to execute and benchmark.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Job {
     /// The maximum cpu time in seconds for the job.
     /// E.g. 1h. Parsed using parse_duration::parse.
     /// Set using RLIMIT_CPU.
-    pub time_limit: u64,
+    pub time_limit: Seconds,
     /// The maximum total memory usage for the job.
     /// Includes startup overhead, which is excluded from the measured memory usage.
     /// Set using RLIMIT_DATA.
