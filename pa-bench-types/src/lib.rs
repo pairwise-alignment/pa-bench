@@ -172,10 +172,29 @@ pub struct JobOutput {
     pub measured: Measured,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum JobError {
+    // Skipped because a smaller job failed before it.
+    Skipped,
+    // Interrupted by user, ie ctrl-C pressed.
+    // SIGINT=2
+    Interrupted,
+    // Rust panic.
+    // Exit code 101
+    Panic,
+    // Killed by kernel because cputime ran out.
+    // SIGKILL=9
+    Timeout,
+    // Crashed because couldn't allocate.
+    // SIGABRT=6
+    MemoryLimit,
+    Signal(i32),
+}
+
 /// The result of an alignment job, containing the input and output.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobResult {
     pub job: Job,
     // TODO(ragnar): Make this a result with a specific error type that indicates the failure reason.
-    pub output: Result<JobOutput, ()>,
+    pub output: Result<JobOutput, (f32, JobError)>,
 }
