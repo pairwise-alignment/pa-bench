@@ -89,7 +89,7 @@ impl Experiments {
                     )
                     .as_secs();
                 let mem_limit = mem_limit.unwrap_or(
-                    parse_bytes(&product.mem_limit.unwrap_or("1m".into()))
+                    parse_bytes(&product.mem_limit.unwrap_or("1GiB".into()))
                         .expect("Could not parse memory limit"),
                 );
                 let datasets = product
