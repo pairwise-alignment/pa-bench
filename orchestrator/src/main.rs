@@ -341,7 +341,7 @@ fn run_with_threads(
                     let job_result = if skip {
                         JobResult {
                             job,
-                            output: Err(()),
+                            output: Err((0., JobError::Skipped)),
                         }
                     } else {
                         run_job(runner, job, *id, nice, show_stderr, verbose)
@@ -389,7 +389,9 @@ fn run_job(
         stdin.write_all(&serde_json::to_vec(&job).unwrap()).unwrap();
     }
 
+    let start = Instant::now();
     let output = child.wait_with_output().unwrap();
+    let duration = start.elapsed().as_secs_f32();
 
     if output.status.success() {
         JobResult {
@@ -404,9 +406,16 @@ fn run_job(
                 }
             }
         }
+        let err = match output.status.signal().unwrap() {
+            2 => JobError::Interrupted,
+            6 => JobError::MemoryLimit,
+            9 => JobError::Timeout,
+            101 => JobError::Panic,
+            signal => JobError::Signal(signal),
+        };
         JobResult {
             job,
-            output: Err(()),
+            output: Err((duration, err)),
         }
     }
 }
