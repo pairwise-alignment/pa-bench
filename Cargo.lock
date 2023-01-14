@@ -44,39 +44,23 @@ dependencies = [
 [[package]]
 name = "astar-pairwise-aligner"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#ca792156f00feebde5c0cd0d6038db36302a143a"
+source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#20b2b0b9136b3cd1a283be2a2c0da4b768bff450"
 dependencies = [
  "bio",
- "clap 3.2.23",
- "colorgrad",
+ "clap",
  "derive_more",
- "edlib_rs",
- "getrandom",
  "instant",
  "itertools",
- "lazy_static",
  "num-traits",
+ "pa-generate",
+ "pa-types",
  "parse_duration",
  "rand",
  "rand_chacha",
- "ropey",
- "rust-wfa2",
  "rustc-hash",
  "serde",
- "serde_json",
  "smallvec",
- "triple_accel 0.4.0 (git+https://github.com/Daniel-Liu-c0deb0t/triple_accel)",
-]
-
-[[package]]
-name = "atty"
-version = "0.2.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
-dependencies = [
- "hermit-abi 0.1.19",
- "libc",
- "winapi",
+ "triple_accel 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -308,47 +292,17 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.2.23"
+version = "4.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71655c45cb9845d3270c9d6df84ebe72b4dad3c2ba3f7023ad47c144e4e473a5"
-dependencies = [
- "atty",
- "bitflags",
- "clap_derive 3.2.18",
- "clap_lex 0.2.4",
- "indexmap",
- "once_cell",
- "strsim",
- "termcolor",
- "textwrap",
-]
-
-[[package]]
-name = "clap"
-version = "4.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa91278560fc226a5d9d736cc21e485ff9aad47d26b8ffe1f54cba868b684b9f"
+checksum = "4ec7a4128863c188deefe750ac1d1dfe66c236909f845af04beed823638dc1b2"
 dependencies = [
  "bitflags",
- "clap_derive 4.1.0",
- "clap_lex 0.3.1",
+ "clap_derive",
+ "clap_lex",
  "is-terminal",
  "once_cell",
  "strsim",
  "termcolor",
-]
-
-[[package]]
-name = "clap_derive"
-version = "3.2.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea0c8bce528c4be4da13ea6fead8965e95b6073585a2f05204bd8f4119f82a65"
-dependencies = [
- "heck",
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -362,15 +316,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "clap_lex"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
-dependencies = [
- "os_str_bytes",
 ]
 
 [[package]]
@@ -410,15 +355,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "colorgrad"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a5f405d474b9d05e0a093d3120e77e9bf26461b57a84b40aa2a221ac5617fb6"
-dependencies = [
- "csscolorparser",
-]
-
-[[package]]
 name = "core-foundation-sys"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -442,15 +378,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b540bd8bc810d3885c6ea91e2018302f68baba2129ab3e88f32389ee9370880d"
 dependencies = [
  "cfg-if",
-]
-
-[[package]]
-name = "csscolorparser"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb2a7d3066da2de787b7f032c736763eb7ae5d355f81a68bab2675a96008b0bf"
-dependencies = [
- "phf",
 ]
 
 [[package]]
@@ -717,15 +644,6 @@ checksum = "2540771e65fc8cb83cd6e8a237f70c319bd5c29f78ed1084ba5d50eeac86f7f9"
 
 [[package]]
 name = "hermit-abi"
-version = "0.1.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62b467343b94ba476dcb2500d242dadbb39557df889310ac77c5d99100aaac33"
-dependencies = [
- "libc",
-]
-
-[[package]]
-name = "hermit-abi"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee512640fe35acbfb4bb779db6f0d80704c2cacfa2e39b601ef3e3f47d1ae4c7"
@@ -802,7 +720,7 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28dfb6c8100ccc63462345b67d1bbc3679177c75ee4bf59bf29c8b1d110b8189"
 dependencies = [
- "hermit-abi 0.2.6",
+ "hermit-abi",
  "io-lifetimes",
  "rustix",
  "windows-sys",
@@ -1129,7 +1047,7 @@ version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fac9e2da13b5eb447a6ce3d392f23a29d8694bff781bf03a16cd9ac8697593b"
 dependencies = [
- "hermit-abi 0.2.6",
+ "hermit-abi",
  "libc",
 ]
 
@@ -1144,7 +1062,7 @@ name = "orchestrator"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "clap 4.1.0",
+ "clap",
  "core_affinity",
  "ctrlc",
  "flate2",
@@ -1193,9 +1111,9 @@ dependencies = [
 [[package]]
 name = "pa-generate"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-generate#20640484c7ee2300938744f9125c176ea6364520"
+source = "git+https://github.com/pairwise-alignment/pa-generate#bb6b251db63b47f92b82f76f434ea06f1b4975d8"
 dependencies = [
- "clap 4.1.0",
+ "clap",
  "itertools",
  "pa-types",
  "rand",
@@ -1207,7 +1125,7 @@ dependencies = [
 [[package]]
 name = "pa-types"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-types#d5c5db380ffb038956b47f1789e1bdff5603e996"
+source = "git+https://github.com/pairwise-alignment/pa-types#90ed28bf2346d9b2af0f6f9cb224b1690c205994"
 dependencies = [
  "derive_more",
  "itertools",
@@ -1276,48 +1194,6 @@ checksum = "e6d5014253a1331579ce62aa67443b4a658c5e7dd03d4bc6d302b94474888143"
 dependencies = [
  "fixedbitset",
  "indexmap",
-]
-
-[[package]]
-name = "phf"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "928c6535de93548188ef63bb7c4036bd415cd8f36ad25af44b9789b2ee72a48c"
-dependencies = [
- "phf_macros",
- "phf_shared",
-]
-
-[[package]]
-name = "phf_generator"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1181c94580fa345f50f19d738aaa39c0ed30a600d95cb2d3e23f94266f14fbf"
-dependencies = [
- "phf_shared",
- "rand",
-]
-
-[[package]]
-name = "phf_macros"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92aacdc5f16768709a569e913f7451034034178b05bdc8acda226659a3dccc66"
-dependencies = [
- "phf_generator",
- "phf_shared",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "phf_shared"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1fb5f6f826b772a8d4c0394209441e7d37cbbb967ae9c7e0e8134365c9ee676"
-dependencies = [
- "siphasher",
 ]
 
 [[package]]
@@ -1490,7 +1366,7 @@ dependencies = [
  "astar-pairwise-aligner",
  "block-aligner",
  "chrono",
- "clap 4.1.0",
+ "clap",
  "core_affinity",
  "edlib_rs",
  "itertools",
@@ -1672,12 +1548,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "siphasher"
-version = "0.3.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bd3e3206899af3f8b12af284fafc038cc1dc2b41d1b89dd17297221c5d225de"
-
-[[package]]
 name = "smallvec"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1769,12 +1639,6 @@ checksum = "bab24d30b911b2376f3a13cc2cd443142f0c81dda04c118693e35b3835757755"
 dependencies = [
  "winapi-util",
 ]
-
-[[package]]
-name = "textwrap"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "222a222a5bfe1bba4a77b45ec488a741b3cb8872e5e499451fd7d0129c9c7c3d"
 
 [[package]]
 name = "thiserror"
