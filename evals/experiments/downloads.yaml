@@ -25,6 +25,14 @@
       url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.50kbps.10000.tar.gz
       dir: biwfa/ont-minion-ul-50k
 
+    # WFA sets
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/real.illumina.b10M.seq.tar.gz
+      dir: wfa/illumina-10m
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/real.ont.b10M.seq.tar.gz
+      dir: wfa/ont-10m
+
   traces: []
   costs: []
   algos: []
