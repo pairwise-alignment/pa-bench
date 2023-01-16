@@ -36,9 +36,9 @@ parasailors = { git = "https://github.com/Daniel-Liu-c0deb0t/parasailors-new", o
 
 # TODO(ragnar): Can this feature detection not be moved into the block aligner crate?
 [target.'cfg(target_arch = "x86_64")'.dependencies]
-block-aligner = { git = "https://github.com/RagnarGrootKoerkamp/block-aligner", branch = "cbindgen_feature", features = ["simd_avx2"], default-features = false }
+block-aligner = { git = "https://github.com/Daniel-Liu-c0deb0t/block-aligner", features = ["simd_avx2"] }
 [target.'cfg(target_arch = "aarch64")'.dependencies]
-block-aligner = { git = "https://github.com/RagnarGrootKoerkamp/block-aligner", branch = "cbindgen_feature", features = ["simd_neon"], default-features = false }
+block-aligner = { git = "https://github.com/Daniel-Liu-c0deb0t/block-aligner", features = ["simd_neon"] }
 
 [features]
 default = ["parasailors"]
