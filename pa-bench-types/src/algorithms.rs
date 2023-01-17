@@ -15,8 +15,13 @@ pub enum AlgorithmParams {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BlockAlignerParams {
-    pub min_size: usize,
-    pub max_size: usize,
+    pub size: BlockAlignerSize,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BlockAlignerSize {
+    Size(usize, usize),
+    Percent(f32, f32),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]

@@ -33,8 +33,7 @@
     - { sub: 1, open: 1, extend: 1 }
   algos:
     - !BlockAligner
-      min_size: 32
-      max_size: 8192
+      size: !Size [32, 8192]
     - !ParasailStriped
     - !Edlib
     - !TripleAccel
