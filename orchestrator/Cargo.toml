@@ -29,3 +29,6 @@ zip-extract = "0.1.1"
 ureq = "2.6.1"
 tar = "0.4.38"
 flate2 = "1.0.25"
+streaming-stats = "0.2.3"
+edlib_rs = { git = "https://github.com/pairwise-alignment/edlib-rs" }
+fxhash = "0.2.1"

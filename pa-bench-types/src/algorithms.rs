@@ -13,12 +13,12 @@ pub enum AlgorithmParams {
     // Add more algorithms here!
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct BlockAlignerParams {
     pub size: BlockAlignerSize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum BlockAlignerSize {
     Size(usize, usize),
     Percent(f32, f32),

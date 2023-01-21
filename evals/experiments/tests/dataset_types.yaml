@@ -10,7 +10,7 @@
       error_models: [Uniform]
       error_rates: [0.25]
       lengths: [1000]
-    - !File manual/1189516942891102444.seq
+    - !File manual/11867059027841440347.seq
     - !Directory manual
     - !Download
       url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip

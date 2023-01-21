@@ -1065,7 +1065,9 @@ dependencies = [
  "clap",
  "core_affinity",
  "ctrlc",
+ "edlib_rs",
  "flate2",
+ "fxhash",
  "itertools",
  "pa-bench-types",
  "pa-generate",
@@ -1074,6 +1076,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "streaming-stats",
  "tar",
  "ureq",
  "walkdir",
@@ -1583,6 +1586,15 @@ name = "str_indices"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f026164926842ec52deb1938fae44f83dfdb82d0a5b0270c5bd5935ab74d6dd"
+
+[[package]]
+name = "streaming-stats"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0d670ce4e348a2081843569e0f79b21c99c91bb9028b3b3ecb0f050306de547"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "strsim"

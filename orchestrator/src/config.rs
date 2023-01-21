@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use tar::Archive;
 use walkdir::DirEntry;
 
-use std::collections::hash_map::DefaultHasher;
 use std::fs;
 use std::hash::{Hash, Hasher};
 use std::io::{BufWriter, Cursor, Write};
@@ -12,9 +11,13 @@ use std::time::Duration;
 
 use itertools::{iproduct, Itertools};
 
+use fxhash::FxHasher;
+
 use pa_bench_types::*;
 use pa_generate::*;
 use pa_types::*;
+
+use crate::stats::*;
 
 /// This is the root type of the yaml configuration file.
 /// It consists of multiple Experiments, each of which is the Cartesian product
@@ -139,10 +142,18 @@ impl DatasetConfig {
                 .collect()
         }
 
-        match self {
-            DatasetConfig::Generated(generator) => generator.generate(data_dir, force_rerun),
-            DatasetConfig::File(path) => vec![Dataset::File(data_dir.join(&path))],
-            DatasetConfig::Directory(dir) => collect_dir(&data_dir.join(&dir)),
+        let (dir, dataset) = match self {
+            DatasetConfig::Generated(generator) => {
+                (None, generator.generate(data_dir, force_rerun))
+            }
+            DatasetConfig::File(path) => {
+                let path = data_dir.join(&path);
+                (Some(path.with_extension("")), vec![Dataset::File(path)])
+            }
+            DatasetConfig::Directory(dir) => {
+                let path = data_dir.join(&dir);
+                (Some(path.clone()), collect_dir(&path))
+            }
             DatasetConfig::Download { url, dir } => {
                 let target_dir = &data_dir.join("download").join(&dir);
                 let dir_empty = target_dir
@@ -172,11 +183,12 @@ impl DatasetConfig {
                         _ => panic!("Download url must end in .zip or .tar.gz."),
                     };
                 }
-                collect_dir(target_dir)
+                (Some(target_dir.to_owned()), collect_dir(target_dir))
             }
             DatasetConfig::Data(data) => {
                 let hash = {
-                    let mut state = DefaultHasher::new();
+                    // Use deterministic hasher for file names!
+                    let mut state = FxHasher::default();
                     data.hash(&mut state);
                     state.finish()
                 };
@@ -187,9 +199,28 @@ impl DatasetConfig {
                     writeln!(f, ">{a}").unwrap();
                     writeln!(f, "<{b}").unwrap();
                 }
-                vec![Dataset::File(path)]
+                (Some(path.with_extension("")), vec![Dataset::File(path)])
+            }
+        };
+
+        // Collect stats for non-generated datasets
+        if let Some(dir) = dir {
+            let stats_path = dir.join("dataset_stats.json");
+            if !stats_path.exists() {
+                fs::create_dir_all(&dir).unwrap();
+                let mut stats = StatsCollector::new();
+                for d in &dataset {
+                    if let Dataset::File(f) = d {
+                        stats.add(f);
+                    }
+                }
+                let stats = stats.finish();
+                fs::write(&stats_path, serde_json::to_string(&stats).unwrap())
+                    .expect("Failed to write to stats file!");
             }
         }
+
+        dataset
     }
 }
 

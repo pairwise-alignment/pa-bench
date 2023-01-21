@@ -1,4 +1,5 @@
 mod config;
+mod stats;
 
 use chrono::Timelike;
 use clap::Parser;
@@ -38,7 +39,7 @@ struct Args {
     logs_dir: PathBuf,
 
     /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
-    #[arg(short, long)]
+    #[arg(long)]
     runner: Option<PathBuf>,
 
     /// Time limit. Defaults to value in experiment yaml or 1m.

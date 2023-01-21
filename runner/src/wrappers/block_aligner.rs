@@ -1,5 +1,7 @@
 use super::*;
 
+use pa_bench_types::BlockAlignerSize::*;
+
 // Leading :: needs to be preserved to disambiguate the crate against this module.
 #[rustfmt::skip]
 use ::block_aligner::scan_block::*;
@@ -69,8 +71,8 @@ impl Aligner for BlockAligner {
             Size(min, max) => min..=max,
             Percent(min, max) => percent_len(max_len, min)..=percent_len(max_len, max),
         };
-        self.a.set_bytes::<NucMatrix>(a, size.end);
-        self.b.set_bytes::<NucMatrix>(b, size.end);
+        self.a.set_bytes::<NucMatrix>(a, *size.end());
+        self.b.set_bytes::<NucMatrix>(b, *size.end());
         match &mut self.block {
             BlockAlignerBlock::NoTrace(block) => {
                 block.align(&self.a, &self.b, &self.matrix, self.gaps, size, 0);
