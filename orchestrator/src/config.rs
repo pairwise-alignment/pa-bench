@@ -215,7 +215,7 @@ impl DatasetConfig {
                     }
                 }
                 let stats = stats.finish();
-                fs::write(&stats_path, serde_json::to_string(&stats).unwrap())
+                fs::write(&stats_path, serde_json::to_string_pretty(&stats).unwrap())
                     .expect("Failed to write to stats file!");
             }
         }

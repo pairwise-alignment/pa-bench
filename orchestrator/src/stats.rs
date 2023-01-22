@@ -17,6 +17,10 @@ pub struct StatsCollector {
     divergence_online: OnlineStats,
     largest_gap_minmax: MinMax<usize>,
     largest_gap_online: OnlineStats,
+    substitutions: usize,
+    insertions: usize,
+    deletions: usize,
+    total_bases: usize,
 }
 
 #[derive(Serialize)]
@@ -24,6 +28,10 @@ pub struct AlnStats {
     length: Stats<usize>,
     divergence: Stats<f64>,
     largest_gap: Stats<usize>,
+    substitutions: usize,
+    insertions: usize,
+    deletions: usize,
+    total_bases: usize,
 }
 
 #[derive(Serialize)]
@@ -70,6 +78,13 @@ impl StatsCollector {
                     .max()
                     .unwrap();
 
+                aln.iter().for_each(|&op| match op {
+                    1 => self.insertions += 1,
+                    2 => self.deletions += 1,
+                    3 => self.substitutions += 1,
+                    _ => (),
+                });
+
                 self.len_minmax.add(a.len());
                 self.len_minmax.add(b.len());
                 self.len_online.add(a.len());
@@ -78,6 +93,7 @@ impl StatsCollector {
                 self.divergence_online.add(divergence);
                 self.largest_gap_minmax.add(largest_gap);
                 self.largest_gap_online.add(largest_gap);
+                self.total_bases += a.len() + b.len();
             });
     }
 
@@ -101,6 +117,10 @@ impl StatsCollector {
                 mean: self.largest_gap_online.mean(),
                 stddev: self.largest_gap_online.stddev(),
             },
+            substitutions: self.substitutions,
+            insertions: self.insertions,
+            deletions: self.deletions,
+            total_bases: self.total_bases,
         }
     }
 }
