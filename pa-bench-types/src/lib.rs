@@ -187,11 +187,11 @@ pub struct JobOutput {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum JobError {
+    // orchestrator error
     /// Skipped because a smaller job failed before it.
     Skipped,
-    /// Rust panic.
-    /// Exit code 101
-    Panic,
+
+    // signals
     /// Interrupted by user, ie ctrl-C pressed.
     /// SIGINT=2
     Interrupted,
@@ -203,6 +203,14 @@ pub enum JobError {
     MemoryLimit,
     /// Process killed by an unknown/different signal.
     Signal(i32),
+
+    // error code
+    /// Rust panic.
+    /// Exit code 101
+    Panic,
+    /// Unsupported aligner params.
+    /// Exit code 102
+    Unsupported,
     /// Process exited with given status.
     ExitCode(i32),
 }

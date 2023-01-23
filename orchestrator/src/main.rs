@@ -321,8 +321,9 @@ fn run_with_threads(
     struct Counts {
         done: usize,
         success: usize,
-        failed: usize,
+        unsupported: usize,
         skipped: usize,
+        failed: usize,
     }
 
     let counts = Mutex::new(Counts::default());
@@ -366,6 +367,8 @@ fn run_with_threads(
                         counts.success += 1;
                     } else if skip {
                         counts.skipped += 1;
+                    } else if job_result.output.as_ref().unwrap_err().1 == JobError::Unsupported {
+                        counts.unsupported += 1;
                     } else if job_result.output.as_ref().unwrap_err().1 != JobError::Interrupted {
                         counts.failed += 1;
                         eprintln!("\nFailed job:\n{}\nResult: {:?}", serde_json::to_string(&job_result.job).unwrap(), job_result.output);
@@ -373,10 +376,11 @@ fn run_with_threads(
                     let Counts {
                         done,
                         success,
-                        failed,
+                        unsupported,
                         skipped,
+                        failed,
                     } = *counts;
-                    eprint!("Processed: {done:3} / {num_jobs:3}. Success {success:3}, Failed {failed:3}, Skipped {skipped}\r");
+                    eprint!("Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}\r");
 
                     // If the orchestrator was aborted, do not push failing job results.
                     if job_result.output.is_ok() || *running.lock().unwrap() {
@@ -449,6 +453,7 @@ fn run_job(
         } else if let Some(code) = output.status.code() {
             match code {
                 101 => JobError::Panic,
+                102 => JobError::Unsupported,
                 code => JobError::ExitCode(code),
             }
         } else {
