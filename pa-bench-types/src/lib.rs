@@ -217,6 +217,14 @@ pub enum JobError {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct ResourceUsage {
+    pub walltime: f32,
+    pub usertime: f32,
+    pub systemtime: f32,
+    pub maxrss: Bytes,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AlignStats {
     pub files: usize,
     pub seq_pairs: usize,
@@ -243,7 +251,8 @@ pub struct Stats<T> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobResult {
     pub job: Job,
-    // TODO(ragnar): Make this a result with a specific error type that indicates the failure reason.
     pub stats: AlignStats,
-    pub output: Result<JobOutput, (f32, JobError)>,
+    pub resources: ResourceUsage,
+    // FIXME: Remove the f32 walltime field.
+    pub output: Result<JobOutput, JobError>,
 }

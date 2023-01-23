@@ -34,3 +34,4 @@ edlib_rs = { git = "https://github.com/pairwise-alignment/edlib-rs" }
 fxhash = "0.2.1"
 num = "0.4.0"
 rayon = "1.6.1"
+wait4 = "0.1.3"

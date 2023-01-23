@@ -14,6 +14,7 @@ use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
+use wait4::{ResUse, Wait4};
 
 use pa_bench_types::*;
 
@@ -356,7 +357,8 @@ fn run_with_threads(
                         JobResult {
                             job,
                             stats,
-                            output: Err((0., JobError::Skipped)),
+                            resources: ResourceUsage::default(),
+                            output: Err(JobError::Skipped),
                         }
                     } else {
                         run_job(runner, job, stats, *id, nice, show_stderr, verbose)
@@ -368,11 +370,11 @@ fn run_with_threads(
                         counts.success += 1;
                     } else if skip {
                         counts.skipped += 1;
-                    } else if job_result.output.as_ref().unwrap_err().1 == JobError::Unsupported {
+                    } else if *job_result.output.as_ref().unwrap_err() == JobError::Unsupported {
                         counts.unsupported += 1;
-                    } else if job_result.output.as_ref().unwrap_err().1 != JobError::Interrupted {
+                    } else if *job_result.output.as_ref().unwrap_err() != JobError::Interrupted {
                         counts.failed += 1;
-                        eprintln!("\nFailed job:\n{}\nResult: {:?}", serde_json::to_string(&job_result.job).unwrap(), job_result.output);
+                        eprintln!("\n Failed job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
                     };
                     let Counts {
                         done,
@@ -381,7 +383,7 @@ fn run_with_threads(
                         skipped,
                         failed,
                     } = *counts;
-                    eprint!("\rProcessed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}");
+                    eprint!("\r Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}");
 
                     // If the orchestrator was aborted, do not push failing job results.
                     if job_result.output.is_ok() || *running.lock().unwrap() {
@@ -429,43 +431,54 @@ fn run_job(
     }
 
     let start = Instant::now();
-    let output = child.wait_with_output().unwrap();
-    let duration = start.elapsed().as_secs_f32();
+    let ResUse { status, rusage } = child.wait4().unwrap();
+    let walltime = start.elapsed().as_secs_f32();
+    let mut stdout = Vec::new();
+    child.stdout.unwrap().read_to_end(&mut stdout).unwrap();
 
-    if output.status.success() {
+    let resources = ResourceUsage {
+        walltime,
+        usertime: rusage.utime.as_secs_f32(),
+        systemtime: rusage.stime.as_secs_f32(),
+        maxrss: rusage.maxrss,
+    };
+
+    if status.success() {
         JobResult {
             job,
-            output: Ok(serde_json::from_slice(&output.stdout).expect("Error reading output json:")),
             stats,
+            resources,
+            output: Ok(serde_json::from_slice(&stdout).expect("Error reading output json:")),
         }
     } else {
         if show_stderr {
-            if let Some(code) = output.status.signal() {
+            if let Some(code) = status.signal() {
                 if code == 24 {
                     eprintln!("Time limit exceeded for {job:?}");
                 }
             }
         }
-        let err = if let Some(signal) = output.status.signal() {
+        let err = if let Some(signal) = status.signal() {
             match signal {
                 2 => JobError::Interrupted,
                 6 => JobError::MemoryLimit,
                 9 => JobError::Timeout,
                 signal => JobError::Signal(signal),
             }
-        } else if let Some(code) = output.status.code() {
+        } else if let Some(code) = status.code() {
             match code {
                 101 => JobError::Panic,
                 102 => JobError::Unsupported,
                 code => JobError::ExitCode(code),
             }
         } else {
-            panic!("Unknown exit type {:?}", output.status);
+            panic!("Unknown exit type {:?}", status);
         };
         JobResult {
             job,
-            output: Err((duration, err)),
             stats,
+            resources,
+            output: Err(err),
         }
     }
 }
