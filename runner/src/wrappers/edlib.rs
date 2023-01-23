@@ -9,13 +9,21 @@ pub struct Edlib {
 impl AlignerParams for EdlibParams {
     type Aligner = Edlib;
 
-    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        _max_len: usize,
+    ) -> Result<Self::Aligner, &'static str> {
+        if !cm.is_unit() {
+            return Err("Edlib only works for unit cost model");
+        }
         assert!(cm.is_unit());
         let mut config = EdlibAlignConfigRs::default();
         if trace {
             config.task = EdlibAlignTaskRs::EDLIB_TASK_PATH;
         }
-        Self::Aligner { config }
+        Ok(Self::Aligner { config })
     }
 
     fn is_exact(&self) -> bool {

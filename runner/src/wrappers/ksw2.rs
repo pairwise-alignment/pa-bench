@@ -16,7 +16,12 @@ pub struct Ksw2 {
 
 impl AlignerParams for Ksw2Params {
     type Aligner = Ksw2;
-    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        _max_len: usize,
+    ) -> Result<Self::Aligner, &'static str> {
         // NOTE: The score matrix isn't actually used: only m[0]=match and
         // m[1]=mismatch are used, unless the flag KSW_EZ_GENERIC_SC=0x04 is set which says the matrix is arbitrary.
         let mut score_matrix = [0; M * M];
@@ -31,14 +36,14 @@ impl AlignerParams for Ksw2Params {
         encoding[b'C' as usize] = 1;
         encoding[b'G' as usize] = 2;
         encoding[b'T' as usize] = 3;
-        Self::Aligner {
+        Ok(Self::Aligner {
             params: self.clone(),
             trace,
             encoding,
             score_matrix,
             open: cm.open as _,
             extend: cm.extend as _,
-        }
+        })
     }
 
     fn is_exact(&self) -> bool {

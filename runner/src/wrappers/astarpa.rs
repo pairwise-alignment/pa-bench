@@ -6,11 +6,20 @@ use super::*;
 impl AlignerParams for AstarPaParamsNoVis {
     type Aligner = Box<dyn AstarPaAligner>;
 
-    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        _max_len: usize,
+    ) -> Result<Self::Aligner, &'static str> {
         // The trace parameter must be true since A*PA gives a trace 'for free' currently.
-        assert!(trace);
-        assert!(cm.is_unit());
-        self.aligner()
+        if !trace {
+            return Err("Trace must be true for A*PA");
+        }
+        if !cm.is_unit() {
+            return Err("A*PA only works for unit cost model");
+        }
+        Ok(self.aligner())
     }
 
     fn is_exact(&self) -> bool {

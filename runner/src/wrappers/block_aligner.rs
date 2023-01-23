@@ -28,8 +28,15 @@ pub struct BlockAligner {
 impl AlignerParams for BlockAlignerParams {
     type Aligner = BlockAligner;
 
-    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner {
-        assert!(cm.is_affine());
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        max_len: usize,
+    ) -> Result<Self::Aligner, &'static str> {
+        if !cm.is_affine() {
+            return Err("BlockAligner only works for affine cost models");
+        }
         let max_size = match self.size {
             Size(_, max) => max,
             Percent(_, max) => percent_len(max_len, max),
@@ -48,7 +55,7 @@ impl AlignerParams for BlockAlignerParams {
         let a = PaddedBytes::new::<NucMatrix>(max_len, max_size);
         let b = PaddedBytes::new::<NucMatrix>(max_len, max_size);
 
-        Self::Aligner {
+        Ok(Self::Aligner {
             params: self.clone(),
             matrix,
             gaps,
@@ -56,7 +63,7 @@ impl AlignerParams for BlockAlignerParams {
             a,
             b,
             s,
-        }
+        })
     }
 
     fn is_exact(&self) -> bool {

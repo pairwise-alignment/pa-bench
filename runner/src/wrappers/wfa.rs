@@ -16,9 +16,16 @@ pub struct Wfa {
 impl AlignerParams for WfaParams {
     type Aligner = Wfa;
 
-    fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        _max_len: usize,
+    ) -> Result<Self::Aligner, &'static str> {
         // memory model does not matter if score only
-        assert!(trace || self.memory_model == MemoryModel::MemoryUltraLow);
+        if !trace && self.memory_model != MemoryModel::MemoryUltraLow {
+            return Err("WFA without trace should always use MmemoryModel::UltraLow");
+        }
         let scope = if trace {
             AlignmentScope::Alignment
         } else {
@@ -35,7 +42,7 @@ impl AlignerParams for WfaParams {
             _ => unimplemented!("WFA does not support match bonus!"),
         };
         aligner.set_heuristic(self.heuristic);
-        Self::Aligner { cm, aligner }
+        Ok(Self::Aligner { cm, aligner })
     }
 
     fn is_exact(&self) -> bool {

@@ -14,15 +14,22 @@ mod with_parasailors {
     impl AlignerParams for ParasailStripedParams {
         type Aligner = ParasailStriped;
 
-        fn new(&self, cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
-            assert!(!trace);
+        fn new(
+            &self,
+            cm: CostModel,
+            trace: bool,
+            _max_len: usize,
+        ) -> Result<Self::Aligner, &'static str> {
+            if trace {
+                return Err("Parasail does not support returning a trace");
+            }
             let s = ScoreModel::from_costs(cm);
-            Self::Aligner {
+            Ok(Self::Aligner {
                 matrix: Matrix::create("ACGT", s.r#match as _, s.sub as _),
                 gap_open: -s.open - s.extend,
                 gap_extend: -s.extend,
                 s,
-            }
+            })
         }
 
         fn is_exact(&self) -> bool {
