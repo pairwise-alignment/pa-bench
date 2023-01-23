@@ -218,8 +218,6 @@ fn main() {
     existing_job_results.extend(job_results);
     let mut job_results = existing_job_results;
 
-    verify_costs(&mut job_results);
-
     if let Some(dir) = results_path.parent() {
         fs::create_dir_all(dir).unwrap();
     }
@@ -228,6 +226,8 @@ fn main() {
         "Failed to write results to {}",
         results_path.display()
     ));
+
+    verify_costs(&mut job_results);
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
