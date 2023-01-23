@@ -14,7 +14,12 @@ pub trait AlignerParams {
     type Aligner: Aligner;
 
     /// Instantiate the aligner with a configuration.
-    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Self::Aligner;
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        max_len: usize,
+    ) -> Result<Self::Aligner, &'static str>;
 
     /// Is the aligner exact?
     fn is_exact(&self) -> bool;
@@ -22,12 +27,22 @@ pub trait AlignerParams {
 
 /// A type-erased helper trait that returns a `dyn Aligner`.
 pub trait TypeErasedAlignerParams {
-    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Box<dyn Aligner>;
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        max_len: usize,
+    ) -> Result<Box<dyn Aligner>, &'static str>;
     fn is_exact(&self) -> bool;
 }
 impl<A: Aligner + 'static, T: AlignerParams<Aligner = A>> TypeErasedAlignerParams for T {
-    fn new(&self, cm: CostModel, trace: bool, max_len: usize) -> Box<dyn Aligner> {
-        Box::new(self.new(cm, trace, max_len))
+    fn new(
+        &self,
+        cm: CostModel,
+        trace: bool,
+        max_len: usize,
+    ) -> Result<Box<dyn Aligner>, &'static str> {
+        Ok(Box::new(self.new(cm, trace, max_len)?))
     }
     fn is_exact(&self) -> bool {
         self.is_exact()
@@ -59,5 +74,16 @@ pub fn get_aligner(
         Ksw2(params) => params,
         AstarPA(params) => params,
     };
-    (params.new(cm, trace, max_len), params.is_exact())
+    let aligner = match params.new(cm, trace, max_len) {
+        Ok(a) => a,
+        Err(err) => {
+            eprintln!(
+                "\n\nBad aligner parameters:\n algo: {algo:?}\n cm: sub={} open={} extend={}\n trace: {trace}\n error: {err}",
+                cm.sub, cm.open, cm.extend
+            );
+            std::process::exit(102);
+        }
+    };
+
+    (aligner, params.is_exact())
 }
