@@ -135,11 +135,13 @@ impl DatasetConfig {
                     if e.file_type().is_file()
                         && e.path().extension().map_or(false, |ext| ext == "seq")
                     {
-                        Some(Dataset::File(e.path().to_path_buf()))
+                        Some(e.path().to_path_buf())
                     } else {
                         None
                     }
                 })
+                .sorted()
+                .map(|file| Dataset::File(file))
                 .collect()
         }
 
