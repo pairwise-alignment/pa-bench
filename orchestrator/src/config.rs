@@ -1,4 +1,5 @@
 use flate2::bufread::GzDecoder;
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use stats::merge_all;
 use tar::Archive;
@@ -210,25 +211,31 @@ impl DatasetConfig {
         // For directories and downloads, merged summary stats are only generated on the initial download.
         // Either way, missing per-file stats are always generated.
 
-        let merged_stats = merge_all(dataset.iter().filter_map(|d| {
-            let f = match d {
-                Dataset::Generated(g) => g.path(),
-                Dataset::File(f) => f.to_path_buf(),
-                Dataset::Data(_) => return None,
-            };
-            let stats_path = f.with_extension("stats.json");
-            let stats = if stats_path.is_file() {
-                let v = fs::read(&stats_path).unwrap();
-                serde_json::from_slice(&v)
-                    .expect(&format!("Could not parse {} as json", stats_path.display()))
-            } else {
-                let stats = AlignStats::file_stats(&f);
-                fs::write(&stats_path, serde_json::to_string_pretty(&stats).unwrap())
-                    .expect("Failed to write to stats file!");
-                stats
-            };
-            Some(stats)
-        }));
+        let merged_stats = merge_all(
+            dataset
+                .par_iter()
+                .filter_map(|d| {
+                    let f = match d {
+                        Dataset::Generated(g) => g.path(),
+                        Dataset::File(f) => f.to_path_buf(),
+                        Dataset::Data(_) => return None,
+                    };
+                    let stats_path = f.with_extension("stats.json");
+                    let stats = if stats_path.is_file() {
+                        let v = fs::read(&stats_path).unwrap();
+                        serde_json::from_slice(&v)
+                            .expect(&format!("Could not parse {} as json", stats_path.display()))
+                    } else {
+                        let stats = AlignStats::file_stats(&f);
+                        fs::write(&stats_path, serde_json::to_string_pretty(&stats).unwrap())
+                            .expect("Failed to write to stats file!");
+                        stats
+                    };
+                    Some(stats)
+                })
+                .collect::<Vec<_>>()
+                .into_iter(),
+        );
         if let Some(stats_path) = dir_stats_path {
             if let Some(merged_stats) = merged_stats {
                 if !stats_path.exists() {
