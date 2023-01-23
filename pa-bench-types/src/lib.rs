@@ -187,21 +187,24 @@ pub struct JobOutput {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum JobError {
-    // Skipped because a smaller job failed before it.
+    /// Skipped because a smaller job failed before it.
     Skipped,
-    // Interrupted by user, ie ctrl-C pressed.
-    // SIGINT=2
-    Interrupted,
-    // Rust panic.
-    // Exit code 101
+    /// Rust panic.
+    /// Exit code 101
     Panic,
-    // Killed by kernel because cputime ran out.
-    // SIGKILL=9
+    /// Interrupted by user, ie ctrl-C pressed.
+    /// SIGINT=2
+    Interrupted,
+    /// Killed by kernel because cputime ran out.
+    /// SIGKILL=9
     Timeout,
-    // Crashed because couldn't allocate.
-    // SIGABRT=6
+    /// Crashed because couldn't allocate.
+    /// SIGABRT=6
     MemoryLimit,
+    /// Process killed by an unknown/different signal.
     Signal(i32),
+    /// Process exited with given status.
+    ExitCode(i32),
 }
 
 /// The result of an alignment job, containing the input and output.

@@ -439,12 +439,20 @@ fn run_job(
                 }
             }
         }
-        let err = match output.status.signal().unwrap() {
-            2 => JobError::Interrupted,
-            6 => JobError::MemoryLimit,
-            9 => JobError::Timeout,
-            101 => JobError::Panic,
-            signal => JobError::Signal(signal),
+        let err = if let Some(signal) = output.status.signal() {
+            match signal {
+                2 => JobError::Interrupted,
+                6 => JobError::MemoryLimit,
+                9 => JobError::Timeout,
+                signal => JobError::Signal(signal),
+            }
+        } else if let Some(code) = output.status.code() {
+            match code {
+                101 => JobError::Panic,
+                code => JobError::ExitCode(code),
+            }
+        } else {
+            panic!("Unknown exit type {:?}", output.status);
         };
         JobResult {
             job,
