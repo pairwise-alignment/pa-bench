@@ -112,8 +112,7 @@ costs:
   - { sub: 2, open: 3, extend: 2 }
 algos:
   - !BlockAligner
-    min_size: 32
-    max_size: 1024
+    size: !Size [32, 8192]
   - !ParasailStriped
   - !Edlib
   - !TripleAccel
