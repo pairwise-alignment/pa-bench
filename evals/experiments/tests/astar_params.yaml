@@ -5,4 +5,5 @@
     - !Wfa
     - !AstarPA
       diagonal_transition: false
-      heuristic: !None
+      heuristic:
+        type: !None
