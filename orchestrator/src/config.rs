@@ -1,7 +1,8 @@
 use flate2::bufread::GzDecoder;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
-use stats::merge_all;
+#[rustfmt::skip]
+use ::stats::merge_all;
 use tar::Archive;
 use walkdir::DirEntry;
 
@@ -19,7 +20,7 @@ use pa_bench_types::*;
 use pa_generate::*;
 use pa_types::*;
 
-use crate::stats::*;
+use crate::stats::file_stats;
 
 /// This is the root type of the yaml configuration file.
 /// It consists of multiple Experiments, each of which is the Cartesian product
@@ -83,7 +84,7 @@ impl Experiments {
         force_rerun: bool,
         time_limit: Option<Duration>,
         mem_limit: Option<Bytes>,
-    ) -> Vec<Job> {
+    ) -> Vec<(Job, AlignStats)> {
         self.0
             .into_iter()
             .flat_map(|product| {
@@ -103,13 +104,18 @@ impl Experiments {
                     .flat_map(|d| d.generate(data_dir, force_rerun).into_iter())
                     .collect_vec();
                 iproduct!(datasets, product.costs, product.traces, product.algos).map(
-                    move |(dataset, costs, traceback, algo)| Job {
-                        time_limit,
-                        mem_limit,
-                        dataset,
-                        costs,
-                        traceback,
-                        algo,
+                    move |((dataset, stats), costs, traceback, algo)| {
+                        (
+                            Job {
+                                time_limit,
+                                mem_limit,
+                                dataset,
+                                costs,
+                                traceback,
+                                algo,
+                            },
+                            stats,
+                        )
                     },
                 )
             })
@@ -118,7 +124,7 @@ impl Experiments {
 }
 
 impl DatasetConfig {
-    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Dataset> {
+    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<(Dataset, AlignStats)> {
         fn collect_dir(dir: &Path) -> Vec<Dataset> {
             assert!(dir.is_dir() && dir.exists());
             fn is_hidden(entry: &DirEntry) -> bool {
@@ -211,31 +217,30 @@ impl DatasetConfig {
         // For directories and downloads, merged summary stats are only generated on the initial download.
         // Either way, missing per-file stats are always generated.
 
-        let merged_stats = merge_all(
-            dataset
-                .par_iter()
-                .filter_map(|d| {
-                    let f = match d {
-                        Dataset::Generated(g) => g.path(),
-                        Dataset::File(f) => f.to_path_buf(),
-                        Dataset::Data(_) => return None,
-                    };
-                    let stats_path = f.with_extension("stats.json");
-                    let stats = if stats_path.is_file() {
-                        let v = fs::read(&stats_path).unwrap();
-                        serde_json::from_slice(&v)
-                            .expect(&format!("Could not parse {} as json", stats_path.display()))
-                    } else {
-                        let stats = AlignStats::file_stats(&f);
-                        fs::write(&stats_path, serde_json::to_string_pretty(&stats).unwrap())
-                            .expect("Failed to write to stats file!");
-                        stats
-                    };
-                    Some(stats)
-                })
-                .collect::<Vec<_>>()
-                .into_iter(),
-        );
+        let datasets_with_stats = dataset
+            .into_par_iter()
+            .map(|d| {
+                let f = match &d {
+                    Dataset::Generated(g) => g.path(),
+                    Dataset::File(f) => f.to_path_buf(),
+                    // TODO: Generate stats on the fly.
+                    Dataset::Data(_) => todo!(),
+                };
+                let stats_path = f.with_extension("stats.json");
+                let stats = if stats_path.is_file() {
+                    let v = fs::read(&stats_path).unwrap();
+                    serde_json::from_slice(&v)
+                        .expect(&format!("Could not parse {} as json", stats_path.display()))
+                } else {
+                    let stats = file_stats(&f);
+                    fs::write(&stats_path, serde_json::to_string_pretty(&stats).unwrap())
+                        .expect("Failed to write to stats file!");
+                    stats
+                };
+                (d, stats)
+            })
+            .collect::<Vec<_>>();
+        let merged_stats = merge_all(datasets_with_stats.iter().map(|(_d, s)| s.clone()));
         if let Some(stats_path) = dir_stats_path {
             if let Some(merged_stats) = merged_stats {
                 if !stats_path.exists() {
@@ -250,7 +255,7 @@ impl DatasetConfig {
             }
         }
 
-        dataset
+        datasets_with_stats
     }
 }
 

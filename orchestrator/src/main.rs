@@ -147,7 +147,7 @@ fn main() {
     if args.incremental {
         eprintln!("Existing jobs: {}", existing_job_results.len());
         let num_jobs_before = jobs.len();
-        jobs.retain(|job| {
+        jobs.retain(|(job, _stats)| {
             existing_job_results
                 .iter()
                 .find(|existing_job| {
@@ -292,7 +292,7 @@ fn verify_costs(results: &mut Vec<JobResult>) {
 
 fn run_with_threads(
     runner: &Path,
-    jobs: Vec<Job>,
+    jobs: Vec<(Job, AlignStats)>,
     cores: Option<Vec<usize>>,
     nice: Option<i32>,
     show_stderr: bool,
@@ -332,7 +332,7 @@ fn run_with_threads(
         for id in &cores {
             scope.spawn(|| {
                 loop {
-                    let Some(job) = jobs_iter.lock().unwrap().next() else {
+                    let Some((job, stats)) = jobs_iter.lock().unwrap().next() else {
                         break;
                     };
                     if !*running.lock().unwrap() {
@@ -355,10 +355,11 @@ fn run_with_threads(
                     let job_result = if skip {
                         JobResult {
                             job,
+                            stats,
                             output: Err((0., JobError::Skipped)),
                         }
                     } else {
-                        run_job(runner, job, *id, nice, show_stderr, verbose)
+                        run_job(runner, job, stats, *id, nice, show_stderr, verbose)
                     };
 
                     let mut counts = counts.lock().unwrap();
@@ -399,6 +400,7 @@ fn run_with_threads(
 fn run_job(
     runner: &Path,
     job: Job,
+    stats: AlignStats,
     core_id: Option<usize>,
     nice: Option<i32>,
     show_stderr: bool,
@@ -434,6 +436,7 @@ fn run_job(
         JobResult {
             job,
             output: Ok(serde_json::from_slice(&output.stdout).expect("Error reading output json:")),
+            stats,
         }
     } else {
         if show_stderr {
@@ -462,6 +465,7 @@ fn run_job(
         JobResult {
             job,
             output: Err((duration, err)),
+            stats,
         }
     }
 }

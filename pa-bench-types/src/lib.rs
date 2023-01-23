@@ -6,6 +6,7 @@ use pa_generate::*;
 use pa_types::*;
 
 mod algorithms;
+pub mod stats;
 pub use algorithms::*;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -215,10 +216,34 @@ pub enum JobError {
     ExitCode(i32),
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct AlignStats {
+    pub files: usize,
+    pub seq_pairs: usize,
+    pub total_bases: usize,
+
+    pub length: Stats<usize>,
+    pub divergence: Stats<f64>,
+    pub largest_gap: Stats<usize>,
+
+    pub substitutions: usize,
+    pub insertions: usize,
+    pub deletions: usize,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Stats<T> {
+    pub min: T,
+    pub max: T,
+    pub mean: f64,
+    pub stddev: f64,
+}
+
 /// The result of an alignment job, containing the input and output.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobResult {
     pub job: Job,
     // TODO(ragnar): Make this a result with a specific error type that indicates the failure reason.
+    pub stats: AlignStats,
     pub output: Result<JobOutput, (f32, JobError)>,
 }
