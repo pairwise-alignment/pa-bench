@@ -380,7 +380,7 @@ fn run_with_threads(
                         skipped,
                         failed,
                     } = *counts;
-                    eprint!("Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}\r");
+                    eprint!("\rProcessed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}");
 
                     // If the orchestrator was aborted, do not push failing job results.
                     if job_result.output.is_ok() || *running.lock().unwrap() {

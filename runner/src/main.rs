@@ -32,11 +32,17 @@ struct Args {
     /// Pin the process to the given core.
     #[arg(short, long)]
     pin_core_id: Option<usize>,
+
     /// Set the process niceness. <0 for higher priority.
     ///
     /// May require root rights, or modifying `/etc/security/limits.conf`.
     #[arg(long)]
     nice: Option<i32>,
+
+    /// Disable time and memory limit.
+    #[arg(long)]
+    no_limits: bool,
+
     #[arg(short, long)]
     verbose: bool,
 }
@@ -58,7 +64,9 @@ fn main() {
         .read_to_end(&mut stdin_job)
         .expect("Error in reading from stdin!");
     let job: Job = serde_json::from_slice(&stdin_job).expect("Error in parsing input json!");
-    set_limits(job.time_limit, job.mem_limit);
+    if !args.no_limits {
+        set_limits(job.time_limit, job.mem_limit);
+    }
 
     if args.verbose {
         eprintln!("\nRunning job:\n{job:?}");
