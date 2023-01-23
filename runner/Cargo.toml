@@ -25,7 +25,7 @@ rustix = { version = "0.36.5", features = ["process"] }
 
 # Aligners:
 triple_accel = { git = "https://github.com/Daniel-Liu-c0deb0t/triple_accel" }
-astar-pairwise-aligner = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", default-features = false }
+astarpa = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", default-features = false }
 
 # Wrappers:
 edlib_rs = { git = "https://github.com/pairwise-alignment/edlib-rs" }
