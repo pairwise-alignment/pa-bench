@@ -19,11 +19,22 @@ use core_affinity;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
-#[command(author, version, about)]
+#[command(
+    author,
+    version,
+    about,
+    after_help = "Input: json Job on stdin.
+Output: json JobResult on stdout.
+Exit code 101: Rust panic.
+Exit code 102: aligner does not support the given parameters."
+)]
 struct Args {
+    /// Pin the process to the given core.
     #[arg(short, long)]
     pin_core_id: Option<usize>,
-    // process niceness. <0 for higher priority.
+    /// Set the process niceness. <0 for higher priority.
+    ///
+    /// May require root rights, or modifying `/etc/security/limits.conf`.
     #[arg(long)]
     nice: Option<i32>,
     #[arg(short, long)]
