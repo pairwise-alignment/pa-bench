@@ -1,5 +1,6 @@
 use flate2::bufread::GzDecoder;
 use serde::{Deserialize, Serialize};
+use stats::merge_all;
 use tar::Archive;
 use walkdir::DirEntry;
 
@@ -142,17 +143,17 @@ impl DatasetConfig {
                 .collect()
         }
 
-        let (dir, dataset) = match self {
+        let (dir_stats_path, dataset) = match self {
             DatasetConfig::Generated(generator) => {
                 (None, generator.generate(data_dir, force_rerun))
             }
             DatasetConfig::File(path) => {
                 let path = data_dir.join(&path);
-                (Some(path.with_extension("")), vec![Dataset::File(path)])
+                (None, vec![Dataset::File(path)])
             }
             DatasetConfig::Directory(dir) => {
                 let path = data_dir.join(&dir);
-                (Some(path.clone()), collect_dir(&path))
+                (Some(path.join("stats.json")), collect_dir(&path))
             }
             DatasetConfig::Download { url, dir } => {
                 let target_dir = &data_dir.join("download").join(&dir);
@@ -183,7 +184,7 @@ impl DatasetConfig {
                         _ => panic!("Download url must end in .zip or .tar.gz."),
                     };
                 }
-                (Some(target_dir.to_owned()), collect_dir(target_dir))
+                (Some(target_dir.join("stats.json")), collect_dir(target_dir))
             }
             DatasetConfig::Data(data) => {
                 let hash = {
@@ -199,24 +200,44 @@ impl DatasetConfig {
                     writeln!(f, ">{a}").unwrap();
                     writeln!(f, "<{b}").unwrap();
                 }
-                (Some(path.with_extension("")), vec![Dataset::File(path)])
+                (None, vec![Dataset::File(path)])
             }
         };
 
-        // Collect stats for non-generated datasets
-        if let Some(dir) = dir {
-            let stats_path = dir.join("dataset_stats.json");
-            if !stats_path.exists() {
-                fs::create_dir_all(&dir).unwrap();
-                let mut stats = StatsCollector::new();
-                for d in &dataset {
-                    if let Dataset::File(f) = d {
-                        stats.add(f);
-                    }
-                }
-                let stats = stats.finish();
+        // Collect stats for each file, and collect summary stats for Directory and Download rules.
+        // For directories and downloads, merged summary stats are only generated on the initial download.
+        // Either way, missing per-file stats are always generated.
+
+        let merged_stats = merge_all(dataset.iter().filter_map(|d| {
+            let f = match d {
+                Dataset::Generated(g) => g.path(),
+                Dataset::File(f) => f.to_path_buf(),
+                Dataset::Data(_) => return None,
+            };
+            let stats_path = f.with_extension("stats.json");
+            let stats = if stats_path.is_file() {
+                let v = fs::read(&stats_path).unwrap();
+                serde_json::from_slice(&v)
+                    .expect(&format!("Could not parse {} as json", stats_path.display()))
+            } else {
+                let stats = AlignStats::file_stats(&f);
                 fs::write(&stats_path, serde_json::to_string_pretty(&stats).unwrap())
                     .expect("Failed to write to stats file!");
+                stats
+            };
+            Some(stats)
+        }));
+        if let Some(stats_path) = dir_stats_path {
+            if let Some(merged_stats) = merged_stats {
+                if !stats_path.exists() {
+                    eprintln!("Write summary stats to {}", stats_path.display());
+                    fs::create_dir_all(&stats_path.parent().unwrap()).unwrap();
+                    fs::write(
+                        &stats_path,
+                        serde_json::to_string_pretty(&merged_stats).unwrap(),
+                    )
+                    .expect("Failed to write to stats file!");
+                }
             }
         }
 
