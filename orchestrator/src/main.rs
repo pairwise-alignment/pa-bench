@@ -364,6 +364,10 @@ fn run_with_threads(
                         run_job(runner, job, stats, *id, nice, show_stderr, verbose)
                     };
 
+                    if verbose {
+                        eprintln!("\n Job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
+                    }
+
                     let mut counts = counts.lock().unwrap();
                     counts.done += 1;
                     if job_result.output.is_ok() {
@@ -374,7 +378,9 @@ fn run_with_threads(
                         counts.unsupported += 1;
                     } else if *job_result.output.as_ref().unwrap_err() != JobError::Interrupted {
                         counts.failed += 1;
-                        eprintln!("\n Failed job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
+                        if !verbose {
+                            eprintln!("\n Failed job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
+                        }
                     };
                     let Counts {
                         done,
