@@ -437,10 +437,15 @@ fn run_job(
     }
 
     let start = Instant::now();
+    let mut stdout = Vec::new();
+    child
+        .stdout
+        .take()
+        .unwrap()
+        .read_to_end(&mut stdout)
+        .unwrap();
     let ResUse { status, rusage } = child.wait4().unwrap();
     let walltime = start.elapsed().as_secs_f32();
-    let mut stdout = Vec::new();
-    child.stdout.unwrap().read_to_end(&mut stdout).unwrap();
 
     let resources = ResourceUsage {
         walltime,
