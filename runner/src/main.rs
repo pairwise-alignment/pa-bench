@@ -140,14 +140,6 @@ fn main() {
     // Verify the cigar strings, but do not return them as they are not used for further analysis and take a lot of space.
     if job.traceback {
         for ((a, b), &cost, cigar) in izip!(sequence_pairs, &costs, cigars) {
-            if args.verbose {
-                eprintln!(
-                    "A: {}\nB: {}\nCigar: {cigar:?}\ncost: {cost}",
-                    String::from_utf8(a.to_vec()).unwrap(),
-                    String::from_utf8(b.to_vec()).unwrap()
-                );
-            }
-
             let cigar_cost = cigar.verify(&job.costs, a, b);
             assert_eq!(
                 cigar_cost,
