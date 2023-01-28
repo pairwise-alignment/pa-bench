@@ -2,29 +2,29 @@
     Scaling with error rate with k=9
 
     This runs in around 1 hour in total.
-  time_limit: 20min
+  time_limit: 1h
+  mem_limit: 10GiB
   datasets:
     - !Generated
       seed: 31415
-      error_rates:
-        [
-          0.01,
+      error_rates: [
+          #0.01,
           0.02,
-          0.04,
+          #0.04,
           0.06,
-          0.08,
+          #0.08,
           0.10,
-          0.12,
+          #0.12,
           0.14,
-          0.16,
+          #0.16,
           0.18,
-          0.20,
+          #0.20,
           0.22,
-          0.24,
+          #0.24,
           0.26,
-          0.28,
+          #0.28,
           0.30,
-          0.32,
+          #0.32,
           0.34,
         ]
       error_models: [Uniform]
@@ -40,6 +40,8 @@
       diagonal_transition: false
       heuristic:
         type: !None
+        r: 0
+        k: 9
 
     - !AstarPA
       diagonal_transition: false
@@ -56,8 +58,7 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        type: !CSH
-        gap_cost: true
+        type: !GCSH
         r: 1
         k: 9
 
@@ -76,7 +77,44 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
+        type: !GCSH
+        r: 2
+        k: 9
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 1
+        k: 9
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
         type: !CSH
-        gap_cost: true
+        r: 1
+        k: 9
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 9
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 2
+        k: 9
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 2
+        k: 9
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
         r: 2
         k: 9

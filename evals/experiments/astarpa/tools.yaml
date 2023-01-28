@@ -1,22 +1,14 @@
 - comment: |
     For low error rates 1% and 5%, use r=1.
+  time_limit: 24h
+  mem_limit: 10GiB
   datasets:
     - !Generated
       seed: 31415
       error_rates: [0.01, 0.05]
       error_models: [Uniform]
-      lengths: [
-          3000,
-          10000,
-          30000,
-          100000,
-          300000,
-          1000000,
-          #3000000,
-          #10000000,
-        ]
-      total_size: 1000000
-      #total_size: 100000000
+      lengths: [3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+      total_size: 10000000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
@@ -37,45 +29,35 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        type: !CSH
-        gap_cost: true
+        type: !GCSH
         r: 1
 
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !SH
-        r: 1
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !CSH
-        r: 1
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !CSH
-        gap_cost: true
-        r: 1
+    # - !AstarPA
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !SH
+    #     r: 1
+    # - !AstarPA
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !CSH
+    #     r: 1
+    # - !AstarPA
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !GCSH
+    #     r: 1
 - comment: |
     For high error rates 10% and 15%, use r=2.
+  time_limit: 24h
+  mem_limit: 10GiB
   datasets:
     - !Generated
       seed: 31415
       error_rates: [0.10, 0.15]
       error_models: [Uniform]
-      lengths: [
-          3000,
-          10000,
-          30000,
-          100000,
-          300000,
-          1000000,
-          #3000000,
-          #10000000,
-        ]
-      total_size: 1000000
-      #total_size: 100000000
+      lengths: [3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+      total_size: 10000000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
@@ -96,23 +78,21 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        type: !CSH
-        gap_cost: true
+        type: !GCSH
         r: 2
 
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !SH
-        r: 2
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !CSH
-        r: 2
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !CSH
-        gap_cost: true
-        r: 2
+    # - !AstarPA
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !SH
+    #     r: 2
+    # - !AstarPA
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !CSH
+    #     r: 2
+    # - !AstarPA
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !GCSH
+    #     r: 2
