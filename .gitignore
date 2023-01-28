@@ -4,3 +4,4 @@
 /evals/.results
 /evals/analysis/.ipynb_checkpoints
 /evals/analysis/*.png
+/evals/analysis/plots/
