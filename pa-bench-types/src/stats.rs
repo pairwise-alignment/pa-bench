@@ -60,6 +60,7 @@ impl Commute for AlignStats {
             length,
             divergence,
             largest_gap,
+            edit_distance,
             substitutions,
             insertions,
             deletions,
@@ -73,6 +74,7 @@ impl Commute for AlignStats {
         self.seq_pairs += seq_pairs;
         self.total_bases += total_bases;
 
+        self.edit_distance += edit_distance;
         self.substitutions += substitutions;
         self.insertions += insertions;
         self.deletions += deletions;

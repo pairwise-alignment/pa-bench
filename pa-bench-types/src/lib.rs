@@ -234,6 +234,7 @@ pub struct AlignStats {
     pub divergence: Stats<f64>,
     pub largest_gap: Stats<usize>,
 
+    pub edit_distance: usize,
     pub substitutions: usize,
     pub insertions: usize,
     pub deletions: usize,

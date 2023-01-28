@@ -57,6 +57,7 @@ pub fn file_stats(file: &Path) -> AlignStats {
                     length,
                     divergence: Stats::new(divergence),
                     largest_gap: Stats::new(largest_gap),
+                    edit_distance: res.getDistance() as _,
                     substitutions,
                     insertions,
                     deletions,
