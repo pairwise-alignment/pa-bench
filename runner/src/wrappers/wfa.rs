@@ -39,7 +39,7 @@ impl AlignerParams for WfaParams {
             cm if cm.is_affine() => {
                 WFAlignerGapAffine::new(cm.sub, cm.open, cm.extend, scope, self.memory_model)
             }
-            _ => unimplemented!("WFA does not support match bonus!"),
+            _ => return Err("WFA does not support match bonus!"),
         };
         aligner.set_heuristic(self.heuristic);
         Ok(Self::Aligner { cm, aligner })
