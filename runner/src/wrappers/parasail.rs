@@ -33,7 +33,8 @@ mod with_parasailors {
         }
 
         fn is_exact(&self) -> bool {
-            true
+            // FIXME: Turn this back to true after fixing overflows.
+            false
         }
     }
 
