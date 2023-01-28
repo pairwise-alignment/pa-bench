@@ -135,7 +135,7 @@ fn main() {
     eprintln!("Generated {} jobs.", jobs.len());
 
     // Read the existing results file.
-    let mut existing_job_results: Vec<JobResult> = if !args.force_rerun && results_path.is_file() {
+    let existing_jobs: Vec<JobResult> = if !args.force_rerun && results_path.is_file() {
         serde_json::from_str(
             &fs::read_to_string(&results_path).expect("Error reading existing results file"),
         )
@@ -144,12 +144,38 @@ fn main() {
         vec![]
     };
 
+    // We have a list of existing results, and a list of jobs to run.
+    // We first split as follows:
+    // - Existing jobs that are not part of the experiment.
+    //   -> existing_jobs_extra
+    // - Existing jobs that are reused.
+    //   -> existing_jobs_used
+    //
+    // Then, if incremental running is set, we only retain jobs that are new.
+    // - Existing jobs that are rerun.
+    //   -> jobs_to_run
+    // - New jobs.
+    //   -> jobs_to_run
+    //
+    // Lastly, we remove from existing_jobs_used any job equal to a job_to_run.
+
+    let (mut existing_jobs_used, existing_jobs_extra): (Vec<_>, Vec<_>) =
+        existing_jobs.into_iter().partition(|existing_job| {
+            jobs.iter()
+                .find(|(j, _)| j.is_same_as(&existing_job.job))
+                .is_some()
+        });
+
     // Skip jobs that succeeded before, or were attempted with at least as many resources.
     if args.incremental {
-        eprintln!("Existing jobs: {}", existing_job_results.len());
+        eprintln!(
+            "Existing jobs: {} in experiment + {} extra",
+            existing_jobs_used.len(),
+            existing_jobs_extra.len()
+        );
         let num_jobs_before = jobs.len();
         jobs.retain(|(job, _stats)| {
-            existing_job_results
+            existing_jobs_used
                 .iter()
                 .find(|existing_job| {
                     existing_job.job.is_same_as(job)
@@ -162,6 +188,13 @@ fn main() {
         eprintln!("Reused jobs: {}", num_jobs_before - jobs.len());
         eprintln!("Running {} jobs...", jobs.len());
     };
+
+    // Remove jobs that were run from existing results.
+    existing_jobs_used.retain(|existing_job| {
+        jobs.iter()
+            .find(|(job, _)| job.is_same_as(&existing_job.job))
+            .is_none()
+    });
 
     let runner_cores = if let Some(num_jobs) = args.num_jobs {
         let mut cores = core_affinity::get_core_ids()
@@ -207,28 +240,35 @@ fn main() {
             .expect(&format!("Failed to write logs to {}", logs_path.display()));
     }
 
-    // Remove jobs that were run from existing results.
-    existing_job_results.retain(|existing_job| {
-        job_results
-            .iter()
-            .find(|job| job.job.is_same_as(&existing_job.job))
-            .is_none()
-    });
-
-    // Append new results to existing results.
-    existing_job_results.extend(job_results);
-    let mut job_results = existing_job_results;
-
     if let Some(dir) = results_path.parent() {
         fs::create_dir_all(dir).unwrap();
     }
+
+    let mut experiment_jobs = existing_jobs_used;
+    experiment_jobs.extend(job_results);
+
+    // First, write jobs for this experiment to '.exact.json'.
     eprintln!("Output: {}", results_path.display());
-    fs::write(&results_path, &serde_json::to_string(&job_results).unwrap()).expect(&format!(
+    fs::write(
+        &results_path.with_extension("exact.json"),
+        &serde_json::to_string(&experiment_jobs).unwrap(),
+    )
+    .expect(&format!(
         "Failed to write results to {}",
         results_path.display()
     ));
 
-    verify_costs(&mut job_results);
+    // Then, write all existing jobs.
+    let mut all_jobs = experiment_jobs;
+    all_jobs.extend(existing_jobs_extra);
+
+    eprintln!("Output: {}", results_path.display());
+    fs::write(&results_path, &serde_json::to_string(&all_jobs).unwrap()).expect(&format!(
+        "Failed to write results to {}",
+        results_path.display()
+    ));
+
+    verify_costs(&mut all_jobs);
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
