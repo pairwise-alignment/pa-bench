@@ -144,7 +144,7 @@ fn main() {
             assert_eq!(
                 cigar_cost,
                 cost,
-                "\njob: {job:?}\nA: {}\nB: {}\nCigar: {cigar:?}\ncost: {cost}\ncigar_cost: {cigar_cost}\n",
+                "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {cigar:?}\ncost: {cost}\ncigar_cost: {cigar_cost}\n",
                 String::from_utf8(a.to_vec()).unwrap(),
                 String::from_utf8(b.to_vec()).unwrap(),
             );
