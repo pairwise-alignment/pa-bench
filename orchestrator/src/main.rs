@@ -328,6 +328,7 @@ fn run_with_threads(
     }
 
     let counts = Mutex::new(Counts::default());
+    let stderr = Mutex::new(());
 
     thread::scope(|scope| {
         for id in &cores {
@@ -364,6 +365,7 @@ fn run_with_threads(
                         run_job(runner, job, stats, *id, nice, show_stderr, verbose)
                     };
 
+                    let _stderr = stderr.lock().unwrap();
                     if verbose {
                         eprintln!("\n Job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
                     }
@@ -389,7 +391,9 @@ fn run_with_threads(
                         skipped,
                         failed,
                     } = *counts;
-                    eprint!("\r Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}");
+                    {
+                        eprint!("\r Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}");
+                    }
 
                     // If the orchestrator was aborted, do not push failing job results.
                     if job_result.output.is_ok() || *running.lock().unwrap() {
@@ -462,13 +466,6 @@ fn run_job(
             output: Ok(serde_json::from_slice(&stdout).expect("Error reading output json:")),
         }
     } else {
-        if show_stderr {
-            if let Some(code) = status.signal() {
-                if code == 24 {
-                    eprintln!("Time limit exceeded for {job:?}");
-                }
-            }
-        }
         let err = if let Some(signal) = status.signal() {
             match signal {
                 2 => JobError::Interrupted,
