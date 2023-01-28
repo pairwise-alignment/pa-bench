@@ -17,9 +17,8 @@ impl AlignerParams for TripleAccelParams {
         trace: bool,
         _max_len: usize,
     ) -> Result<Self::Aligner, &'static str> {
-        // TripleAccel has a bug in traceback when using affine gap costs.
-        if !cm.is_affine() {
-            return Err("TripleAccel only works with non-affine cost models");
+        if cm.is_affine() && trace {
+            return Err("TripleAccel has a bug in traceback for affine costs");
         }
         let costs = ::triple_accel::levenshtein::EditCosts::new(
             cm.sub as _,

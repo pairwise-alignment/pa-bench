@@ -1,0 +1,15 @@
+# TripleAccel returns a cigar that does not take into account the affine scoring:
+# X=X=
+# instead of
+# =XX=
+- datasets:
+    - !Data
+      - ["AC", "AACC"]
+      - ["AACC", "AC"]
+  traces:
+    - true
+  costs:
+    - { sub: 1, open: 1, extend: 1 }
+  algos:
+    - !Wfa
+    - !TripleAccel
