@@ -32,8 +32,8 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    - !BlockAligner
-      size: !Size [32, 1024]
+    # - !BlockAligner
+    #   size: !Size [32, 1024]
     - !ParasailStriped
     - !Edlib
     - !TripleAccel
@@ -62,3 +62,4 @@
       diagonal_transition: true
       heuristic:
         type: !None
+        r: 0
