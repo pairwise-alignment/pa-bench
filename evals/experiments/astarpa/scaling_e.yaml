@@ -27,7 +27,7 @@
           #0.32,
           0.34,
         ]
-      error_models: [Uniform, NoisyIndel, NoisyMove]
+      error_models: [Uniform, NoisyIndel]
       lengths: [10000]
       # total_size: 1000000
       total_size: 100000
@@ -35,8 +35,17 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
+    - !Edlib
+    - !Wfa
+
     - !AstarPA
       diagonal_transition: false
+      heuristic:
+        type: !None
+        r: 0
+        k: 9
+    - !AstarPA
+      diagonal_transition: true
       heuristic:
         type: !None
         r: 0

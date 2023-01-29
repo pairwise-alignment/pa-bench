@@ -6,7 +6,7 @@
     - !Generated
       seed: 31415
       error_rates: [0.05]
-      error_models: [Uniform, NoisyIndel, NoisyMove]
+      error_models: [Uniform, NoisyIndel]
       lengths: [100, 300, 1000, 3000, 10000, 30000, 100000]
       # TODO: BUMP
       #total_size: 1000000
@@ -17,6 +17,12 @@
   algos:
     - !AstarPA
       diagonal_transition: false
+      heuristic:
+        type: !None
+        r: 0
+        k: 15
+    - !AstarPA
+      diagonal_transition: true
       heuristic:
         type: !None
         r: 0
@@ -50,13 +56,16 @@
     - !Generated
       seed: 31415
       error_rates: [0.05]
-      error_models: [Uniform, NoisyIndel, NoisyMove]
+      error_models: [Uniform, NoisyIndel]
       lengths: [100, 300, 1000, 3000, 10000, 30000, 100000]
-      total_size: 100000000
+      total_size: 1000000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
+    - !Edlib
+    - !Wfa
+
     - !AstarPA
       diagonal_transition: false
       heuristic:
