@@ -139,7 +139,10 @@ fn main() {
         serde_json::from_str(
             &fs::read_to_string(&results_path).expect("Error reading existing results file"),
         )
-        .expect("Error parsing results json file")
+        .expect(&format!(
+            "Error parsing results json file {}",
+            results_path.display()
+        ))
     } else {
         vec![]
     };
