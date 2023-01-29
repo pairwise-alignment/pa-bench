@@ -250,8 +250,13 @@ fn main() {
     let mut experiment_jobs = existing_jobs_used;
     experiment_jobs.extend(job_results);
 
+    verify_costs(&mut experiment_jobs);
+
     // First, write jobs for this experiment to '.exact.json'.
-    eprintln!("Output: {}", results_path.display());
+    eprintln!(
+        "Output: {}",
+        results_path.with_extension("exact.json").display()
+    );
     fs::write(
         &results_path.with_extension("exact.json"),
         &serde_json::to_string(&experiment_jobs).unwrap(),
@@ -270,11 +275,10 @@ fn main() {
         "Failed to write results to {}",
         results_path.display()
     ));
-
-    verify_costs(&mut all_jobs);
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
+/// Deduplicates exact costs.
 fn verify_costs(results: &mut Vec<JobResult>) {
     // Ensure exact algorithms are first in results.
     results.sort_by_key(|res| !res.output.as_ref().map(|o| o.is_exact).unwrap_or(false));
@@ -288,6 +292,10 @@ fn verify_costs(results: &mut Vec<JobResult>) {
             continue;
         };
 
+        if output.costs.is_empty() {
+            continue;
+        }
+
         // Find the first exact job with the same input and compare costs.
         for reference_result in earlier_results {
             if !reference_result.job.same_input(&result.job) {
@@ -297,6 +305,9 @@ fn verify_costs(results: &mut Vec<JobResult>) {
                 continue;
             };
             if !reference_output.is_exact {
+                continue;
+            }
+            if reference_output.costs.is_empty() {
                 continue;
             }
             assert_eq!(
@@ -319,6 +330,8 @@ fn verify_costs(results: &mut Vec<JobResult>) {
                             output.costs,
                             reference_output.costs,
                         );
+                // Remove the costs from this output, since they are the same as the reference output above.
+                output.costs = vec![];
             } else {
                 // For inexact jobs, add the correct ones and the fraction of correct results.
                 output.exact_costs = Some(reference_output.costs.clone());
