@@ -62,9 +62,13 @@ mod without_parasailors {
     impl AlignerParams for ParasailStripedParams {
         type Aligner = ParasailStriped;
 
-        fn default(_cm: CostModel, trace: bool, _max_len: usize) -> Self::Aligner {
-            assert!(!trace);
-            ParasailStriped
+        fn new(
+            &self,
+            _cm: CostModel,
+            _trace: bool,
+            _max_len: usize,
+        ) -> Result<Self::Aligner, &'static str> {
+            return Err("Enable the parasailors feature to use Parasail");
         }
 
         fn is_exact(&self) -> bool {
