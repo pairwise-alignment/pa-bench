@@ -244,9 +244,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.78"
+version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a20104e2335ce8a659d6dd92a51a767a0c062599c73b343fd152cb401e828c3d"
+checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
 
 [[package]]
 name = "cexpr"
@@ -1202,7 +1202,7 @@ dependencies = [
 [[package]]
 name = "pa-generate"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-generate#bb6b251db63b47f92b82f76f434ea06f1b4975d8"
+source = "git+https://github.com/pairwise-alignment/pa-generate#c7d4b0e102f40cece77b1b48ba0c4d473d2db9b7"
 dependencies = [
  "clap",
  "itertools",

@@ -4,6 +4,7 @@
       total_size: 100000
       error_models:
         - Uniform
+        # - NoisyIndel
         # - NoisyInsert
         # - NoisyDelete
         # - NoisyMove
