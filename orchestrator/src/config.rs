@@ -277,7 +277,7 @@ impl DatasetGeneratorConfig {
                     pattern_length: None,
                 };
                 let path = generated_dataset.path();
-                if force_rerun || !path.exists() {
+                if force_rerun || !(path.exists() && path.metadata().unwrap().len() > 0) {
                     eprintln!("Generating dataset {}", path.display());
                     generated_dataset.to_generator().generate_file(&path);
                 }

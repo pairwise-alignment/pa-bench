@@ -64,7 +64,7 @@ pub fn file_stats(file: &Path) -> AlignStats {
                 }
             }),
     )
-    .expect("File must contain at least one sequence pair!");
+    .expect(&format!("File {} is empty!", file.display()));
     stats.files = 1;
     stats
 }
