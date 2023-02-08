@@ -397,25 +397,30 @@ fn run_with_threads(
                         break;
                     }
                     // If a smaller job for the same algorithm failed, skip it.
-                    let mut skip = false;
+                    let mut skip = None;
                     if job.dataset.is_generated() {
                         for prev in job_results.lock().unwrap().iter() {
                             if prev.output.is_err()
                                 && prev.job.dataset.is_generated()
                                 && job.is_larger(&prev.job)
                             {
-                                skip = true;
+                                skip = Some(
+                                    if prev.output.as_ref().unwrap_err() == &JobError::Unsupported {
+                                        JobError::Unsupported
+                                    } else {
+                                        JobError::Skipped
+                                    });
                                 break;
                             }
                         }
                     }
 
-                    let job_result = if skip {
+                    let job_result = if let Some(err) = &skip {
                         JobResult {
                             job,
                             stats,
                             resources: ResourceUsage::default(),
-                            output: Err(JobError::Skipped),
+                            output: Err(err.clone()),
                         }
                     } else {
                         run_job(runner, job, stats, *id, nice, show_stderr, verbose)
@@ -430,7 +435,7 @@ fn run_with_threads(
                     counts.done += 1;
                     if job_result.output.is_ok() {
                         counts.success += 1;
-                    } else if skip {
+                    } else if skip == Some(JobError::Skipped) {
                         counts.skipped += 1;
                     } else if *job_result.output.as_ref().unwrap_err() == JobError::Unsupported {
                         counts.unsupported += 1;
