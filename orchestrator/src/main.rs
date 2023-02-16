@@ -25,7 +25,8 @@ use config::*;
 struct Args {
     // TODO: VEC
     /// Path to an experiment yaml file.
-    experiment: PathBuf,
+    #[arg(num_args = 1..)]
+    experiments: Vec<PathBuf>,
 
     /// Path to the output json file. By default mirrors the `experiments` dir in `results`.
     ///
@@ -128,18 +129,27 @@ fn main() {
         "{} does not exist!",
         args.runner.unwrap().display()
     );
+    if args.output.is_some() && args.experiments.len() != 1 {
+        panic!("Output can only be specified when running exactly 1 experiment.");
+    }
+    for i in 0..args.experiments.len() {
+        run_experiment(&args, i);
+    }
+}
 
-    let experiment_yaml =
-        fs::read_to_string(&args.experiment).expect("Failed to read jobs generator:");
+fn run_experiment(args: &Args, experiment_idx: usize) {
+    let experiment = &args.experiments[experiment_idx];
+    eprintln!("Running experiment {}", experiment.display());
+    let experiment_yaml = fs::read_to_string(&experiment).expect("Failed to read jobs generator:");
     let experiments: Experiments =
         serde_yaml::from_str(&experiment_yaml).expect("Failed to parse jobs generator yaml:");
 
-    let results_path = args.output.unwrap_or_else(|| {
+    let results_path = args.output.clone().unwrap_or_else(|| {
         // Mirror the structure of experiments in results.
         // To be precise: replace the deepest directory named "experiments" by "results".
         // If not found, simply uses .json instead of .yaml for the output file.
         let mut found = false;
-        args.experiment
+        experiment
             .with_extension("json")
             .iter()
             .rev()
@@ -248,7 +258,7 @@ fn main() {
     };
 
     let job_results = run_with_threads(
-        &args.runner.unwrap(),
+        args.runner.as_ref().unwrap(),
         jobs,
         runner_cores,
         args.nice,
@@ -259,14 +269,14 @@ fn main() {
     {
         let logs_path = args.logs_dir.join(format!(
             "{}_{}.json",
-            args.experiment.file_stem().unwrap().to_str().unwrap(),
+            experiment.file_stem().unwrap().to_str().unwrap(),
             chrono::Local::now()
                 .with_nanosecond(0)
                 .unwrap()
                 .to_rfc3339()
         ));
         // Write results to persistent log.
-        fs::create_dir_all(args.logs_dir).unwrap();
+        fs::create_dir_all(&args.logs_dir).unwrap();
         fs::write(&logs_path, &serde_json::to_string(&job_results).unwrap())
             .expect(&format!("Failed to write logs to {}", logs_path.display()));
     }
