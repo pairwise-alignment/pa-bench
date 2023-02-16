@@ -81,7 +81,7 @@ impl Experiments {
     pub fn generate(
         self,
         data_dir: &Path,
-        force_rerun: bool,
+        regenerate: bool,
         time_limit: Option<Duration>,
         mem_limit: Option<Bytes>,
     ) -> Vec<(Job, AlignStats)> {
@@ -101,7 +101,7 @@ impl Experiments {
                 let datasets = product
                     .datasets
                     .into_iter()
-                    .flat_map(|d| d.generate(data_dir, force_rerun).into_iter())
+                    .flat_map(|d| d.generate(data_dir, regenerate).into_iter())
                     .collect_vec();
                 iproduct!(datasets, product.costs, product.traces, product.algos).map(
                     move |((dataset, stats), costs, traceback, algo)| {
@@ -124,7 +124,7 @@ impl Experiments {
 }
 
 impl DatasetConfig {
-    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<(Dataset, AlignStats)> {
+    pub fn generate(self, data_dir: &Path, regenerate: bool) -> Vec<(Dataset, AlignStats)> {
         fn collect_dir(dir: &Path) -> Vec<Dataset> {
             assert!(dir.is_dir() && dir.exists());
             fn is_hidden(entry: &DirEntry) -> bool {
@@ -153,9 +153,7 @@ impl DatasetConfig {
         }
 
         let (dir_stats_path, dataset) = match self {
-            DatasetConfig::Generated(generator) => {
-                (None, generator.generate(data_dir, force_rerun))
-            }
+            DatasetConfig::Generated(generator) => (None, generator.generate(data_dir, regenerate)),
             DatasetConfig::File(path) => {
                 let path = data_dir.join(&path);
                 (None, vec![Dataset::File(path)])
@@ -261,7 +259,7 @@ impl DatasetConfig {
 
 impl DatasetGeneratorConfig {
     /// Generates missing `.seq` files in a directory and returns them.
-    pub fn generate(self, data_dir: &Path, force_rerun: bool) -> Vec<Dataset> {
+    pub fn generate(self, data_dir: &Path, regenerate: bool) -> Vec<Dataset> {
         let dir = data_dir.join("generated");
         fs::create_dir_all(&dir).unwrap();
 
@@ -277,7 +275,7 @@ impl DatasetGeneratorConfig {
                     pattern_length: None,
                 };
                 let path = generated_dataset.path();
-                if force_rerun || !(path.exists() && path.metadata().unwrap().len() > 0) {
+                if regenerate || !(path.exists() && path.metadata().unwrap().len() > 0) {
                     eprintln!("Generating dataset {}", path.display());
                     generated_dataset.to_generator().generate_file(&path);
                 }

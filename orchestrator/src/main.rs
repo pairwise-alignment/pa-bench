@@ -21,50 +21,39 @@ use pa_bench_types::*;
 use config::*;
 
 #[derive(Debug, Parser)]
-#[command(author, version, about)]
+#[command(author, about)]
 struct Args {
+    // TODO: VEC
     /// Path to an experiment yaml file.
     experiment: PathBuf,
 
     /// Path to the output json file. By default mirrors the `experiments` dir in `results`.
-    results: Option<PathBuf>,
-
-    /// Path to the data directory.
-    #[arg(short, long, default_value = "evals/data")]
-    data_dir: PathBuf,
-
-    /// Path to the logs directory.
     ///
-    /// Results of all runs are stored here.
-    #[arg(short, long, default_value = "evals/results/.log")]
-    logs_dir: PathBuf,
-
-    /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
-    #[arg(long)]
-    runner: Option<PathBuf>,
-
-    /// Time limit. Defaults to value in experiment yaml or 1m.
-    #[arg(short, long, value_parser = parse_duration::parse)]
-    time_limit: Option<Duration>,
-
-    /// Memory limit. Defaults to value in experiment yaml or 1GiB.
-    #[arg(short, long, value_parser = parse_bytes)]
-    mem_limit: Option<Bytes>,
-
-    // process niceness. <0 for higher priority.
-    #[arg(long)]
-    nice: Option<i32>,
+    /// Only works if only a single experiment is given.
+    #[arg(short = 'o', long)]
+    output: Option<PathBuf>,
 
     /// Number of parallel jobs to use.
     ///
     /// Jobs are pinned to separate cores.
     /// The number of jobs is capped to the total number of cores minus 1.
-    #[arg(short = 'j', long)]
+    #[arg(short = 'j')]
     num_jobs: Option<usize>,
 
-    /// Show stderr of runner process.
+    /// Time limit. Defaults to value in experiment yaml or 1m.
+    #[arg(short, long, value_parser = parse_duration::parse)]
+    #[clap(help_heading = "Limits")]
+    time_limit: Option<Duration>,
+
+    /// Memory limit. Defaults to value in experiment yaml or 1GiB.
+    #[arg(short, long, value_parser = parse_bytes)]
+    #[clap(help_heading = "Limits")]
+    mem_limit: Option<Bytes>,
+
+    /// Process niceness. '--nice=-20' for highest priority.
     #[arg(long)]
-    stderr: bool,
+    #[clap(help_heading = "Limits")]
+    nice: Option<i32>,
 
     /// Skip jobs already present in the results file.
     ///
@@ -73,19 +62,57 @@ struct Args {
     #[arg(short, long)]
     incremental: bool,
 
-    /// In combination with --incremental, rerun all failed jobs.
+    /// In combination with --incremental, also rerun failed jobs.
     ///
     /// This also reruns jobs that had at least as many resources. Useful when code changed.
     #[arg(short, long)]
     rerun_failed: bool,
 
-    /// Verbose runner outputs.
+    /// Regenerate generated datasets.
+    #[arg(long, hide_short_help = true)]
+    regenerate: bool,
+
+    /// Discard all existing results.
+    #[arg(long, hide_short_help = true)]
+    clean: bool,
+
+    /// Shorthand for '-j5 --incremental --rerun-failed'
     #[arg(short, long)]
+    quick: bool,
+
+    /// Shorthand for '-j1 --nice=-20'
+    #[arg(long)]
+    release: bool,
+
+    /// Print jobs started and finished.
+    #[arg(short, long)]
+    #[clap(help_heading = "Output")]
     verbose: bool,
 
-    /// Ignore the existing results json and regenerate datasets.
+    /// Show stderr of runner process.
     #[arg(long)]
-    force_rerun: bool,
+    #[clap(help_heading = "Output")]
+    stderr: bool,
+
+    /// Path to the data directory.
+    #[arg(long, default_value = "evals/data")]
+    #[clap(help_heading = "Custom paths")]
+    #[clap(hide_short_help = true)]
+    data_dir: PathBuf,
+
+    /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
+    #[arg(long)]
+    #[clap(help_heading = "Custom paths")]
+    #[clap(hide_short_help = true)]
+    runner: Option<PathBuf>,
+
+    /// Path to the logs directory.
+    ///
+    /// Results of all runs are stored here.
+    #[arg(long, default_value = "evals/results/.log")]
+    #[clap(help_heading = "Custom paths")]
+    #[clap(hide_short_help = true)]
+    logs_dir: PathBuf,
 }
 
 fn main() {
@@ -107,9 +134,10 @@ fn main() {
     let experiments: Experiments =
         serde_yaml::from_str(&experiment_yaml).expect("Failed to parse jobs generator yaml:");
 
-    let results_path = args.results.unwrap_or_else(|| {
+    let results_path = args.output.unwrap_or_else(|| {
         // Mirror the structure of experiments in results.
-        // To be precise: replace the last directory named "experiments" by "results".
+        // To be precise: replace the deepest directory named "experiments" by "results".
+        // If not found, simply uses .json instead of .yaml for the output file.
         let mut found = false;
         args.experiment
             .with_extension("json")
@@ -128,14 +156,14 @@ fn main() {
     });
     let mut jobs = experiments.generate(
         &args.data_dir,
-        args.force_rerun,
+        args.regenerate,
         args.time_limit,
         args.mem_limit,
     );
     eprintln!("Generated {} jobs.", jobs.len());
 
     // Read the existing results file.
-    let existing_jobs: Vec<JobResult> = if !args.force_rerun && results_path.is_file() {
+    let existing_jobs: Vec<JobResult> = if !args.clean && results_path.is_file() {
         serde_json::from_str(
             &fs::read_to_string(&results_path).expect("Error reading existing results file"),
         )
@@ -423,12 +451,15 @@ fn run_with_threads(
                             output: Err(err.clone()),
                         }
                     } else {
-                        run_job(runner, job, stats, *id, nice, show_stderr, verbose)
+                        if verbose {
+                            eprintln!("\n Running job:\n{}\n", serde_json::to_string(&job).unwrap());
+                        }
+                        run_job(runner, job, stats, *id, nice, show_stderr)
                     };
 
                     let _stderr = stderr.lock().unwrap();
                     if verbose {
-                        eprintln!("\n Job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
+                        eprintln!("\n Job result:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
                     }
 
                     let mut counts = counts.lock().unwrap();
@@ -477,7 +508,6 @@ fn run_job(
     core_id: Option<usize>,
     nice: Option<i32>,
     show_stderr: bool,
-    verbose: bool,
 ) -> JobResult {
     let mut cmd = Command::new(runner);
     if let Some(id) = core_id {
@@ -486,9 +516,6 @@ fn run_job(
     if let Some(nice) = nice {
         // negative numbers need to be passed with =.
         cmd.arg(format!("--nice={nice}"));
-    }
-    if verbose {
-        cmd.arg("--verbose");
     }
     cmd.stdin(Stdio::piped()).stdout(Stdio::piped());
     if !show_stderr {
