@@ -1,66 +1,29 @@
-- datasets:
+- time_limit: 10min
+  mem_limit: 64GiB
+  datasets:
     - !Generated
       seed: 31415
       total_size: 100000
-      error_models:
-        - Uniform
-        # - NoisyIndel
-        # - NoisyInsert
-        # - NoisyDelete
-        # - NoisyMove
-        # - NoisyDuplicate
-        # - SymmetricRepeat
+      error_models: [Uniform]
       error_rates: [0.001, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
-      lengths:
-        [
-          100,
-          200,
-          350,
-          500,
-          1000,
-          2000,
-          3500,
-          5000,
-          10000,
-          20000,
-          35000,
-          50000,
-          100000,
-        ]
+      lengths: [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
+    - !Generated
+      seed: 31415
+      total_size: 100000
+      error_models: [Independent]
+      error_rates: [1.0]
+      lengths: [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
   traces:
     - false
     - true
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    # - !BlockAligner
-    #   size: !Size [32, 1024]
-    - !ParasailStriped
     - !Edlib
     - !TripleAccel
     - !Wfa
       memory_model: !MemoryUltraLow
       heuristic: !None
-    - !Wfa
-      memory_model: !MemoryLow
-      heuristic: !None
-    - !Wfa
-      memory_model: !MemoryMed
-      heuristic: !None
-    - !Wfa
-      memory_model: !MemoryHigh
-      heuristic: !None
-    - !Ksw2
-      method: !GlobalSuzukiSse
-      band_doubling: false
     - !Ksw2
       method: !GlobalSuzukiSse
       band_doubling: true
-    - !Ksw2
-      method: !ExtensionSuzukiSse
-      band_doubling: false
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !None
-        r: 0
