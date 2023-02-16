@@ -299,8 +299,6 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
     let mut experiment_jobs = existing_jobs_used;
     experiment_jobs.extend(job_results);
 
-    verify_costs(&mut experiment_jobs);
-
     // First, write jobs for this experiment to '.exact.json'.
     eprintln!(
         "Output: {}",
@@ -324,6 +322,8 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
         "Failed to write results to {}",
         results_path.display()
     ));
+
+    verify_costs(&mut all_jobs);
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
