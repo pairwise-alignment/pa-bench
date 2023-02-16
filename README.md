@@ -11,17 +11,19 @@ job at a time and limits and measures the time and memory usage. The
 
 Results are incrementally accumulated in a `json` file.
 
-## Crates
+## Repository layout
+
+There are three crates:
 
 - `pa-bench-types`: Shared types.
-- `runner`: Benchmarks a single job.
-- `orchestrator`: Calls the runner for each job.
+- `runner`: Benchmarks a single job given as json on `stdin`.
+- `orchestrator`: Generates/downloads datasets, generates all jobs, and calls the runner for each job.
 
 ## Running the benchmark
 
 1. Clone this repo and make sure you have Rust installed.
 2. Build all crates in this repo with `cargo build --release`.
-3. Run `cargo run --release` in the `evals` directory. See the [usage](#usage) below for details.
+3. Run `cargo run --release` from the root. See the [usage](#usage) below for details.
 
 ## Adding an aligner
 
@@ -44,31 +46,38 @@ configurations!
 - **Nice**: Use `--nice=-20` to increase the priority of each runner job. This
   requires root. (See the end of this file.)
 - **Parallel running**: Use `-j 10` to run `10` jobs in parallel. Each job (and
-  the orchestrator) is pinned to a different core.
+  the orchestrator) is **pinned** to a different core.
 - **Incremental running**: With `--incremental`, jobs already present
   in the target `json` file are not rerun.
-- **Force rerun**: With `--force-rerun`, the existing results file is ignored
-  and datasets are regenerated.
 
 **Output**
 
-- Runtime of processing input pairs, excluding startup and file io time.
-- Maximum memory usage, excluding the memory usage of the input data.
-- Start and end time of job, for logging purposes.
-- CPU frequency at start and end of job, as a sanity check.
+- **Runtime** of processing input pairs, excluding startup and file io time.
+- **Maximum memory usage** (max rss), excluding the memory usage of the input data.
+- **Start and end time** of job, for logging purposes.
+- **CPU frequency** at start and end of job, as a sanity check.
+
+**Other**
+
+- **Interrupting**: You can interrupt a run at any time with `ctrl-C`. This will stop ongoing
+  jobs and write results so far to disk.
+- **Cigar checking**: When traceback is enabled, all Cigar strings are checked
+  to see whether they are valid and have the right cost.
+- **Cost checking**: The cost returned by exact aligners is cross-validated. For
+  inexact aligners, the fraction of correct results is computed.
 
 ## Input format
 
 The input is specified as a `yaml` file containing:
 
-- datasets: file paths or settings to generate datasets;
-- traces: whether each tool computes a path or only the edit distance;
-- costs: the cost models to run all aligners on;
-- algos: the algorithms (aligners with parameters) to use.
+- **datasets**: file paths or settings to generate datasets;
+- **traces**: whether each tool computes a path or only the edit distance;
+- **costs**: the cost models to run all aligners on;
+- **algos**: the algorithms (aligners with parameters) to use.
 
 A job is created for the each combination of the 4 lists.
 
-Example:
+Examples can be found in [`evals/experiments/`](./evals/experiments). Here is one:
 
 ```yaml
 datasets:
@@ -129,9 +138,9 @@ algos:
 
 ## Usage
 
-Minimal usage to get started: first build the `runner` in release mode
-and then run the orchestrator in the root directory with `-q` (i.e. `5` parallel
-jobs and reusing previous results) on one or more experiment files:
+Minimal usage to get started: first build the `runner` in release mode and then
+run the orchestrator in the root directory with `-q` (a shorthand for `5`
+parallel jobs and reusing previous results) on one or more experiment files:
 
 ```sh
 cargo build --release
@@ -158,7 +167,7 @@ Options:
   -j <NUM_JOBS>          Number of parallel jobs to use
   -i, --incremental      Skip jobs already present in the results file
   -r, --rerun-failed     In combination with --incremental, also rerun failed jobs
-  -q, --quick            Shorthand for '-j5 --incremental --rerun-failed'
+  -q, --quick            Shorthand for '-j5 --incremental'
       --release          Shorthand for '-j1 --nice=-20'
   -h, --help             Print help (see more with '--help')
 
