@@ -77,12 +77,12 @@ struct Args {
     #[arg(long, hide_short_help = true)]
     clean: bool,
 
-    /// Shorthand for '-j5 --incremental --rerun-failed'
+    /// Shorthand for '-j5 --incremental'
     #[arg(short, long)]
     quick: bool,
 
     /// Shorthand for '-j1 --nice=-20'
-    #[arg(long)]
+    #[arg(long, conflicts_with = "quick")]
     release: bool,
 
     /// Print jobs started and finished.
@@ -118,6 +118,17 @@ struct Args {
 
 fn main() {
     let mut args = Args::parse();
+
+    // Handle `--quick` and `--release` flags.
+    if args.quick {
+        args.incremental = true;
+        args.num_jobs.get_or_insert(5);
+    }
+    if args.release {
+        args.nice.get_or_insert(-20);
+        args.num_jobs.get_or_insert(1);
+    }
+
     if args.runner.is_none() {
         let dir = std::env::var("CARGO_MANIFEST_DIR")
             .expect("Neither --runner nor CARGO_MANIFEST_DIR env var is set.");
