@@ -5,4 +5,4 @@ astarpa: cpu-freq
 	cargo run --release -- --nice=-20 -q evals/experiments/astarpa/*.yaml
 affine: cpu-freq
 	cargo build --release --no-default-features
-	cargo run --release -- --nice=-20 -q evals/experiments/affine/*.yaml
+	cargo run --release -- --nice=-20 -q evals/experiments/affine_cost_scaling.yaml
