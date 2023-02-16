@@ -19,12 +19,6 @@ There are three crates:
 - `runner`: Benchmarks a single job given as json on `stdin`.
 - `orchestrator`: Generates/downloads datasets, generates all jobs, and calls the runner for each job.
 
-## Running the benchmark
-
-1. Clone this repo and make sure you have Rust installed.
-2. Build all crates in this repo with `cargo build --release`.
-3. Run `cargo run --release` from the root. See the [usage](#usage) below for details.
-
 ## Adding an aligner
 
 The following files will need to be updated:
@@ -140,14 +134,9 @@ algos:
 
 ## Usage
 
-Minimal usage to get started: first build the `runner` in release mode and then
-run the orchestrator in the root directory with `-q` (a shorthand for `5`
-parallel jobs and reusing previous results) on one or more experiment files:
-
-```sh
-cargo build --release
-cargo run --release -- -q evals/experiments/test.yaml
-```
+1. Clone this repo and make sure you have Rust installed.
+2. Build the runner and orchestrator with `cargo build --release`.
+3. Run `cargo run --release -- [--quick | --release] evals/experiments/test.yaml` from the root.
 
 This writes incremental results to
 `evals/results/test.json` (this includes jobs that are not part of the
