@@ -59,6 +59,8 @@ configurations!
 
 **Other**
 
+- **Skipping**: When a job fails, all _larger_ jobs (larger `n` or `e`) are
+  automatically skipped.
 - **Interrupting**: You can interrupt a run at any time with `ctrl-C`. This will stop ongoing
   jobs and write results so far to disk.
 - **Cigar checking**: When traceback is enabled, all Cigar strings are checked
