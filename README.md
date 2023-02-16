@@ -129,35 +129,47 @@ algos:
 
 ## Usage
 
-Minimal usage: first build the `runner` in release mode
-and then run the orchestrator in the `evals` directory on an input file.
+Minimal usage to get started: first build the `runner` in release mode
+and then run the orchestrator in the root directory with `-q` (i.e. `5` parallel
+jobs and reusing previous results) on one or more experiment files:
 
 ```sh
 cargo build --release
-cd evals && cargo run --release -- experiments/test.yaml results/test.json
+cargo run --release -- -q evals/experiments/test.yaml
 ```
 
-Full help:
+This writes incremental results to
+`evals/results/test.json` (this includes jobs that are not part of the
+experiment anymore) and the exact jobs listed in the current experiment
+are written to `evals/results/test.exact.json`.
+
+Succinct help (run with `--help` for more):
 
 ```text
-Usage: orchestrator [OPTIONS] <EXPERIMENT> [RESULTS]
+A binary to run and benchmark multiple pairwise alignment tasks.
+
+Usage: orchestrator [OPTIONS] [EXPERIMENTS]...
 
 Arguments:
-  <EXPERIMENT>  Path to an experiment yaml file
-  [RESULTS]     Path to the output json file [default: results/results.json]
+  [EXPERIMENTS]...  Path to an experiment yaml file
 
 Options:
-  -d, --data-dir <DATA_DIR>      Path to the data directory [default: data]
-  -l, --logs-dir <LOGS_DIR>      Path to the logs directory [default: results/.logs]
-  -r, --runner <RUNNER>          Path to the runner binary [default: ../target/release/runner]
-  -t, --time-limit <TIME_LIMIT>  [default: 1h]
-  -m, --mem-limit <MEM_LIMIT>    [default: 1GiB]
-      --nice <NICE>
-  -j, --num-jobs <NUM_JOBS>      Number of parallel jobs to use
-      --stderr                   Show stderr of runner process
-      --incremental              Skip jobs already present in the results file
-  -v, --verbose                  Verbose runner outputs
-      --force-rerun              Ignore the existing results json and regenerate datasets
+  -o, --output <OUTPUT>  Path to the output json file. By default mirrors the `experiments` dir in `results`
+  -j <NUM_JOBS>          Number of parallel jobs to use
+  -i, --incremental      Skip jobs already present in the results file
+  -r, --rerun-failed     In combination with --incremental, also rerun failed jobs
+  -q, --quick            Shorthand for '-j5 --incremental --rerun-failed'
+      --release          Shorthand for '-j1 --nice=-20'
+  -h, --help             Print help (see more with '--help')
+
+Limits:
+  -t, --time-limit <TIME_LIMIT>  Time limit. Defaults to value in experiment yaml or 1m
+  -m, --mem-limit <MEM_LIMIT>    Memory limit. Defaults to value in experiment yaml or 1GiB
+      --nice <NICE>              Process niceness. '--nice=-20' for highest priority
+
+Output:
+  -v, --verbose  Print jobs started and finished
+      --stderr   Show stderr of runner process
 ```
 
 ## Notes on benchmarking
