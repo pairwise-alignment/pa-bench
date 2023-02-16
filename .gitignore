@@ -2,6 +2,7 @@
 /evals/data
 /evals/results*
 /evals/.results
-/evals/analysis/.ipynb_checkpoints
-/evals/analysis/*.png
-/evals/analysis/plots/
+/evals/*.png
+/evals/plots/
+
+.ipynb_checkpoints
