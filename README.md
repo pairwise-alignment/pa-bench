@@ -41,8 +41,10 @@ configurations!
   requires root. (See the end of this file.)
 - **Parallel running**: Use `-j 10` to run `10` jobs in parallel. Each job (and
   the orchestrator) is **pinned** to a different core.
-- **Incremental running**: With `--incremental`, jobs already present
-  in the target `json` file are not rerun.
+- **Incremental running**: By default, jobs results already present
+  in the target `json` file are reused. With `--rerun-failed`, failed jobs are
+  retried, and with `--rerun-all`, all jobs are rerun. `--clean` completely
+  removes the cache.
 
 **Output**
 
@@ -136,7 +138,7 @@ algos:
 
 1. Clone this repo and make sure you have Rust installed.
 2. Build the runner and orchestrator with `cargo build --release`.
-3. Run `cargo run --release -- [--quick | --release] evals/experiments/test.yaml` from the root.
+3. Run `cargo run --release -- [--release] evals/experiments/test.yaml` from the root.
 
 This writes incremental results to
 `evals/results/test.json` (this includes jobs that are not part of the
@@ -145,7 +147,7 @@ are written to `evals/results/test.exact.json`.
 
 Succinct help (run with `--help` for more):
 
-```text
+````text
 A binary to run and benchmark multiple pairwise alignment tasks.
 
 Usage: orchestrator [OPTIONS] [EXPERIMENTS]...
@@ -155,11 +157,10 @@ Arguments:
 
 Options:
   -o, --output <OUTPUT>  Path to the output json file. By default mirrors the `experiments` dir in `results`
-  -j <NUM_JOBS>          Number of parallel jobs to use
-  -i, --incremental      Skip jobs already present in the results file
-  -r, --rerun-failed     In combination with --incremental, also rerun failed jobs
-  -q, --quick            Shorthand for '-j5 --incremental'
-      --release          Shorthand for '-j1 --nice=-20'
+  -j <NUM_JOBS>          Number of parallel jobs to use [default: 5]
+      --rerun-all        Ignore job cache, i.e. rerun jobs already present in the results file
+      --rerun-failed     Rerun failed jobs that are otherwise reused
+      --release          Shorthand for '-j1 --nice=-20 --rerun_all'
   -h, --help             Print help (see more with '--help')
 
 Limits:
@@ -169,8 +170,7 @@ Limits:
 
 Output:
   -v, --verbose  Print jobs started and finished
-      --stderr   Show stderr of runner process
-```
+      --stderr   Show stderr of runner process```
 
 ## Notes on benchmarking
 
@@ -181,4 +181,4 @@ orchestrator as root. Alternatively, you could add the following line to
 
 ```text
 <username> - nice -20
-```
+````
