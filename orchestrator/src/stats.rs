@@ -2,6 +2,7 @@ use edlib_rs::*;
 use itertools::Itertools;
 use pa_bench_types::{AlignStats, Stats};
 use stats::merge_all;
+use std::cmp::max;
 use std::fs;
 use std::path::Path;
 
@@ -23,20 +24,31 @@ pub fn file_stats(file: &Path) -> AlignStats {
                 let res = edlibAlignRs(&a, &b, &config);
                 let aln = res.getAlignment().unwrap();
                 let divergence = (res.getDistance() as f64) / (aln.len() as f64);
-                let largest_gap = aln
-                    .iter()
-                    .group_by(|&o| o)
-                    .into_iter()
-                    .filter_map(|(&op, group)| {
-                        if op == 1 || op == 2 {
-                            // ins or del
-                            Some(group.count())
-                        } else {
-                            None
+
+                // Compute the largest gap as the max over all intervals of the number of insertions (deletions) minus non-insertions (non-deletions).
+                let mut largest_gap = 0;
+                let mut ins = 0usize;
+                let mut dels = 0usize;
+                for &op in aln {
+                    match op {
+                        1 => {
+                            ins += 1;
+                            largest_gap = max(largest_gap, ins);
+
+                            dels = dels.saturating_sub(1);
                         }
-                    })
-                    .max()
-                    .unwrap_or(0);
+                        2 => {
+                            dels += 1;
+                            largest_gap = max(largest_gap, dels);
+
+                            ins = ins.saturating_sub(1);
+                        }
+                        _ => {
+                            ins = ins.saturating_sub(1);
+                            dels = dels.saturating_sub(1);
+                        }
+                    }
+                }
 
                 let mut insertions = 0;
                 let mut deletions = 0;

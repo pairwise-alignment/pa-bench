@@ -232,6 +232,10 @@ pub struct AlignStats {
 
     pub length: Stats<usize>,
     pub divergence: Stats<f64>,
+    /// The largest gap in the alignment.
+    /// To be resilient against noise, this is defined as the max of:
+    /// - max_{interval i..j} max(insertions in i..j - non-insertions in i..j)
+    /// - max_{interval i..j} max(deletions in i..j - non-deletions in i..j)
     pub largest_gap: Stats<usize>,
 
     pub edit_distance: usize,
