@@ -56,17 +56,16 @@ struct Args {
     #[clap(help_heading = "Limits")]
     nice: Option<i32>,
 
-    /// Skip jobs already present in the results file.
+    /// Ignore job cache, i.e. rerun jobs already present in the results file.
     ///
-    /// This skips any already-present job that either succeeded or had at least
-    /// as many resources as the new job.
-    #[arg(short, long)]
-    incremental: bool,
+    /// By default, already-present jobs are reused.
+    #[arg(long)]
+    rerun_all: bool,
 
-    /// In combination with --incremental, also rerun failed jobs.
+    /// Rerun failed jobs that are otherwise reused.
     ///
     /// This also reruns jobs that had at least as many resources. Useful when code changed.
-    #[arg(short, long)]
+    #[arg(long, conflicts_with = "rerun_all")]
     rerun_failed: bool,
 
     /// Regenerate generated datasets.
