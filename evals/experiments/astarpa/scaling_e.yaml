@@ -1,5 +1,5 @@
 - comment: |
-    Scaling with error rate with k=9
+    Scaling with error rate with k=10
 
     This runs in around 1 hour in total.
   time_limit: 10min
@@ -27,7 +27,7 @@
           #0.32,
           0.34,
         ]
-      error_models: [Uniform, NoisyIndel]
+      error_models: [Uniform]
       lengths: [10000]
       # total_size: 1000000
       total_size: 100000
@@ -35,94 +35,91 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    - !Edlib
-    - !Wfa
-
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !None
         r: 0
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !None
         r: 0
-        k: 9
+        k: 10
 
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 1
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 1
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 1
-        k: 9
+        k: 10
 
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 2
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 2
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 2
-        k: 9
+        k: 10
 
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 1
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 1
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !GCSH
         r: 1
-        k: 9
+        k: 10
 
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 2
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 2
-        k: 9
+        k: 10
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !GCSH
         r: 2
-        k: 9
+        k: 10
