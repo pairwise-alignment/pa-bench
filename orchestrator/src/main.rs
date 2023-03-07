@@ -38,8 +38,8 @@ struct Args {
     ///
     /// Jobs are pinned to separate cores.
     /// The number of jobs is capped to the total number of cores minus 1.
-    #[arg(short = 'j')]
-    num_jobs: Option<usize>,
+    #[arg(short = 'j', default_value = "5")]
+    num_jobs: usize,
 
     /// Time limit. Defaults to value in experiment yaml or 1m.
     #[arg(short, long, value_parser = parse_duration::parse)]
@@ -77,12 +77,8 @@ struct Args {
     #[arg(long, hide_short_help = true)]
     clean: bool,
 
-    /// Shorthand for '-j5 --incremental'
-    #[arg(short, long)]
-    quick: bool,
-
-    /// Shorthand for '-j1 --nice=-20'
-    #[arg(long, conflicts_with = "quick")]
+    /// Shorthand for '-j1 --nice=-20 --rerun_all'
+    #[arg(long)]
     release: bool,
 
     /// Print jobs started and finished.
@@ -119,14 +115,11 @@ struct Args {
 fn main() {
     let mut args = Args::parse();
 
-    // Handle `--quick` and `--release` flags.
-    if args.quick {
-        args.incremental = true;
-        args.num_jobs.get_or_insert(5);
-    }
+    // Handle `--release` flag.
     if args.release {
         args.nice.get_or_insert(-20);
-        args.num_jobs.get_or_insert(1);
+        args.num_jobs = 1;
+        args.rerun_all = true;
     }
 
     if args.runner.is_none() {
@@ -134,12 +127,12 @@ fn main() {
             .expect("Neither --runner nor CARGO_MANIFEST_DIR env var is set.");
         args.runner = Some(Path::new(&dir).join("../target/release/runner"));
     }
-
     assert!(
         args.runner.as_ref().unwrap().exists(),
         "{} does not exist!",
         args.runner.unwrap().display()
     );
+
     if args.output.is_some() && args.experiments.len() != 1 {
         panic!("Output can only be specified when running exactly 1 experiment.");
     }
@@ -219,7 +212,7 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
         });
 
     // Skip jobs that succeeded before, or were attempted with at least as many resources.
-    if args.incremental {
+    if !args.rerun_all {
         eprintln!(
             "Existing jobs: {} in experiment + {} extra",
             existing_jobs_used.len(),
@@ -248,25 +241,21 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
             .is_none()
     });
 
-    let runner_cores = if let Some(num_jobs) = args.num_jobs {
-        let mut cores = core_affinity::get_core_ids()
-            .unwrap()
-            .into_iter()
-            // NOTE: This assumes that virtual cores 0 and n/2 are on the same
-            // physical core, in case hyperthreading is enabled.
-            // TODO(ragnar): Is it better to spread the load over non-adjacent
-            // physical cores? Unclear to me.
-            .take(num_jobs + 1);
+    let mut cores = core_affinity::get_core_ids()
+        .unwrap()
+        .into_iter()
+        // NOTE: This assumes that virtual cores 0 and n/2 are on the same
+        // physical core, in case hyperthreading is enabled.
+        // TODO(ragnar): Is it better to spread the load over non-adjacent
+        // physical cores? Unclear to me.
+        .take(args.num_jobs + 1);
 
-        // Reserve one core for the orchestrator.
-        let orchestrator_core = cores.next().unwrap();
-        core_affinity::set_for_current(orchestrator_core);
+    // Reserve one core for the orchestrator.
+    let orchestrator_core = cores.next().unwrap();
+    core_affinity::set_for_current(orchestrator_core);
 
-        // Remaining (up to) #processes cores are for runners.
-        Some(cores.map(|c| c.id).collect())
-    } else {
-        None
-    };
+    // Remaining (up to) #processes cores are for runners.
+    let runner_cores = cores.map(|c| c.id).collect();
 
     let job_results = run_with_threads(
         args.runner.as_ref().unwrap(),
@@ -399,7 +388,7 @@ fn verify_costs(results: &mut Vec<JobResult>) {
 fn run_with_threads(
     runner: &Path,
     jobs: Vec<(Job, AlignStats)>,
-    cores: Option<Vec<usize>>,
+    cores: Vec<usize>,
     nice: Option<i32>,
     show_stderr: bool,
     verbose: bool,
@@ -407,11 +396,6 @@ fn run_with_threads(
     let num_jobs = jobs.len();
     let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
-
-    // Make a `Vec<Option<usize>>` which defaults to `[None]`.
-    let cores = cores
-        .map(|cores| cores.into_iter().map(Some).collect())
-        .unwrap_or(vec![None]);
 
     let running = Arc::new(Mutex::new(true));
     {
@@ -475,7 +459,7 @@ fn run_with_threads(
                         if verbose {
                             eprintln!("\n Running job:\n{}\n", serde_json::to_string(&job).unwrap());
                         }
-                        run_job(runner, job, stats, *id, nice, show_stderr)
+                        run_job(runner, job, stats, Some(*id), nice, show_stderr)
                     };
 
                     let _stderr = stderr.lock().unwrap();
