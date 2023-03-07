@@ -24,24 +24,30 @@
       diagonal_transition: false
       heuristic:
         type: !SH
+        prune: !Start
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !CSH
+        prune: !Start
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !GCSH
+        prune: !Start
 
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !SH
+        prune: !Start
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !CSH
+        prune: !Start
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !GCSH
+        prune: !Start
