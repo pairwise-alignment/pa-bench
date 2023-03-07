@@ -1,9 +1,22 @@
-- datasets:
-  traces:
-  costs:
+- mem_limit: 32GiB
+  datasets:
+    - !Data
+      - - CGCTGGCTGCTGCCACTAACTCCGTATAGTCTCACCAAGT
+        - CGCTGGCTCGCCTGCCACGTAACTCCGTATAGTCTCACCAACTGTCAGTT
+      - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
+        - ACAGGTACACCACTATCACGACAAGTTGGGTC
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
   algos:
     - !Wfa
     - !AstarPA
       diagonal_transition: false
       heuristic:
         type: !None
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        prune: !Both
+        r: 2
