@@ -4,12 +4,13 @@ use crate::{bench::*, wrappers::*};
 
 use itertools::{izip, Itertools};
 use pa_bench_types::*;
-use pa_types::*;
+use pa_types::Seq;
 
 use std::{
     cmp::max,
     fs,
     io::{self, prelude::*},
+    path::{Path, PathBuf},
 };
 
 use serde_json;
@@ -29,6 +30,9 @@ Exit code 101: Rust panic.
 Exit code 102: aligner does not support the given parameters."
 )]
 struct Args {
+    /// An optional experiment.yaml to run. By default takes a Job on stdin.
+    experiment: Option<PathBuf>,
+
     /// Pin the process to the given core.
     #[arg(short, long)]
     pin_core_id: Option<usize>,
@@ -44,6 +48,30 @@ struct Args {
     no_limits: bool,
 }
 
+fn read_path<'a>(
+    path: &std::path::PathBuf,
+    file_data: &'a mut Vec<u8>,
+) -> Vec<(&'a [u8], &'a [u8])> {
+    assert_eq!(
+        path.extension()
+            .expect("Dataset does not have a file extension"),
+        "seq",
+        "Job dataset {} does not have extension .seq.",
+        path.display()
+    );
+    *file_data = fs::read(&path).expect("Could not read dataset file");
+    file_data
+        .split(|&c| c == '\n' as u8)
+        .tuples()
+        .map(|(a, b)| {
+            (
+                a.strip_prefix(b">").expect("Odd lines must start with >"),
+                b.strip_prefix(b"<").expect("Even lines must start with <"),
+            )
+        })
+        .collect()
+}
+
 fn main() {
     let args = Args::parse();
     if let Some(id) = args.pin_core_id {
@@ -56,41 +84,26 @@ fn main() {
         rustix::process::nice(nice).unwrap();
     }
 
-    let mut stdin_job = vec![];
-    io::stdin()
-        .read_to_end(&mut stdin_job)
-        .expect("Error in reading from stdin!");
-    let job: Job = serde_json::from_slice(&stdin_job).expect("Error in parsing input json!");
+    if let Some(experiment) = &args.experiment {
+        run_experiment(&args, experiment);
+    } else {
+        let mut stdin_job = vec![];
+        io::stdin()
+            .read_to_end(&mut stdin_job)
+            .expect("Error in reading from stdin!");
+        let job: Job = serde_json::from_slice(&stdin_job).expect("Error in parsing input json!");
+        let output = run_job(&args, job);
+        println!("{}", serde_json::to_string(&output).unwrap());
+    }
+}
+
+fn run_job(args: &Args, job: Job) -> JobOutput {
     if !args.no_limits {
         set_limits(job.time_limit, job.mem_limit);
     }
 
     // NOTE: Although we could read and process the pairs in the dataset in streaming
     // manner, that complicates the time and memory measurement. Thus, all seqs are read up-front.
-
-    fn read_path<'a>(
-        path: &std::path::PathBuf,
-        file_data: &'a mut Vec<u8>,
-    ) -> Vec<(&'a [u8], &'a [u8])> {
-        assert_eq!(
-            path.extension()
-                .expect("Dataset does not have a file extension"),
-            "seq",
-            "Job dataset {} does not have extension .seq.",
-            path.display()
-        );
-        *file_data = fs::read(&path).expect("Could not read dataset file");
-        file_data
-            .split(|&c| c == '\n' as u8)
-            .tuples()
-            .map(|(a, b)| {
-                (
-                    a.strip_prefix(b">").expect("Odd lines must start with >"),
-                    b.strip_prefix(b"<").expect("Even lines must start with <"),
-                )
-            })
-            .collect()
-    }
 
     // The seqs are references to the read file or direct input data.
     // This way all data is stored within one big allocation instead of being spread over many Vecs.
@@ -153,5 +166,18 @@ fn main() {
         p_correct: None,
         measured,
     };
-    println!("{}", serde_json::to_string(&output).unwrap());
+    output
+}
+
+fn run_experiment(args: &Args, experiment: &Path) {
+    let experiment_yaml = fs::read_to_string(&experiment).expect("Failed to read jobs generator:");
+    let experiments: Experiments =
+        serde_yaml::from_str(&experiment_yaml).expect("Failed to parse jobs generator yaml:");
+
+    let jobs = experiments.generate(&Path::new("evals/data"), false, None, None);
+
+    for (job, _stats) in jobs {
+        let output = run_job(args, job);
+        eprintln!("Job output:\n{output:?}");
+    }
 }

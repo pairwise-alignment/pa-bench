@@ -1,6 +1,3 @@
-mod config;
-mod stats;
-
 use chrono::Timelike;
 use clap::Parser;
 use core_affinity;
@@ -17,8 +14,6 @@ use std::time::{Duration, Instant};
 use wait4::{ResUse, Wait4};
 
 use pa_bench_types::*;
-
-use config::*;
 
 #[derive(Debug, Parser)]
 #[command(author, about)]

@@ -16,11 +16,11 @@ use itertools::{iproduct, Itertools};
 
 use fxhash::FxHasher;
 
-use pa_bench_types::*;
 use pa_generate::*;
 use pa_types::*;
 
 use crate::stats::file_stats;
+use crate::*;
 
 /// This is the root type of the yaml configuration file.
 /// It consists of multiple Experiments, each of which is the Cartesian product
@@ -74,7 +74,8 @@ pub struct DatasetGeneratorConfig {
     error_models: Vec<ErrorModel>,
     error_rates: Vec<f32>,
     lengths: Vec<usize>,
-    total_size: usize,
+    total_size: Option<usize>,
+    count: Option<usize>,
 }
 
 impl Experiments {
@@ -271,7 +272,9 @@ impl DatasetGeneratorConfig {
                     error_model,
                     error_rate,
                     length,
-                    total_size: self.total_size,
+                    total_size: self
+                        .total_size
+                        .unwrap_or(self.count.expect("total_size or count must be set") * length),
                     pattern_length: None,
                 };
                 let path = generated_dataset.path();

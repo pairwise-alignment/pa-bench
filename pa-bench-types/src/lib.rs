@@ -6,8 +6,10 @@ use pa_generate::*;
 use pa_types::*;
 
 mod algorithms;
+mod experiments;
 pub mod stats;
 pub use algorithms::*;
+pub use experiments::*;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct GeneratedDataset {
