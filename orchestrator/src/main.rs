@@ -29,6 +29,10 @@ struct Args {
     #[arg(short = 'o', long)]
     output: Option<PathBuf>,
 
+    /// Shared cache of JobResults. Default: <experiment>.cache.json.
+    #[arg(long)]
+    cache: Option<PathBuf>,
+
     /// Number of parallel jobs to use.
     ///
     /// Jobs are pinned to separate cores.
@@ -162,6 +166,12 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
             .rev()
             .collect()
     });
+    let results_cache_path = if let Some(cache) = &args.cache {
+        cache.clone()
+    } else {
+        results_path.with_extension("cache.json")
+    };
+
     let mut jobs = experiments.generate(
         &args.data_dir,
         args.regenerate,
@@ -170,14 +180,14 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
     );
     eprintln!("Generated {} jobs.", jobs.len());
 
-    // Read the existing results file.
-    let existing_jobs: Vec<JobResult> = if !args.clean && results_path.is_file() {
+    // Read the cached results.
+    let existing_jobs: Vec<JobResult> = if !args.clean && results_cache_path.is_file() {
         serde_json::from_str(
-            &fs::read_to_string(&results_path).expect("Error reading existing results file"),
+            &fs::read_to_string(&results_cache_path).expect("Error reading existing results file"),
         )
         .expect(&format!(
-            "Error parsing results json file {}",
-            results_path.display()
+            "Error parsing results cache {}",
+            results_cache_path.display()
         ))
     } else {
         vec![]
@@ -208,7 +218,7 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
     // Skip jobs that succeeded before, or were attempted with at least as many resources.
     if !args.rerun_all {
         eprintln!(
-            "Existing jobs: {} in experiment + {} extra",
+            "Cached jobs: {} in experiment + {} extra",
             existing_jobs_used.len(),
             existing_jobs_extra.len()
         );
@@ -275,7 +285,7 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
             .expect(&format!("Failed to write logs to {}", logs_path.display()));
     }
 
-    if let Some(dir) = results_path.parent() {
+    if let Some(dir) = results_cache_path.parent() {
         fs::create_dir_all(dir).unwrap();
     }
 
@@ -283,12 +293,9 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
     experiment_jobs.extend(job_results);
 
     // First, write jobs for this experiment to '.exact.json'.
-    eprintln!(
-        "Output: {}",
-        results_path.with_extension("exact.json").display()
-    );
+    eprintln!("Output: {}", results_path.display());
     fs::write(
-        &results_path.with_extension("exact.json"),
+        &results_path,
         &serde_json::to_string(&experiment_jobs).unwrap(),
     )
     .expect(&format!(
@@ -296,14 +303,18 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
         results_path.display()
     ));
 
-    // Then, write all existing jobs.
+    // Then, write the updated cache.
     let mut all_jobs = experiment_jobs;
     all_jobs.extend(existing_jobs_extra);
 
-    eprintln!("Output: {}", results_path.display());
-    fs::write(&results_path, &serde_json::to_string(&all_jobs).unwrap()).expect(&format!(
+    eprintln!("Output: {}", results_cache_path.display());
+    fs::write(
+        &results_cache_path,
+        &serde_json::to_string(&all_jobs).unwrap(),
+    )
+    .expect(&format!(
         "Failed to write results to {}",
-        results_path.display()
+        results_cache_path.display()
     ));
 
     verify_costs(&mut all_jobs);
