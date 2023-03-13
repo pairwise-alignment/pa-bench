@@ -238,13 +238,6 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
         eprintln!("Running {} jobs...", jobs.len());
     };
 
-    // Remove jobs that were run from existing results.
-    existing_jobs_used.retain(|existing_job| {
-        jobs.iter()
-            .find(|(job, _)| job.is_same_as(&existing_job.job))
-            .is_none()
-    });
-
     let mut cores = core_affinity::get_core_ids()
         .unwrap()
         .into_iter()
@@ -288,6 +281,14 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
     if let Some(dir) = results_cache_path.parent() {
         fs::create_dir_all(dir).unwrap();
     }
+
+    // Remove jobs that were run from existing results.
+    existing_jobs_used.retain(|existing_job| {
+        job_results
+            .iter()
+            .find(|job_result| job_result.job.is_same_as(&existing_job.job))
+            .is_none()
+    });
 
     let mut experiment_jobs = existing_jobs_used;
     experiment_jobs.extend(job_results);
