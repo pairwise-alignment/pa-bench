@@ -163,6 +163,11 @@ impl Job {
 pub struct Measured {
     /// Runtime in seconds.
     pub runtime: f32,
+    /// max_rss after reading input file.
+    pub memory_initial: Option<Bytes>,
+    /// max_rss at the end.
+    pub memory_total: Option<Bytes>,
+    /// Increase in memory usage.
     pub memory: Bytes,
     /// Formatted UTC time when run was started/ended.
     pub time_start: chrono::DateTime<chrono::Utc>,

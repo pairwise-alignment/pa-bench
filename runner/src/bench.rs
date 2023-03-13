@@ -4,26 +4,29 @@ use chrono::SubsecRound;
 use libc;
 use pa_bench_types::{Bytes, Measured};
 
-pub fn measure<F>(f: F) -> Measured
-where
-    F: FnOnce(),
-{
+/// F can return some state that is dropped only after the memory is measured.
+pub fn measure<T, F: FnOnce() -> T>(f: F) -> Measured {
     let cpu_start = get_cpu();
     let cpu_freq_start = cpu_start.and_then(|c| get_cpu_freq(c));
-    let initial_mem = get_maxrss();
+    let memory_initial = get_maxrss();
     let time_start = chrono::Utc::now().trunc_subsecs(3);
     let start = Instant::now();
 
-    f();
+    let state = f();
 
     let runtime = start.elapsed().as_secs_f32();
     let time_end = chrono::Utc::now().trunc_subsecs(3);
-    let memory = get_maxrss().saturating_sub(initial_mem);
+    let memory_total = get_maxrss();
+    let memory = memory_total.saturating_sub(memory_initial);
     let cpu_end = get_cpu();
     let cpu_freq_end = cpu_end.and_then(|c| get_cpu_freq(c));
+
+    drop(state);
+
     Measured {
-        // fill time-critical data first
         runtime,
+        memory_initial: Some(memory_initial),
+        memory_total: Some(memory_total),
         memory,
         time_start,
         time_end,

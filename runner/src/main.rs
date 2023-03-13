@@ -141,6 +141,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
                 cigars.push(cigar.unwrap());
             }
         });
+        aligner
     });
 
     // Verify the cigar strings, but do not return them as they are not used for further analysis and take a lot of space.
