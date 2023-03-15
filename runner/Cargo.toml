@@ -41,4 +41,5 @@ block-aligner = { git = "https://github.com/Daniel-Liu-c0deb0t/block-aligner", f
 block-aligner = { git = "https://github.com/Daniel-Liu-c0deb0t/block-aligner", features = ["simd_neon"] }
 
 [features]
-default = ["parasailors"]
+#default = ["parasailors"]
+parasailors = ["dep:parasailors"]
