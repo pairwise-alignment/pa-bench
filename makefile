@@ -1,8 +1,14 @@
+
+astarpa: cpu-freq prep
+	cargo build --release --no-default-features
+	cargo run --release -- --release evals/astarpa/experiments/*.yaml --cache evals/astarpa/results/cache.json
+
 cpu-freq:
 	sudo cpupower frequency-set -d 2.6GHz -u 2.6GHz -g powersave
-astarpa: cpu-freq
-	cargo build --release --no-default-features
-	cargo run --release -- --nice=-20 -q evals/experiments/astarpa/*.yaml
-affine: cpu-freq
-	cargo build --release --no-default-features
-	cargo run --release -- --nice=-20 -q evals/experiments/affine_cost_scaling.yaml
+
+prep:
+	systemctl --user stop emacs || true
+	kill chromium || true
+	kill telegram-desktop || true
+	kill signal-desktop || true
+	kill slack || true
