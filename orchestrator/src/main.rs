@@ -1,6 +1,7 @@
 use chrono::Timelike;
 use clap::Parser;
 use core_affinity;
+use once_cell::sync::Lazy;
 use serde_json;
 use serde_yaml;
 use std::fs;
@@ -8,7 +9,7 @@ use std::io::prelude::*;
 use std::os::unix::process::ExitStatusExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 use std::thread;
 use std::time::{Duration, Instant};
 use wait4::{ResUse, Wait4};
@@ -110,6 +111,8 @@ struct Args {
     logs_dir: PathBuf,
 }
 
+static RUNNING: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(true));
+
 fn main() {
     let mut args = Args::parse();
 
@@ -133,8 +136,20 @@ fn main() {
     if args.output.is_some() && args.experiments.len() != 1 {
         panic!("Output can only be specified when running exactly 1 experiment.");
     }
+
+    {
+        ctrlc::set_handler(move || {
+            eprintln!("Pressed Ctrl-C. Stopping running jobs.");
+            *RUNNING.lock().unwrap() = false;
+        })
+        .expect("Error setting Ctrl-C handler");
+    }
+
     for i in 0..args.experiments.len() {
         run_experiment(&args, i);
+        if !*RUNNING.lock().unwrap() {
+            break;
+        }
     }
 }
 
@@ -402,16 +417,6 @@ fn run_with_threads(
     let job_results = Mutex::new(Vec::<JobResult>::with_capacity(jobs.len()));
     let jobs_iter = Mutex::new(jobs.into_iter());
 
-    let running = Arc::new(Mutex::new(true));
-    {
-        let r = running.clone();
-        ctrlc::set_handler(move || {
-            eprintln!("Pressed Ctrl-C. Stopping running jobs.");
-            *r.lock().unwrap() = false;
-        })
-        .expect("Error setting Ctrl-C handler");
-    }
-
     #[derive(Default)]
     struct Counts {
         done: usize,
@@ -431,7 +436,7 @@ fn run_with_threads(
                     let Some((job, stats)) = jobs_iter.lock().unwrap().next() else {
                         break;
                     };
-                    if !*running.lock().unwrap() {
+                    if !*RUNNING.lock().unwrap() {
                         break;
                     }
                     // If a smaller job for the same algorithm failed, skip it.
@@ -498,7 +503,7 @@ fn run_with_threads(
                     }
 
                     // If the orchestrator was aborted, do not push failing job results.
-                    if job_result.output.is_ok() || *running.lock().unwrap() {
+                    if job_result.output.is_ok() || *RUNNING.lock().unwrap() {
                         job_results.lock().unwrap().push(job_result);
                     }
                 }

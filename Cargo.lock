@@ -1261,6 +1261,7 @@ dependencies = [
  "core_affinity",
  "ctrlc",
  "num 0.4.0",
+ "once_cell",
  "pa-bench-types",
  "pa-generate",
  "pa-types",
