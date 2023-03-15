@@ -2,8 +2,8 @@
     Scaling with error rate with k=10
 
     This runs in around 1 hour in total.
-  time_limit: 10min
-  mem_limit: 10GiB
+  time_limit: 1h
+  mem_limit: 32GiB
   datasets:
     - !Generated
       seed: 31415
@@ -29,8 +29,7 @@
         ]
       error_models: [Uniform]
       lengths: [10000]
-      # total_size: 1000000
-      total_size: 100000
+      total_size: 1000000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
