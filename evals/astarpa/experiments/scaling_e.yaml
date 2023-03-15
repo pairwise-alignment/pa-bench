@@ -8,23 +8,23 @@
     - !Generated
       seed: 31415
       error_rates: [
-          #0.01,
+          0.01,
           0.02,
-          #0.04,
+          0.04,
           0.06,
-          #0.08,
+          0.08,
           0.10,
-          #0.12,
+          0.12,
           0.14,
-          #0.16,
+          0.16,
           0.18,
-          #0.20,
+          0.20,
           0.22,
-          #0.24,
+          0.24,
           0.26,
-          #0.28,
+          0.28,
           0.30,
-          #0.32,
+          0.32,
           0.34,
         ]
       error_models: [Uniform]
@@ -34,8 +34,6 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    - !Edlib
-    - !Wfa
     - !AstarPA
       diagonal_transition: false
       heuristic:
