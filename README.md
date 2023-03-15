@@ -160,7 +160,7 @@ Options:
   -j <NUM_JOBS>          Number of parallel jobs to use [default: 5]
       --rerun-all        Ignore job cache, i.e. rerun jobs already present in the results file
       --rerun-failed     Rerun failed jobs that are otherwise reused
-      --release          Shorthand for '-j1 --nice=-20 --rerun_all'
+      --release          Shorthand for '-j1 --nice=-20'
   -h, --help             Print help (see more with '--help')
 
 Limits:

@@ -75,7 +75,7 @@ struct Args {
     #[arg(long, hide_short_help = true)]
     clean: bool,
 
-    /// Shorthand for '-j1 --nice=-20 --rerun_all'
+    /// Shorthand for '-j1 --nice=-20'
     #[arg(long)]
     release: bool,
 
@@ -117,7 +117,6 @@ fn main() {
     if args.release {
         args.nice.get_or_insert(-20);
         args.num_jobs = 1;
-        args.rerun_all = true;
     }
 
     if args.runner.is_none() {
