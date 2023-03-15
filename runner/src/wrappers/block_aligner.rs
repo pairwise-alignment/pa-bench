@@ -72,7 +72,7 @@ impl AlignerParams for BlockAlignerParams {
 }
 
 impl Aligner for BlockAligner {
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let max_len = a.len().max(b.len());
         let size = match self.params.size {
             Size(min, max) => min..=max,
@@ -86,6 +86,7 @@ impl Aligner for BlockAligner {
                 (
                     self.s.global_cost(block.res().score, a.len(), b.len()),
                     None,
+                    AlignerStats::default(),
                 )
             }
             BlockAlignerBlock::Trace(block) => {
@@ -113,6 +114,7 @@ impl Aligner for BlockAligner {
                 (
                     self.s.global_cost(block.res().score, a.len(), b.len()),
                     Some(Cigar { ops }),
+                    AlignerStats::default(),
                 )
             }
         }

@@ -77,7 +77,7 @@ mod without_parasailors {
     }
 
     impl Aligner for ParasailStriped {
-        fn align(&mut self, _a: Seq, _b: Seq) -> (Cost, Option<Cigar>) {
+        fn align(&mut self, _a: Seq, _b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
             unimplemented!("Enable parasailors feature to use Parasail.");
         }
     }

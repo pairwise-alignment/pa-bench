@@ -51,7 +51,7 @@ impl AlignerParams for WfaParams {
 }
 
 impl Aligner for Wfa {
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let status = self.aligner.align_end_to_end(a, b);
         assert_eq!(status, AlignmentStatus::StatusSuccessful);
         let cost = self.aligner.score();
@@ -62,6 +62,6 @@ impl Aligner for Wfa {
             Some(Cigar::parse(&cigar, a, b))
         };
         let cost = if self.cm.is_unit() { cost } else { -cost };
-        (cost as _, cigar)
+        (cost as _, cigar, AlignerStats::default())
     }
 }

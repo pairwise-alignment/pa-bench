@@ -28,8 +28,14 @@ impl AlignerParams for AstarPaParamsNoVis {
 }
 
 impl Aligner for Box<dyn AstarPaAligner> {
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
-        let (cost, cigar) = AstarPaAligner::align(self.as_mut(), a, b).0;
-        (cost, Some(cigar))
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
+        let ((cost, cigar), stats) = AstarPaAligner::align(self.as_mut(), a, b);
+        (
+            cost,
+            Some(cigar),
+            AlignerStats {
+                expanded: Some(stats.extended + stats.expanded),
+            },
+        )
     }
 }

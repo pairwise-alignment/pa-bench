@@ -180,6 +180,11 @@ pub struct Measured {
     pub cpu_freq_end: Option<f32>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct AlignerStats {
+    pub expanded: Option<usize>,
+}
+
 /// The output of an alignment job.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobOutput {
@@ -191,6 +196,9 @@ pub struct JobOutput {
     /// Proportion of correct costs.
     pub p_correct: Option<f32>,
     pub measured: Measured,
+
+    /// Total number of expanded states.
+    pub expanded: Option<usize>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]

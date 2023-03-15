@@ -35,7 +35,7 @@ impl AlignerParams for TripleAccelParams {
 }
 
 impl Aligner for TripleAccel {
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let (cost, edits) =
             ::triple_accel::levenshtein::levenshtein_exp_with_opts(a, b, self.trace, self.costs);
 
@@ -55,6 +55,6 @@ impl Aligner for TripleAccel {
                 .collect(),
         });
 
-        (cost as _, cigar)
+        (cost as _, cigar, AlignerStats::default())
     }
 }

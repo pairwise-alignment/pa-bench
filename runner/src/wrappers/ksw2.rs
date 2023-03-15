@@ -52,7 +52,7 @@ impl AlignerParams for Ksw2Params {
 }
 
 impl Aligner for Ksw2 {
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let a_mapped: Vec<u8> = a.iter().map(|x| self.encoding[*x as usize]).collect();
         let b_mapped: Vec<u8> = b.iter().map(|x| self.encoding[*x as usize]).collect();
         unsafe {
@@ -209,7 +209,7 @@ impl Aligner for Ksw2 {
                 cigar
             });
             let cost = -score;
-            (cost, cigar)
+            (cost, cigar, AlignerStats::default())
         }
     }
 }

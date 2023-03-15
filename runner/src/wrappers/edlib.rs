@@ -32,7 +32,7 @@ impl AlignerParams for EdlibParams {
 }
 
 impl Aligner for Edlib {
-    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>) {
+    fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let result = edlibAlignRs(a, b, &self.config);
         assert!(result.status == EDLIB_RS_STATUS_OK);
         let cost = result.getDistance();
@@ -45,6 +45,7 @@ impl Aligner for Edlib {
                 _ => panic!("Edlib should only return operations 0..=3."),
             }))
         });
-        (cost, cigar)
+
+        (cost, cigar, AlignerStats::default())
     }
 }
