@@ -272,9 +272,9 @@ impl DatasetGeneratorConfig {
                     error_model,
                     error_rate,
                     length,
-                    total_size: self
-                        .total_size
-                        .unwrap_or(self.count.expect("total_size or count must be set") * length),
+                    total_size: self.total_size.unwrap_or_else(|| {
+                        self.count.expect("total_size or count must be set") * length
+                    }),
                     pattern_length: None,
                 };
                 let path = generated_dataset.path();
