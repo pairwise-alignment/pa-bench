@@ -393,7 +393,7 @@ fn verify_costs(results: &mut Vec<JobResult>) {
 
 fn run_with_threads(
     runner: &Path,
-    jobs: Vec<(Job, AlignStats)>,
+    jobs: Vec<(Job, DatasetStats)>,
     cores: Vec<usize>,
     nice: Option<i32>,
     show_stderr: bool,
@@ -515,7 +515,7 @@ fn run_with_threads(
 fn run_job(
     runner: &Path,
     job: Job,
-    stats: AlignStats,
+    stats: DatasetStats,
     core_id: Option<usize>,
     nice: Option<i32>,
     show_stderr: bool,

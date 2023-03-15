@@ -1,4 +1,4 @@
-use crate::{AlignStats, Stats};
+use crate::{DatasetStats, Stats};
 use edlib_rs::*;
 use itertools::Itertools;
 use num::ToPrimitive;
@@ -57,9 +57,9 @@ impl<T: PartialOrd + Copy + ToPrimitive> Stats<T> {
     }
 }
 
-impl Commute for AlignStats {
+impl Commute for DatasetStats {
     fn merge(&mut self, other: Self) {
-        let AlignStats {
+        let DatasetStats {
             files,
             seq_pairs,
             total_bases,
@@ -87,7 +87,7 @@ impl Commute for AlignStats {
     }
 }
 
-pub fn file_stats(file: &Path) -> AlignStats {
+pub fn file_stats(file: &Path) -> DatasetStats {
     eprintln!("Generating stats for {}", file.display());
     let data = fs::read(&file).expect("Could not read dataset file!");
     let mut config = EdlibAlignConfigRs::default();
@@ -143,7 +143,7 @@ pub fn file_stats(file: &Path) -> AlignStats {
                 });
                 let mut length = Stats::new(a.len());
                 length.merge(Stats::new(b.len()), 1, 1);
-                AlignStats {
+                DatasetStats {
                     files: 0,
                     seq_pairs: 1,
                     total_bases: a.len() + b.len(),

@@ -85,7 +85,7 @@ impl Experiments {
         regenerate: bool,
         time_limit: Option<Duration>,
         mem_limit: Option<Bytes>,
-    ) -> Vec<(Job, AlignStats)> {
+    ) -> Vec<(Job, DatasetStats)> {
         self.0
             .into_iter()
             .flat_map(|product| {
@@ -125,7 +125,7 @@ impl Experiments {
 }
 
 impl DatasetConfig {
-    pub fn generate(self, data_dir: &Path, regenerate: bool) -> Vec<(Dataset, AlignStats)> {
+    pub fn generate(self, data_dir: &Path, regenerate: bool) -> Vec<(Dataset, DatasetStats)> {
         fn collect_dir(dir: &Path) -> Vec<Dataset> {
             assert!(dir.is_dir() && dir.exists());
             fn is_hidden(entry: &DirEntry) -> bool {

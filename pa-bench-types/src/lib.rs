@@ -232,7 +232,7 @@ pub struct ResourceUsage {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AlignStats {
+pub struct DatasetStats {
     pub files: usize,
     pub seq_pairs: usize,
     pub total_bases: usize,
@@ -263,7 +263,7 @@ pub struct Stats<T> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobResult {
     pub job: Job,
-    pub stats: AlignStats,
+    pub stats: DatasetStats,
     pub resources: ResourceUsage,
     // FIXME: Remove the f32 walltime field.
     pub output: Result<JobOutput, JobError>,
