@@ -145,15 +145,31 @@ fn main() {
         .expect("Error setting Ctrl-C handler");
     }
 
+    let mut cores = core_affinity::get_core_ids()
+        .unwrap()
+        .into_iter()
+        // NOTE: This assumes that virtual cores 0 and n/2 are on the same
+        // physical core, in case hyperthreading is enabled.
+        // TODO(ragnar): Is it better to spread the load over non-adjacent
+        // physical cores? Unclear to me.
+        .take(args.num_jobs + 1);
+
+    // Reserve one core for the orchestrator.
+    let orchestrator_core = cores.next().unwrap();
+    core_affinity::set_for_current(orchestrator_core);
+
+    // Remaining (up to) #processes cores are for runners.
+    let runner_cores = cores.map(|c| c.id).collect();
+
     for i in 0..args.experiments.len() {
-        run_experiment(&args, i);
+        run_experiment(&args, i, &runner_cores);
         if !*RUNNING.lock().unwrap() {
             break;
         }
     }
 }
 
-fn run_experiment(args: &Args, experiment_idx: usize) {
+fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>) {
     let experiment = &args.experiments[experiment_idx];
     eprintln!("Running experiment {}", experiment.display());
     let experiment_yaml = fs::read_to_string(&experiment).expect("Failed to read jobs generator:");
@@ -251,22 +267,6 @@ fn run_experiment(args: &Args, experiment_idx: usize) {
         eprintln!("Reused jobs: {}", num_jobs_before - jobs.len());
         eprintln!("Running {} jobs...", jobs.len());
     };
-
-    let mut cores = core_affinity::get_core_ids()
-        .unwrap()
-        .into_iter()
-        // NOTE: This assumes that virtual cores 0 and n/2 are on the same
-        // physical core, in case hyperthreading is enabled.
-        // TODO(ragnar): Is it better to spread the load over non-adjacent
-        // physical cores? Unclear to me.
-        .take(args.num_jobs + 1);
-
-    // Reserve one core for the orchestrator.
-    let orchestrator_core = cores.next().unwrap();
-    core_affinity::set_for_current(orchestrator_core);
-
-    // Remaining (up to) #processes cores are for runners.
-    let runner_cores = cores.map(|c| c.id).collect();
 
     let job_results = run_with_threads(
         args.runner.as_ref().unwrap(),
@@ -408,7 +408,7 @@ fn verify_costs(results: &mut Vec<JobResult>) {
 fn run_with_threads(
     runner: &Path,
     jobs: Vec<(Job, DatasetStats)>,
-    cores: Vec<usize>,
+    cores: &Vec<usize>,
     nice: Option<i32>,
     show_stderr: bool,
     verbose: bool,
@@ -430,7 +430,7 @@ fn run_with_threads(
     let stderr = Mutex::new(());
 
     thread::scope(|scope| {
-        for id in &cores {
+        for id in cores {
             scope.spawn(|| {
                 loop {
                     let Some((job, stats)) = jobs_iter.lock().unwrap().next() else {
