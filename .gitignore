@@ -1,8 +1,7 @@
 /target
 /evals/data
-/evals/results*
-/evals/.results
-/evals/*.png
-/evals/plots/
+results
+*.png
+plots
 
 .ipynb_checkpoints

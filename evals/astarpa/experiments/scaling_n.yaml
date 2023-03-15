@@ -1,16 +1,14 @@
 - comment: |
     Slow tools (dijkstra, A* without pruning) with total size 10^6.
-  time_limit: 10min
-  mem_limit: 10GiB
+  time_limit: 30min
+  mem_limit: 32GiB
   datasets:
     - !Generated
       seed: 31415
       error_rates: [0.05]
       error_models: [Uniform]
-      lengths: [100, 300, 1000, 3000, 10000, 30000, 100000]
-      # TODO: BUMP
-      #total_size: 1000000
-      total_size: 100000
+      lengths: [1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+      total_size: 1000000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
@@ -34,31 +32,18 @@
         prune: !None
         r: 1
         k: 15
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !CSH
-        prune: !None
-        r: 1
-        k: 15
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !GCSH
-        prune: !None
-        r: 1
-        k: 15
 - comment: |
     Fast tools with total size 10^8.
-  time_limit: 10min
-  mem_limit: 10GiB
+  time_limit: 30min
+  mem_limit: 32GiB
   datasets:
     - !Generated
       seed: 31415
       error_rates: [0.05]
       error_models: [Uniform]
-      lengths: [100, 300, 1000, 3000, 10000, 30000, 100000]
-      total_size: 1000000
+      lengths:
+        [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+      total_size: 10000000
   traces: [true]
   costs:
     - { sub: 1, open: 0, extend: 1 }
@@ -73,35 +58,7 @@
         r: 1
         k: 15
         prune: !Both
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !CSH
-        r: 1
-        k: 15
-        prune: !Both
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !GCSH
-        r: 1
-        k: 15
-        prune: !Both
 
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !SH
-        r: 1
-        k: 15
-        prune: !Both
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !CSH
-        r: 1
-        k: 15
-        prune: !Both
     - !AstarPA
       diagonal_transition: true
       heuristic:
