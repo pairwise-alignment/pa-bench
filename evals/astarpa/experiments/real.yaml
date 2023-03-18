@@ -8,10 +8,10 @@
   datasets:
     # A*PA sets
     - !Download
-      url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
       dir: astarpa/ont-ul-500k
     - !Download
-      url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
       dir: astarpa/ont-minion-ul-500k
 
   traces: [true]

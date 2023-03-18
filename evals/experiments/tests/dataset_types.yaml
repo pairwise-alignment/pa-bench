@@ -13,7 +13,7 @@
     - !File manual/11867059027841440347.seq
     - !Directory manual
     - !Download
-      url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
       dir: human/chm13/
   traces: [false]
   costs:

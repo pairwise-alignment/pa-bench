@@ -91,7 +91,7 @@ datasets:
   - !Directory path/to/directory
   # Download and extract a zip file containing .seq files.
   - !Download
-    url: https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+    url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
     dir: human/chm13/
   # Generated data
   - !Generated # Seed for the RNG.
