@@ -9,8 +9,14 @@ pub enum AlgorithmParams {
     TripleAccel(TripleAccelParams),
     Wfa(WfaParams),
     Ksw2(Ksw2Params),
-    AstarPA(astarpa::AstarPaParamsNoVis),
+    AstarPA(AstarPaParams),
     // Add more algorithms here!
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct AstarPaParams {
+    pub diagonal_transition: bool,
+    pub heuristic: astarpa::HeuristicParams,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
