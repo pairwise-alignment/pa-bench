@@ -1,6 +1,6 @@
 run:
 	cargo build --release --no-default-features
-	cd ../../ && cargo run --release -- --release experiments/*.yaml --cache results/cache.json
+	cd ../../ && cargo run --release -- --release evals/astarpa/experiments/*.yaml --cache evals/astarpa/results/cache.json
 
 run_release: cpu-freq prep run
 
