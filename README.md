@@ -1,13 +1,13 @@
 # Pairwise Alignment Benchmarks
 
-**Status: Work in progress**
-
-This repository contains code to benchmark pairwise aligners.
+This repository contains code to benchmark pairwise aligners. Evals for
+[A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) are at [`evals/astarpa`](./evals/astarpa/).
 
 Benchmarking is done using `job`s. Each job consists on an input dataset (a
 `.seq` file), a cost model, and a tool with parameters. The `runner` binary runs one
 job at a time and limits and measures the time and memory usage. The
-`orchestrator` binary sets up multiple jobs using a `yaml` input file and calls the runner for each of them.
+`orchestrator` binary sets up multiple jobs using a `yaml` configuration file
+and calls the runner for each of them.
 
 Results are incrementally accumulated in a `json` file.
 
@@ -15,7 +15,7 @@ Results are incrementally accumulated in a `json` file.
 
 There are three crates:
 
-- `pa-bench-types`: Shared types.
+- `pa-bench-types`: Shared types and aligner arguments.
 - `runner`: Benchmarks a single job given as json on `stdin`.
 - `orchestrator`: Generates/downloads datasets, generates all jobs, and calls the runner for each job.
 
@@ -33,7 +33,7 @@ configurations!
 
 ## Benchmarking features
 
-**Settings**
+**Orchestrator settings**
 
 - **Time limit**: Use `--time-limit 1h` to limit each run to `1` hour using `ulimit`.
 - **Memory**: Use `--mem-limit GiB` to limit each run to `1GiB` of total memory using `ulimit`.
@@ -47,6 +47,9 @@ configurations!
   removes the cache.
 
 **Output**
+
+Output is written to a `json` file, and also written to a cache that can be
+reused across experiments.
 
 - **Runtime** of processing input pairs, excluding startup and file io time.
 - **Maximum memory usage** (max rss), excluding the memory usage of the input data.
@@ -101,12 +104,8 @@ datasets:
     # The error models to use. See pa-generate crate for more info:
     # https://github.com/pairwise-alignment/pa-generate
     error_models:
+      # Uniform, NoisyInsert, NoisyDelete, NoisyMove, NoisyDuplicate, SymmetricRepeat
       - Uniform
-      # - NoisyInsert
-      # - NoisyDelete
-      # - NoisyMove
-      # - NoisyDuplicate
-      # - SymmetricRepeat
     error_rates: [0.01, 0.05, 0.1, 0.1]
     lengths: [100, 1000, 10000, 100000]
 # Run both with and without traces
@@ -116,7 +115,6 @@ costs:
   - { sub: 1, open: 0, extend: 1 }
   # affine costs
   - { sub: 1, open: 1, extend: 1 }
-  - { sub: 2, open: 3, extend: 2 }
 algos:
   - !BlockAligner
     size: !Size [32, 8192]
@@ -129,9 +127,7 @@ algos:
   - !Ksw2
     method: !GlobalSuzukiSse
     band_doubling: false
-  - !Ksw2
-    method: !GlobalSuzukiSse
-    band_doubling: true
+  - !AstarPa
 ```
 
 ## Usage
@@ -140,15 +136,15 @@ algos:
 2. Build the runner and orchestrator with `cargo build --release`.
 3. Run `cargo run --release -- [--release] evals/experiments/test.yaml` from the root.
 
-This writes incremental results to
-`evals/results/test.json` (this includes jobs that are not part of the
-experiment anymore) and the exact jobs listed in the current experiment
-are written to `evals/results/test.exact.json`.
+First, this will generate/download required input data files in `evals/data`.
+Results are written to `evals/results/test.json` and a cache of all (outdated)
+jobs for the current experiment is stored in `evals/results/test.cache.json` or
+at the provided `--cache`.
 
 Succinct help (run with `--help` for more):
 
-````text
-A binary to run and benchmark multiple pairwise alignment tasks.
+```text
+ binary to run and benchmark multiple pairwise alignment tasks.
 
 Usage: orchestrator [OPTIONS] [EXPERIMENTS]...
 
@@ -157,6 +153,7 @@ Arguments:
 
 Options:
   -o, --output <OUTPUT>  Path to the output json file. By default mirrors the `experiments` dir in `results`
+      --cache <CACHE>    Shared cache of JobResults. Default: <experiment>.cache.json
   -j <NUM_JOBS>          Number of parallel jobs to use [default: 5]
       --rerun-all        Ignore job cache, i.e. rerun jobs already present in the results file
       --rerun-failed     Rerun failed jobs that are otherwise reused
@@ -170,7 +167,8 @@ Limits:
 
 Output:
   -v, --verbose  Print jobs started and finished
-      --stderr   Show stderr of runner process```
+      --stderr   Show stderr of runner process
+```
 
 ## Notes on benchmarking
 
@@ -181,4 +179,39 @@ orchestrator as root. Alternatively, you could add the following line to
 
 ```text
 <username> - nice -20
-````
+```
+
+**CPU Settings.** Make sure to
+
+- fix the cpu frequency using
+  `cpupower frequency-set -d 2.6GHz -u 2.6GHz -g powersave` (`powersave` can
+  give more consistent results than `performance`),
+- disable hyperthreading,
+- disable turbo-boost,
+- disable power saving,
+- the laptop is fully charged and connected to power.
+
+## Datasets
+
+Datasets are available in the [`datasets` release](https://github.com/pairwise-alignment/pa-bench/releases/tag/datasets).
+
+## Code layout
+
+<!-- cargo depgraph --features parasailors  --include runner,triple_accel,ksw2-sys,pa-generate,astarpa,edlib_rs,pa-types,pa-bench-types,rust-wfa2,wfa2-sys,orchestrator,parasailors --dedup-transitive-deps | dot -Tsvg > imgs/depgraph-small.svg -->
+
+![Dependency graph](imgs/depgraph-small.svg)
+
+From low-level to higher, the following crates are relevant:
+
+- `pa-types`: Basic pairwise alignment types such as `Seq`, `Pos`, `Cost` and `Cigar`.
+- `pa-generate`: A utility to generate sequence pairs with various kinds or error types.
+- `pa-bench-types` contains the definition of a `Experiment`, `Dataset`, `Job`,
+  `JobResult`, and the `AlgorithmParams` enum that selects the algorithm to run
+  and its parameters. This causes `pa-bench-types` to have dependencies on
+  crates that contain aligner-specific parameter types.
+- `pa-runner` contains an `Aligner` trait and implements this uniform interface
+  for all aligners. The binary it provides executes a job and calls one of the
+  implemented aligners. Parasailors is an optional dependency do reduce the
+  otherwise large build time.
+- `pa-orchestrator` contains a binary that collects all jobs in an experiment
+  and calls the `runner` once per job.
