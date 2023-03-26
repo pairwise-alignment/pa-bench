@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{ops::AddAssign, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -180,9 +180,52 @@ pub struct Measured {
     pub cpu_freq_end: Option<f32>,
 }
 
+/// Alignmend statistics. All stats are summed over all sequence pairs in a dataset.
+/// All times are in seconds.
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct AlignerStats {
+    /// The number of expanded states.
+    /// Includes also extend steps.
     pub expanded: Option<usize>,
+
+    /// Time spent on precomputation.
+    /// Total time should equal precomputation+expanding+traceback.
+    pub precomputation: Option<f64>,
+
+    /// Time spent on computing states.
+    pub expanding: Option<f64>,
+
+    /// Time spent on computing the traceback.
+    pub traceback: Option<f64>,
+
+    // More fine-grained reporting for A*PA. Disjoint from the above.
+    /// Time evaluating h.
+    pub h: Option<f64>,
+
+    /// Time in seconds spent on pruning.
+    pub pruning: Option<f64>,
+
+    /// Time in seconds spent on reordering.
+    pub reordering: Option<f64>,
+}
+
+impl AddAssign for AlignerStats {
+    fn add_assign(&mut self, rhs: Self) {
+        fn add<T: AddAssign>(l: &mut Option<T>, r: Option<T>) {
+            match (l, r) {
+                (Some(l), Some(r)) => *l += r,
+                (l @ None, Some(r)) => *l = Some(r),
+                _ => {}
+            }
+        }
+        add(&mut self.expanded, rhs.expanded);
+        add(&mut self.precomputation, rhs.precomputation);
+        add(&mut self.expanding, rhs.expanding);
+        add(&mut self.traceback, rhs.traceback);
+        add(&mut self.h, rhs.h);
+        add(&mut self.pruning, rhs.pruning);
+        add(&mut self.reordering, rhs.reordering);
+    }
 }
 
 /// The output of an alignment job.
@@ -198,7 +241,10 @@ pub struct JobOutput {
     pub measured: Measured,
 
     /// Total number of expanded states.
+    // TODO: Drop this in favour of stats.expanded.
     pub expanded: Option<usize>,
+
+    pub stats: Option<AlignerStats>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]

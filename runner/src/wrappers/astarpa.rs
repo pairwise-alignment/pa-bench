@@ -35,6 +35,12 @@ impl Aligner for Box<dyn AstarStatsAligner> {
             Some(cigar),
             AlignerStats {
                 expanded: Some(stats.extended + stats.expanded),
+                precomputation: Some(stats.timing.precomp),
+                expanding: Some(stats.timing.astar),
+                traceback: Some(stats.timing.traceback),
+                h: Some(stats.h.h_duration),
+                pruning: Some(stats.h.prune_duration),
+                reordering: Some(stats.timing.reordering),
             },
         )
     }

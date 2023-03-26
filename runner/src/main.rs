@@ -129,7 +129,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
 
     let mut costs = Vec::with_capacity(sequence_pairs.len());
     let mut cigars = Vec::with_capacity(sequence_pairs.len());
-    let mut expanded = 0;
+    let mut total_stats = AlignerStats::default();
     let mut is_exact = false;
 
     let measured = measure(|| {
@@ -138,9 +138,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
         sequence_pairs.iter().for_each(|(a, b)| {
             let (cost, cigar, stats) = aligner.align(a, b);
             costs.push(cost);
-            if let Some(x) = stats.expanded {
-                expanded += x;
-            }
+            total_stats += stats;
             if job.traceback {
                 cigars.push(cigar.unwrap());
             }
@@ -170,7 +168,8 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
         is_exact,
         p_correct: None,
         measured,
-        expanded: Some(expanded),
+        expanded: total_stats.expanded,
+        stats: Some(total_stats),
     };
     output
 }
