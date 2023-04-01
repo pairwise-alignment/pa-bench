@@ -30,18 +30,16 @@ impl AlignerParams for AstarPaParams {
 impl Aligner for Box<dyn AstarStatsAligner> {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let ((cost, cigar), stats) = AstarStatsAligner::align(self.as_mut(), a, b);
-        (
-            cost,
-            Some(cigar),
-            AlignerStats {
-                expanded: Some(stats.extended + stats.expanded),
-                precomputation: Some(stats.timing.precomp),
-                expanding: Some(stats.timing.astar),
-                traceback: Some(stats.timing.traceback),
-                h: Some(stats.h.h_duration),
-                pruning: Some(stats.h.prune_duration),
-                reordering: Some(stats.timing.reordering),
-            },
-        )
+        let mut s = AlignerStats::default();
+        s.insert("expanded".into(), (stats.extended + stats.expanded) as _);
+        s.insert("t_precomp".into(), stats.timing.precomp);
+        s.insert("t_astar".into(), stats.timing.astar);
+        s.insert("t_traceback".into(), stats.timing.traceback);
+        s.insert("t_h".into(), stats.h.h_duration);
+        s.insert("t_pruning".into(), stats.h.prune_duration);
+        s.insert("t_contours".into(), stats.h.contours_duration);
+        s.insert("t_reordering".into(), stats.timing.reordering);
+
+        (cost, Some(cigar), s)
     }
 }

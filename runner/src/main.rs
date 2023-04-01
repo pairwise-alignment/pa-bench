@@ -138,7 +138,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
         sequence_pairs.iter().for_each(|(a, b)| {
             let (cost, cigar, stats) = aligner.align(a, b);
             costs.push(cost);
-            total_stats += stats;
+            merge_stats(&mut total_stats, stats);
             if job.traceback {
                 cigars.push(cigar.unwrap());
             }
@@ -168,7 +168,6 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
         is_exact,
         p_correct: None,
         measured,
-        expanded: total_stats.expanded,
         stats: Some(total_stats),
     };
     output
