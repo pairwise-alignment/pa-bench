@@ -56,7 +56,7 @@ dependencies = [
 [[package]]
 name = "astarpa"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#491b765581cfcf602f19d4f3578b9831a4527f6a"
+source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#1e3841e239093fc32ccc2eb3af1d2fe0da240b6e"
 dependencies = [
  "bio",
  "clap",
@@ -1287,7 +1287,7 @@ checksum = "ceedf44fb00f2d1984b0bc98102627ce622e083e49a5bacdb3e514fa4238e267"
 [[package]]
 name = "pa-affine-types"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#491b765581cfcf602f19d4f3578b9831a4527f6a"
+source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#1e3841e239093fc32ccc2eb3af1d2fe0da240b6e"
 dependencies = [
  "pa-types",
 ]
@@ -1336,7 +1336,7 @@ dependencies = [
 [[package]]
 name = "pa-heuristic"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#491b765581cfcf602f19d4f3578b9831a4527f6a"
+source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#1e3841e239093fc32ccc2eb3af1d2fe0da240b6e"
 dependencies = [
  "bio",
  "clap",
@@ -1365,7 +1365,7 @@ dependencies = [
 [[package]]
 name = "pa-vis-types"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#491b765581cfcf602f19d4f3578b9831a4527f6a"
+source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#1e3841e239093fc32ccc2eb3af1d2fe0da240b6e"
 dependencies = [
  "pa-affine-types",
  "pa-heuristic",
