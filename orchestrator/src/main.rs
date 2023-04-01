@@ -309,7 +309,7 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
         args.verbose,
     );
 
-    {
+    if !job_results.is_empty() {
         let logs_path = args.logs_dir.join(format!(
             "{}_{}.json",
             experiment.file_stem().unwrap().to_str().unwrap(),
