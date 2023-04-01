@@ -62,6 +62,11 @@ struct Args {
     #[arg(long)]
     rerun_all: bool,
 
+    /// Remove jobs listed in experiments from the cache.
+    #[arg(long)]
+    #[clap(conflicts_with = "rerun_all", hide_short_help = true)]
+    remove_from_cache: bool,
+
     /// Rerun failed jobs that are otherwise reused.
     ///
     /// This also reruns jobs that had at least as many resources. Useful when code changed.
@@ -238,23 +243,50 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
     //
     // Lastly, we remove from existing_jobs_used any job equal to a job_to_run.
 
-    let (mut existing_jobs_used, existing_jobs_extra): (Vec<_>, Vec<_>) =
+    let (mut existing_jobs_in_experiment, existing_jobs_extra): (Vec<_>, Vec<_>) =
         existing_jobs.into_iter().partition(|existing_job| {
             jobs.iter()
                 .find(|(j, _)| j.is_same_as(&existing_job.job))
                 .is_some()
         });
 
+    // Remove jobs in this experiment from the cache.
+    if args.remove_from_cache {
+        let mut all_jobs = existing_jobs_in_experiment;
+        all_jobs.extend(existing_jobs_extra.clone());
+        // First, copy the cache to a backup file.
+        let backup = results_cache_path.with_extension("backup.json");
+        eprintln!("Output: {} jobs to {}", all_jobs.len(), backup.display());
+        fs::write(&backup, &serde_json::to_string(&all_jobs).unwrap()).expect(&format!(
+            "Failed to write backup to {}",
+            results_cache_path.display()
+        ));
+        eprintln!(
+            "Output: {} jobs to {}",
+            existing_jobs_extra.len(),
+            results_cache_path.display()
+        );
+        fs::write(
+            &results_cache_path,
+            &serde_json::to_string(&existing_jobs_extra).unwrap(),
+        )
+        .expect(&format!(
+            "Failed to write backup to {}",
+            results_cache_path.display()
+        ));
+        return;
+    }
+
     // Skip jobs that succeeded before, or were attempted with at least as many resources.
     if !args.rerun_all {
         eprintln!(
             "Cached jobs: {} in experiment + {} extra",
-            existing_jobs_used.len(),
+            existing_jobs_in_experiment.len(),
             existing_jobs_extra.len()
         );
         let num_jobs_before = jobs.len();
         jobs.retain(|(job, _stats)| {
-            existing_jobs_used
+            existing_jobs_in_experiment
                 .iter()
                 .find(|existing_job| {
                     existing_job.job.is_same_as(job)
@@ -297,18 +329,22 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
     }
 
     // Remove jobs that were run from existing results.
-    existing_jobs_used.retain(|existing_job| {
+    existing_jobs_in_experiment.retain(|existing_job| {
         job_results
             .iter()
             .find(|job_result| job_result.job.is_same_as(&existing_job.job))
             .is_none()
     });
 
-    let mut experiment_jobs = existing_jobs_used;
+    let mut experiment_jobs = existing_jobs_in_experiment;
     experiment_jobs.extend(job_results);
 
     // First, write jobs for this experiment to '.exact.json'.
-    eprintln!("Output: {}", results_path.display());
+    eprintln!(
+        "Output: {} jobs to {}",
+        experiment_jobs.len(),
+        results_path.display()
+    );
     fs::write(
         &results_path,
         &serde_json::to_string(&experiment_jobs).unwrap(),
@@ -322,7 +358,11 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
     let mut all_jobs = experiment_jobs;
     all_jobs.extend(existing_jobs_extra);
 
-    eprintln!("Output: {}", results_cache_path.display());
+    eprintln!(
+        "Output: {} jobs to {}",
+        all_jobs.len(),
+        results_cache_path.display()
+    );
     fs::write(
         &results_cache_path,
         &serde_json::to_string(&all_jobs).unwrap(),
