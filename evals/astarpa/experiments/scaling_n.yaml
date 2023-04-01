@@ -58,11 +58,3 @@
         r: 1
         k: 15
         prune: !Both
-
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        r: 1
-        k: 15
-        prune: !Both

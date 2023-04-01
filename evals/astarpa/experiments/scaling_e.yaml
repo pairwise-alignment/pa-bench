@@ -57,13 +57,6 @@
         r: 1
         k: 10
         prune: !Both
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !GCSH
-        r: 1
-        k: 10
-        prune: !Both
 
     - !AstarPA
       diagonal_transition: false
@@ -79,18 +72,11 @@
         r: 2
         k: 10
         prune: !Both
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !GCSH
-        r: 2
-        k: 10
-        prune: !Both
 
     - !AstarPA
       diagonal_transition: true
       heuristic:
-        type: !GCSH
+        type: !CSH
         r: 1
         k: 10
         prune: !Both
@@ -98,7 +84,7 @@
     - !AstarPA
       diagonal_transition: true
       heuristic:
-        type: !GCSH
+        type: !CSH
         r: 2
         k: 10
         prune: !Both
