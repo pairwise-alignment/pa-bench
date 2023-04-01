@@ -5,7 +5,7 @@ run:
 run_release: cpu-freq prep run
 
 export_plots:
-	cp -r plots ../../../../astarpa-paper/plots
+	cp -r plots/* ../../../../astarpa-paper/plots/
 
 # NOTE: BIOS settings used:
 # - no hyperthreading
