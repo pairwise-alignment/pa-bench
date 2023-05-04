@@ -56,6 +56,11 @@ struct Args {
     #[clap(help_heading = "Limits")]
     nice: Option<i32>,
 
+    /// Disable pinning, which may not work on OSX.
+    #[arg(long)]
+    #[clap(help_heading = "Limits")]
+    no_pin: bool,
+
     /// Ignore job cache, i.e. rerun jobs already present in the results file.
     ///
     /// By default, already-present jobs are reused.
@@ -306,6 +311,7 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
         runner_cores,
         args.nice,
         args.stderr,
+        args.no_pin,
         args.verbose,
     );
 
@@ -451,6 +457,7 @@ fn run_with_threads(
     cores: &Vec<usize>,
     nice: Option<i32>,
     show_stderr: bool,
+    no_pin: bool,
     verbose: bool,
 ) -> Vec<JobResult> {
     let num_jobs = jobs.len();
@@ -509,7 +516,7 @@ fn run_with_threads(
                         if verbose {
                             eprintln!("\n Running job:\n{}\n", serde_json::to_string(&job).unwrap());
                         }
-                        run_job(runner, job, stats, Some(*id), nice, show_stderr)
+                        run_job(runner, job, stats, if no_pin { None } else { Some(*id) }, nice, show_stderr)
                     };
 
                     let _stderr = stderr.lock().unwrap();
