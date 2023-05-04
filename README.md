@@ -41,10 +41,19 @@ configurations!
   requires root. (See the end of this file.)
 - **Parallel running**: Use `-j 10` to run `10` jobs in parallel. Each job (and
   the orchestrator) is **pinned** to a different core.
+- **Pinning**: By default, each job is fixed to run on a single core. This
+  doesn't work on all OSes and can crash/`Panic` the runner. Use `--no-pin` to
+  avoid this.
 - **Incremental running**: By default, jobs results already present
   in the target `json` file are reused. With `--rerun-failed`, failed jobs are
   retried, and with `--rerun-all`, all jobs are rerun. `--clean` completely
   removes the cache.
+
+**Debugging failing jobs**
+
+- To see which jobs are being run, use `--verbose`.
+- To see the error output of runners, use `--stderr`. This should be the first
+  thing to do to figure out why jobs are failing.
 
 **Output**
 
@@ -164,6 +173,7 @@ Limits:
   -t, --time-limit <TIME_LIMIT>  Time limit. Defaults to value in experiment yaml or 1m
   -m, --mem-limit <MEM_LIMIT>    Memory limit. Defaults to value in experiment yaml or 1GiB
       --nice <NICE>              Process niceness. '--nice=-20' for highest priority
+      --no-pin                   Disable pinning, which may not work on OSX
 
 Output:
   -v, --verbose  Print jobs started and finished
@@ -180,6 +190,11 @@ orchestrator as root. Alternatively, you could add the following line to
 ```text
 <username> - nice -20
 ```
+
+**Pinning.**
+Pinning jobs to cores probably only works on linux. On other systems, the runner
+will crash and the orchestrator will report `Result: Err(Panic)`. Use `--no-pin`
+on the orchestrator to avoid this.
 
 **CPU Settings.** Make sure to
 
