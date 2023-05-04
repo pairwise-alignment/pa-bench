@@ -144,6 +144,9 @@ algos:
 1. Clone this repo and make sure you have Rust installed.
 2. Build the runner and orchestrator with `cargo build --release`.
 3. Run `cargo run --release -- [--release] evals/experiments/test.yaml` from the root.
+4. In case of errors, add `--verbose` to see which jobs are being run, and/or
+   `--stderr` to see the output of failing (`Result: Err(Panic)`) jobs. For
+   non-linus OSes, you may need to add `--no-bin` to disable pinning to specific cores.
 
 First, this will generate/download required input data files in `evals/data`.
 Results are written to `evals/results/test.json` and a cache of all (outdated)
