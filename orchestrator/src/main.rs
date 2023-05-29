@@ -34,6 +34,10 @@ struct Args {
     #[arg(long)]
     cache: Option<PathBuf>,
 
+    /// Completely disable using a cache.
+    #[arg(long)]
+    no_cache: bool,
+
     /// Number of parallel jobs to use.
     ///
     /// Jobs are pinned to separate cores.
@@ -224,17 +228,19 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
     eprintln!("Generated {} jobs.", jobs.len());
 
     // Read the cached results.
-    let existing_jobs: Vec<JobResult> = if !args.clean && results_cache_path.is_file() {
-        serde_json::from_str(
-            &fs::read_to_string(&results_cache_path).expect("Error reading existing results file"),
-        )
-        .expect(&format!(
-            "Error parsing results cache {}",
-            results_cache_path.display()
-        ))
-    } else {
-        vec![]
-    };
+    let existing_jobs: Vec<JobResult> =
+        if !args.clean && !args.no_cache && results_cache_path.is_file() {
+            serde_json::from_str(
+                &fs::read_to_string(&results_cache_path)
+                    .expect("Error reading existing results file"),
+            )
+            .expect(&format!(
+                "Error parsing results cache {}",
+                results_cache_path.display()
+            ))
+        } else {
+            vec![]
+        };
 
     // We have a list of existing results, and a list of jobs to run.
     // We first split as follows:
@@ -370,22 +376,24 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
     ));
 
     // Then, write the updated cache.
-    let mut all_jobs = experiment_jobs;
-    all_jobs.extend(existing_jobs_extra);
+    if !args.no_cache {
+        let mut all_jobs = experiment_jobs;
+        all_jobs.extend(existing_jobs_extra);
 
-    eprintln!(
-        "Output: {} jobs to {}",
-        all_jobs.len(),
-        results_cache_path.display()
-    );
-    fs::write(
-        &results_cache_path,
-        &serde_json::to_string(&all_jobs).unwrap(),
-    )
-    .expect(&format!(
-        "Failed to write results to {}",
-        results_cache_path.display()
-    ));
+        eprintln!(
+            "Output: {} jobs to {}",
+            all_jobs.len(),
+            results_cache_path.display()
+        );
+        fs::write(
+            &results_cache_path,
+            &serde_json::to_string(&all_jobs).unwrap(),
+        )
+        .expect(&format!(
+            "Failed to write results to {}",
+            results_cache_path.display()
+        ));
+    }
     if !verified_ok {
         eprintln!("\nA JOB FOR AN EXACT ALIGNER FAILED OUTPUT COST & CIGAR VERIFICATION!\nSEE LOGS ABOVE.\nPLEASE CHECK AND REPORT AN ISSUE.");
         std::process::exit(1);
