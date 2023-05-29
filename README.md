@@ -6,12 +6,13 @@ This repository contains code to benchmark pairwise aligners. Evals for
 See [input format](#input-format), [usage](#usage), and [quick start](#quick-start) below.
 
 Benchmarking is done using `job`s. Each job consists on an input dataset (a
-`.seq` file), a cost model, and a tool with parameters. The `runner` binary runs one
-job at a time and limits and measures the time and memory usage. The
-`orchestrator` binary sets up multiple jobs using a `yaml` configuration file
-and calls the runner for each of them.
+`.seq` file), a cost model, and a tool with parameters.
+The `pa-bench` binary calls itself (recursively) for each job to measure time
+and memory usage.
+An _experiment_ consists of a `yaml` [input configuration file](#input-format) is used to specify the list
+of jobs to run.
 
-Results are incrementally accumulated in a `json` file.
+Results are incrementally accumulated in a `json` _results_ file.
 
 ## Repository layout
 
@@ -19,8 +20,8 @@ There are three crates:
 
 - `pa-wrappers`: Wraps aligners using an `Aligner` trait.
 - `pa-bench-types`: Shared types for benchmarking.
-- `runner`: Benchmarks a single job given as json on `stdin`.
-- `orchestrator`: Generates/downloads datasets, generates all jobs, and calls the runner for each job.
+- `pa-bench`: Generates/downloads datasets, generates all jobs, and calls itself
+  recursively for each job to benchmark it.
 
 ## Adding an aligner
 
@@ -35,14 +36,13 @@ configurations!
 
 ## Benchmarking features
 
-**Orchestrator settings**
+**Main settings**
 
 - **Time limit**: Use `--time-limit 1h` to limit each run to `1` hour using `ulimit`.
 - **Memory**: Use `--mem-limit GiB` to limit each run to `1GiB` of total memory using `ulimit`.
 - **Nice**: Use `--nice=-20` to increase the priority of each runner job. This
   requires root. (See the end of this file.)
-- **Parallel running**: Use `-j 10` to run `10` jobs in parallel. Each job (and
-  the orchestrator) is **pinned** to a different core.
+- **Parallel running**: Use `-j 10` to run `10` jobs in parallel. Each job is **pinned** to a different core.
 - **Pinning**: By default, each job is fixed to run on a single core. This
   doesn't work on all OSes and can crash/`Panic` the runner. Use `--no-pin` to
   avoid this.
@@ -144,9 +144,8 @@ algos:
 ## Usage
 
 1. Clone this repo and make sure you have Rust installed.
-2. Build the runner and orchestrator with `cargo build --release`.
-3. Run `cargo run --release -- [--release] evals/experiments/test.yaml` from the root.
-4. In case of errors, add `--verbose` to see which jobs are being run, and/or
+2. Run `cargo run --release -- [--release] evals/experiments/test.yaml` from the root.
+3. In case of errors, add `--verbose` to see which jobs are being run, and/or
    `--stderr` to see the output of failing (`Result: Err(Panic)`) jobs. For
    non-linus OSes, you may need to add `--no-bin` to disable pinning to specific cores.
 
@@ -155,12 +154,10 @@ Results are written to `evals/results/test.json` and a cache of all (outdated)
 jobs for the current experiment is stored in `evals/results/test.cache.json` or
 at the provided `--cache`.
 
-Succinct help (run with `--help` for more):
+Succinct help of `pa-bench bench -h` (run with `--help` for more):
 
 ```text
- binary to run and benchmark multiple pairwise alignment tasks.
-
-Usage: orchestrator [OPTIONS] [EXPERIMENTS]...
+Usage: pa-bench bench [OPTIONS] [EXPERIMENTS]...
 
 Arguments:
   [EXPERIMENTS]...  Path to an experiment yaml file
@@ -168,6 +165,7 @@ Arguments:
 Options:
   -o, --output <OUTPUT>  Path to the output json file. By default mirrors the `experiments` dir in `results`
       --cache <CACHE>    Shared cache of JobResults. Default: <experiment>.cache.json
+      --no-cache         Completely disable using a cache
   -j <NUM_JOBS>          Number of parallel jobs to use [default: 5]
       --rerun-all        Ignore job cache, i.e. rerun jobs already present in the results file
       --rerun-failed     Rerun failed jobs that are otherwise reused
@@ -203,8 +201,7 @@ interesting, feel free to make a PR to add them here.
 ## Notes on benchmarking
 
 **Niceness.**
-Changing niceness to `-20` (the highest priority) requires running the
-orchestrator as root. Alternatively, you could add the following line to
+Changing niceness to `-20` (the highest priority) requires running `pa-bench` as root. Alternatively, you could add the following line to
 `/etc/security/limits.conf` to allow your user to use lower niceness values:
 
 ```text
@@ -212,9 +209,8 @@ orchestrator as root. Alternatively, you could add the following line to
 ```
 
 **Pinning.**
-Pinning jobs to cores probably only works on linux. On other systems, the runner
-will crash and the orchestrator will report `Result: Err(Panic)`. Use `--no-pin`
-on the orchestrator to avoid this.
+Pinning jobs to cores probably only works on linux. On other systems, benchmarking
+will crash and will report `Result: Err(Panic)`. Use `--no-pin` to avoid this.
 
 **CPU Settings.** Make sure to
 
@@ -232,7 +228,7 @@ Datasets are available in the [`datasets` release](https://github.com/pairwise-a
 
 ## Code layout
 
-<!-- cargo depgraph --features parasailors  --include runner,triple_accel,ksw2-sys,pa-generate,astarpa,edlib_rs,pa-types,pa-bench-types,rust-wfa2,wfa2-sys,orchestrator,parasailors --dedup-transitive-deps | dot -Tsvg > imgs/depgraph-small.svg -->
+<!-- cargo depgraph --features parasailors  --include pa-wrapper,pa-bench,triple_accel,ksw2-sys,pa-generate,astarpa,edlib_rs,pa-types,pa-bench-types,rust-wfa2,wfa2-sys,parasailors --dedup-transitive-deps | dot -Tsvg > imgs/depgraph-small.svg -->
 
 ![Dependency graph](imgs/depgraph-small.svg)
 
@@ -240,13 +236,12 @@ From low-level to higher, the following crates are relevant:
 
 - `pa-types`: Basic pairwise alignment types such as `Seq`, `Pos`, `Cost` and `Cigar`.
 - `pa-generate`: A utility to generate sequence pairs with various kinds or error types.
+- `pa-wrapper` contains an `Aligner` trait and implements this uniform interface
+  for all aligners. Each aligner is behind a feature flag. Parasailors is
+  disabled by default do reduce the otherwise large build time.
 - `pa-bench-types` contains the definition of a `Experiment`, `Dataset`, `Job`,
   `JobResult`, and the `AlgorithmParams` enum that selects the algorithm to run
   and its parameters. This causes `pa-bench-types` to have dependencies on
   crates that contain aligner-specific parameter types.
-- `pa-runner` contains an `Aligner` trait and implements this uniform interface
-  for all aligners. The binary it provides executes a job and calls one of the
-  implemented aligners. Parasailors is an optional dependency do reduce the
-  otherwise large build time.
-- `pa-orchestrator` contains a binary that collects all jobs in an experiment
-  and calls the `runner` once per job.
+- `pa-bench` contains a binary that collects all jobs in an experiment
+  and calls itself once per job.

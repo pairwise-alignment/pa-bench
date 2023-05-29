@@ -1,7 +1,7 @@
 [package]
 name = "pa-bench"
 authors = ["Daniel Liu", "Ragnar Groot Koerkamp"]
-description = "A binary to run and benchmark multiple pairwise alignment tasks."
+description = "A binary to run and benchmark pairwise alignment tasks."
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/pairwise-alignment/pa-bench"

@@ -28,15 +28,18 @@ use wait4::{ResUse, Wait4};
 use pa_bench_types::*;
 
 #[derive(Parser)]
-#[command(author, about)]
+#[command(author, about, version)]
 struct Args {
+    /// The action to run.
     #[command(subcommand)]
     command: SubCommand,
 }
 
 #[derive(Subcommand)]
 enum SubCommand {
+    /// Benchmark a given experiment.yaml file.
     Bench(BenchArgs),
+    /// Run a single Job given on stdin, and print results to stdout.
     Run(runner::Args),
 }
 

@@ -19,15 +19,10 @@ use core_affinity;
 use clap::Parser;
 
 #[derive(Debug, Parser)]
-#[command(
-    author,
-    version,
-    about,
-    after_help = "Input: json Job on stdin.
+#[command(after_help = "Input: json Job on stdin.
 Output: json JobResult on stdout.
 Exit code 101: Rust panic.
-Exit code 102: aligner does not support the given parameters."
-)]
+Exit code 102: aligner does not support the given parameters.")]
 pub struct Args {
     /// An optional experiment.yaml to run. By default takes a Job on stdin.
     experiment: Option<PathBuf>,
