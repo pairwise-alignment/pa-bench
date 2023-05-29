@@ -137,14 +137,17 @@ fn main() {
             .expect("Neither --runner nor CARGO_MANIFEST_DIR env var is set.");
         args.runner = Some(Path::new(&dir).join("../target/release/runner"));
     }
-    assert!(
-        args.runner.as_ref().unwrap().exists(),
-        "{} does not exist!",
-        args.runner.unwrap().display()
-    );
+    if !args.runner.as_ref().unwrap().exists() {
+        eprintln!(
+            "The runner binary {} does not exist! Try running `cargo build --release` first.",
+            args.runner.unwrap().display()
+        );
+        std::process::exit(1);
+    }
 
     if args.output.is_some() && args.experiments.len() != 1 {
-        panic!("Output can only be specified when running exactly 1 experiment.");
+        eprintln!("Output can only be specified when running exactly 1 experiment.");
+        std::process::exit(1);
     }
 
     {
@@ -305,7 +308,7 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
         eprintln!("Running {} jobs...", jobs.len());
     };
 
-    let job_results = run_with_threads(
+    let mut job_results = run_with_threads(
         args.runner.as_ref().unwrap(),
         jobs,
         runner_cores,
@@ -313,6 +316,12 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
         args.stderr,
         args.no_pin,
         args.verbose,
+    );
+
+    let verified_ok = verify_costs(
+        &mut job_results,
+        &existing_jobs_in_experiment,
+        &existing_jobs_extra,
     );
 
     if !job_results.is_empty() {
@@ -377,15 +386,28 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
         "Failed to write results to {}",
         results_cache_path.display()
     ));
-
-    verify_costs(&mut all_jobs);
+    if !verified_ok {
+        eprintln!("\nA JOB FOR AN EXACT ALIGNER FAILED OUTPUT COST & CIGAR VERIFICATION!\nSEE LOGS ABOVE.\nPLEASE CHECK AND REPORT AN ISSUE.");
+        std::process::exit(1);
+    }
 }
 
 /// Verify costs for exact algorithms and count correct costs for approximate algorithms.
-/// Deduplicates exact costs.
-fn verify_costs(results: &mut Vec<JobResult>) {
+/// Deduplicates exact costs so that they are not stored twice in the cache.
+///
+/// The `extra_1` and `extra_2` are existing job results that do not need new
+/// verification but can be used as ground-truth.
+///
+/// Returns true when all verification succeeded.
+fn verify_costs(
+    results: &mut Vec<JobResult>,
+    extra_1: &Vec<JobResult>,
+    extra_2: &Vec<JobResult>,
+) -> bool {
     // Ensure exact algorithms are first in results.
     results.sort_by_key(|res| !res.output.as_ref().map(|o| o.is_exact).unwrap_or(false));
+
+    let mut all_ok = true;
 
     for i in 0..results.len() {
         let (earlier_results, result) = results.split_at_mut(i);
@@ -401,7 +423,11 @@ fn verify_costs(results: &mut Vec<JobResult>) {
         }
 
         // Find the first exact job with the same input and compare costs.
-        for reference_result in earlier_results {
+        for reference_result in earlier_results
+            .iter()
+            .chain(extra_1.iter())
+            .chain(extra_2.iter())
+        {
             if !reference_result.job.same_input(&result.job) {
                 continue;
             }
@@ -417,23 +443,24 @@ fn verify_costs(results: &mut Vec<JobResult>) {
             assert_eq!(
                 output.costs.len(),
                 reference_output.costs.len(),
-                "\nDifferent number of costs!\nJob 1: {:?}\nJob 2: {:?}\nLen costs 1: {:?}\nLen costs 2: {:?}",
+                "\nDifferent number of costs!\nJob 1: {:?}\nJob 2: {:?}\nLen costs 1: {:?}\nLen costs 2: {:?}. Please clear the cache and rerun.",
                 result.job,
                 reference_result.job,
                 output.costs.len(),
                 reference_output.costs.len(),
             );
             if output.is_exact {
-                // For exact jobs, simply check they give the same result.
-                assert_eq!(
-                            output.costs,
-                            reference_output.costs,
-                            "\nIncorrect costs of exact algorithms!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}",
-                            result.job,
-                            reference_result.job,
-                            output.costs,
-                            reference_output.costs,
-                        );
+                if output.costs != reference_output.costs {
+                    all_ok = false;
+                    // For exact jobs, simply check they give the same result.
+                    eprintln!(
+                        "\nTwo exact algorithms returned different costs!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}\n",
+                        result.job,
+                        reference_result.job,
+                        output.costs,
+                        reference_output.costs,
+                    );
+                }
                 // Remove the costs from this output, since they are the same as the reference output above.
                 output.costs = vec![];
             } else {
@@ -447,8 +474,10 @@ fn verify_costs(results: &mut Vec<JobResult>) {
                     .count();
                 output.p_correct = Some((num_correct as f32) / (output.costs.len() as f32));
             }
+            break;
         }
     }
+    all_ok
 }
 
 fn run_with_threads(
