@@ -1,5 +1,16 @@
+//! TODO: Merge this with the `runner` binary to reduce compile times.
+//! TODO: Add `--cleanup-cache` to remove jobs that are not in the experiments.
+//! TODO: Use subcommands for various tasks:
+//! - bench: call runner
+//! - run: run inline
+//! - cache delete
+//! - cache shrink
+
+mod bench;
+mod runner;
+
 use chrono::Timelike;
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use core_affinity;
 use once_cell::sync::Lazy;
 use serde_json;
@@ -16,10 +27,21 @@ use wait4::{ResUse, Wait4};
 
 use pa_bench_types::*;
 
-#[derive(Debug, Parser)]
+#[derive(Parser)]
 #[command(author, about)]
 struct Args {
-    // TODO: VEC
+    #[command(subcommand)]
+    command: SubCommand,
+}
+
+#[derive(Subcommand)]
+enum SubCommand {
+    Bench(BenchArgs),
+    Run(runner::Args),
+}
+
+#[derive(clap::Args)]
+struct BenchArgs {
     /// Path to an experiment yaml file.
     #[arg(num_args = 1..)]
     experiments: Vec<PathBuf>,
@@ -104,21 +126,15 @@ struct Args {
     #[clap(help_heading = "Output")]
     stderr: bool,
 
-    /// Path to the data directory.
+    /// The directory to store generated/downloaded data.
     #[arg(long, default_value = "evals/data")]
     #[clap(help_heading = "Custom paths")]
     #[clap(hide_short_help = true)]
     data_dir: PathBuf,
 
-    /// Path to the runner binary. Uses $CARGO_MANIFEST_DIR/../target/release/runner by default.
-    #[arg(long)]
-    #[clap(help_heading = "Custom paths")]
-    #[clap(hide_short_help = true)]
-    runner: Option<PathBuf>,
-
     /// Path to the logs directory.
     ///
-    /// Results of all runs are stored here.
+    /// Results of all runs are additionally stored here as a backup.
     #[arg(long, default_value = "evals/results/.log")]
     #[clap(help_heading = "Custom paths")]
     #[clap(hide_short_help = true)]
@@ -128,25 +144,18 @@ struct Args {
 static RUNNING: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(true));
 
 fn main() {
-    let mut args = Args::parse();
+    let args = Args::parse();
+    match args.command {
+        SubCommand::Bench(args) => bench(args),
+        SubCommand::Run(args) => runner::main(args),
+    }
+}
 
+fn bench(mut args: BenchArgs) {
     // Handle `--release` flag.
     if args.release {
         args.nice.get_or_insert(-20);
         args.num_jobs = 1;
-    }
-
-    if args.runner.is_none() {
-        let dir = std::env::var("CARGO_MANIFEST_DIR")
-            .expect("Neither --runner nor CARGO_MANIFEST_DIR env var is set.");
-        args.runner = Some(Path::new(&dir).join("../target/release/runner"));
-    }
-    if !args.runner.as_ref().unwrap().exists() {
-        eprintln!(
-            "The runner binary {} does not exist! Try running `cargo build --release` first.",
-            args.runner.unwrap().display()
-        );
-        std::process::exit(1);
     }
 
     if args.output.is_some() && args.experiments.len() != 1 {
@@ -186,7 +195,7 @@ fn main() {
     }
 }
 
-fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>) {
+fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<usize>) {
     let experiment = &args.experiments[experiment_idx];
     eprintln!("Running experiment {}", experiment.display());
     let experiment_yaml = fs::read_to_string(&experiment).expect("Failed to read jobs generator:");
@@ -314,8 +323,16 @@ fn run_experiment(args: &Args, experiment_idx: usize, runner_cores: &Vec<usize>)
         eprintln!("Running {} jobs...", jobs.len());
     };
 
+    let current_exe = match std::env::current_exe() {
+        Ok(x) => x,
+        Err(e) => {
+            eprintln!("Could not determine path to executable needed for self-invocation:\n{e}");
+            std::process::exit(1);
+        }
+    };
+
     let mut job_results = run_with_threads(
-        args.runner.as_ref().unwrap(),
+        &current_exe,
         jobs,
         runner_cores,
         args.nice,
@@ -609,6 +626,7 @@ fn run_job(
     show_stderr: bool,
 ) -> JobResult {
     let mut cmd = Command::new(runner);
+    cmd.arg("run");
     if let Some(id) = core_id {
         cmd.arg("--pin-core-id").arg(id.to_string());
     }

@@ -1,4 +1,3 @@
-mod bench;
 use crate::bench::*;
 
 use itertools::{izip, Itertools};
@@ -29,7 +28,7 @@ Output: json JobResult on stdout.
 Exit code 101: Rust panic.
 Exit code 102: aligner does not support the given parameters."
 )]
-struct Args {
+pub struct Args {
     /// An optional experiment.yaml to run. By default takes a Job on stdin.
     experiment: Option<PathBuf>,
 
@@ -72,8 +71,7 @@ fn read_path<'a>(
         .collect()
 }
 
-fn main() {
-    let args = Args::parse();
+pub fn main(args: Args) {
     if let Some(id) = args.pin_core_id {
         assert!(
             core_affinity::set_for_current(core_affinity::CoreId { id }),

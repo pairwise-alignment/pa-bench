@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "^4.0", features = ["derive"] }
 serde = { version = "^1.0", features = ["derive"] }
 pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
 itertools = "^0.10"
