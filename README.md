@@ -3,6 +3,8 @@
 This repository contains code to benchmark pairwise aligners. Evals for
 [A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) are at [`evals/astarpa`](./evals/astarpa/).
 
+See [input format](#input-format), [usage](#usage), and [quick start](#quick-start) below.
+
 Benchmarking is done using `job`s. Each job consists on an input dataset (a
 `.seq` file), a cost model, and a tool with parameters. The `runner` binary runs one
 job at a time and limits and measures the time and memory usage. The
@@ -182,6 +184,21 @@ Output:
   -v, --verbose  Print jobs started and finished
       --stderr   Show stderr of runner process
 ```
+
+## Quick start
+
+The easiest way to get started is probably to first clone (and fork) the repository.
+Then, you can copy either:
+
+- The `evals/astarpa` directory with all experiments (`*.yaml`) and
+  analysis/plots (`evals.ipynb`) used in the A\*PA paper.
+- The `evals/astarpa-next` directory that specifically tests new versions of
+  A\*PA on some datasets of ultra long ONT reads of human data. This contains the
+  code to plot boxplots+swarmplots of the distribution of runtimes on a dataset.
+- Or you can modify/add experiments to `evals/experiments/` and use `evals/evals.ipynb`.
+
+If you think your experiments, analysis, and/or plots are generally useful and
+interesting, feel free to make a PR to add them here.
 
 ## Notes on benchmarking
 
