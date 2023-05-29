@@ -1,0 +1,125 @@
+- comment: |
+    A*, Edlib, and Wfa on real sequencing data
+
+    The time limit is low and cuts of excessively slow A*PA runs, but sufficient
+    for most Edlib and Biff runs.
+  time_limit: 100s
+  mem_limit: 32GiB
+  datasets:
+    # A*PA sets
+    # - !Generated
+    #   seed: 31415
+    #   error_rates: [0.10]
+    #   error_models: [Uniform]
+    #   lengths: [1200]
+    #   total_size: 1200
+
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      dir: astarpa/ont-ul-500k
+    # - !Download
+    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
+    #   dir: astarpa/ont-minion-ul-500k
+
+    # - !File download/astarpa/ont-ul-500k/seq01.seq
+    # - !File download/astarpa/ont-ul-500k/seq02.seq
+    # - !File download/astarpa/ont-ul-500k/seq03.seq
+    # - !File download/astarpa/ont-ul-500k/seq04.seq
+    # - !File download/astarpa/ont-ul-500k/seq20.seq
+    # - !File download/astarpa/ont-ul-500k/seq32.seq
+    # - !File download/astarpa/ont-minion-ul-500k/seq02.seq
+    # Crash
+    # - !File download/astarpa/ont-minion-ul-500k/seq14.seq
+    # - !File download/astarpa/ont-minion-ul-500k/seq17.seq
+    # - !File download/astarpa/ont-minion-ul-500k/seq08.seq
+    # - !File download/astarpa/ont-minion-ul-500k/seq20.seq
+    # - !File download/astarpa/ont-minion-ul-500k/seq27.seq
+    # - !File download/astarpa/ont-minion-ul-500k/seq48.seq
+    # Slowest input overall.
+    # - !File download/astarpa/ont-minion-ul-500k/seq24.seq
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+    # - !AstarNW
+    #   name: "matches3"
+    #   domain: !Astar
+    #   strategy: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     r: 1
+    #     p: 5
+    #   front: !Bit
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #   sparse_h_calls: true
+    #   prune: true
+    # - !AstarNW
+    #   name: "dt-trace"
+    #   domain: !Astar
+    #   strategy: !LocalDoubling
+    #   block_width: 256
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     r: 1
+    #     p: 5
+    #   front: !Bit
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+    #   prune: true
+
+    # - !AstarNW
+    #   name: "k12"
+    #   domain: !Astar
+    #   strategy: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #     p: 14
+    #   front: !Bit
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+    #   prune: true
+
+    - !AstarNW
+      name: "local-doubling"
+      domain: !Astar
+      strategy: !LocalDoubling
+      block_width: 256
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        k: 12
+        r: 1
+        p: 14
+      front: !Bit
+        sparse: true
+        simd: true
+        incremental_doubling: false
+        dt_trace: true
+        max_g: 40
+        drop: 20
+      sparse_h_calls: true
+      prune: true
+      viz: true

@@ -1,0 +1,23 @@
+run:
+    cd ../.. && cargo run        --release --bin runner \
+                      -- evals/astarpa-next/experiments/real-test.yaml
+flamegraph:
+    cd ../.. && cargo flamegraph --release --bin runner --deterministic --open --min-width 0.03 --skip-after 'runner::run_job::{{{{closure}}::{{{{closure}}' --palette rust \
+                      -- evals/astarpa-next/experiments/real-test.yaml
+bench *args:
+    cd ../.. && cargo build --release && cargo run --release --  evals/astarpa-next/experiments/real-test.yaml --cache evals/astarpa-next/results/cache.json --rerun-all {{args}}
+bench-all:
+    cd ../.. && cargo build --release && cargo run --release --  evals/astarpa-next/experiments/real.yaml --cache evals/astarpa-next/results/cache.json
+affine *args:
+    cd ../.. && cargo build --release && cargo run --release --  evals/astarpa-next/experiments/real-affine.yaml --cache evals/astarpa-next/results/real-affine.cache.json {{args}}
+
+memory:
+    cd ../.. && cargo build --release --bin runner
+    cd ../.. && heaptrack target/release/runner evals/astarpa-next/experiments/real.yaml
+record *args='':
+    cd ../.. && perf record cargo run --release --bin runner --  evals/astarpa-next/experiments/real.yaml && perf report
+
+cpufreq:
+    sudo cpupower frequency-set --governor performance -d 2.6GHz -u 2.6GHz
+powersave:
+    sudo cpupower frequency-set --governor powersave -d 0.8GHz -u 2.6GHz
