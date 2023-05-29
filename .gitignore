@@ -5,3 +5,6 @@ results
 plots
 
 .ipynb_checkpoints
+
+flamegraph.svg
+heaptrack*

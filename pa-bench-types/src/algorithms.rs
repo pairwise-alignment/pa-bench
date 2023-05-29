@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Which algorithm to run and benchmark, along with algorithm-specific parameters.
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum AlgorithmParams {
     BlockAligner(BlockAlignerParams),
     ParasailStriped(ParasailStripedParams),
@@ -10,6 +10,7 @@ pub enum AlgorithmParams {
     Wfa(WfaParams),
     Ksw2(Ksw2Params),
     AstarPA(AstarPaParams),
+    AstarNW(pa_base_algos::nw::AstarNwParams),
     // Add more algorithms here!
 }
 

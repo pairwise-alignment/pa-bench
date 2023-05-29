@@ -21,6 +21,7 @@ pa-generate = { git = "https://github.com/pairwise-alignment/pa-generate" }
 # aligners
 rust-wfa2 = { git = "https://github.com/pairwise-alignment/rust-wfa2" }
 astarpa = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", default-features = false }
+pa-base-algos = { path = "../../../astarpa/pa-base-algos", default-features = false }
 parse-size = "1.0.0"
 num = "0.4.0"
 streaming-stats = "0.2.3"

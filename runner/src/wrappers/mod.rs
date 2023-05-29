@@ -1,6 +1,7 @@
 use pa_bench_types::*;
 use pa_types::*;
 
+pub mod astarnw;
 mod astarpa;
 mod block_aligner;
 mod edlib;
@@ -73,6 +74,7 @@ pub fn get_aligner(
         Wfa(params) => params,
         Ksw2(params) => params,
         AstarPA(params) => params,
+        AstarNW(params) => params,
     };
     let aligner = match params.new(cm, trace, max_len) {
         Ok(a) => a,
