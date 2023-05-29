@@ -1,6 +1,8 @@
-use super::*;
-
+use crate::*;
 use edlib_rs::*;
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct EdlibParams;
 
 pub struct Edlib {
     config: EdlibAlignConfigRs<'static>,
@@ -9,7 +11,7 @@ pub struct Edlib {
 impl AlignerParams for EdlibParams {
     type Aligner = Edlib;
 
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,

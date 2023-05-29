@@ -1,10 +1,10 @@
 mod bench;
-mod wrappers;
-use crate::{bench::*, wrappers::*};
+use crate::bench::*;
 
 use itertools::{izip, Itertools};
 use pa_bench_types::*;
 use pa_types::Seq;
+use pa_wrapper::AlignerStats;
 
 use std::{
     cmp::max,
@@ -134,7 +134,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
 
     let measured = measure(|| {
         let mut aligner;
-        (aligner, is_exact) = get_aligner(&job.algo, job.costs, job.traceback, max_len);
+        (aligner, is_exact) = job.algo.build_aligner(job.costs, job.traceback, max_len);
         sequence_pairs.iter().for_each(|(a, b)| {
             let (cost, cigar, stats) = aligner.align(a, b);
             costs.push(cost);

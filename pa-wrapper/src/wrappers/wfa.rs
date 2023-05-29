@@ -1,5 +1,4 @@
-use super::*;
-
+use crate::*;
 use rust_wfa2::{
     aligner::{
         AlignmentScope, AlignmentStatus, MemoryModel, WFAligner, WFAlignerEdit, WFAlignerGapAffine,
@@ -7,6 +6,31 @@ use rust_wfa2::{
     },
     *,
 };
+
+fn default_memory_model() -> rust_wfa2::aligner::MemoryModel {
+    rust_wfa2::aligner::MemoryModel::MemoryUltraLow
+}
+fn default_heuristic() -> rust_wfa2::aligner::Heuristic {
+    rust_wfa2::aligner::Heuristic::None
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct WfaParams {
+    #[serde(default = "default_memory_model")]
+    pub memory_model: rust_wfa2::aligner::MemoryModel,
+    #[serde(default = "default_heuristic")]
+    pub heuristic: rust_wfa2::aligner::Heuristic,
+}
+
+impl Default for WfaParams {
+    fn default() -> Self {
+        Self {
+            memory_model: rust_wfa2::aligner::MemoryModel::MemoryUltraLow,
+            heuristic: rust_wfa2::aligner::Heuristic::None,
+        }
+    }
+}
 
 pub struct Wfa {
     cm: CostModel,
@@ -16,7 +40,7 @@ pub struct Wfa {
 impl AlignerParams for WfaParams {
     type Aligner = Wfa;
 
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,

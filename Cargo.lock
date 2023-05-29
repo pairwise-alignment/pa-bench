@@ -1368,20 +1368,18 @@ dependencies = [
 name = "pa-bench-types"
 version = "0.1.0"
 dependencies = [
- "astarpa",
  "chrono",
  "edlib_rs",
  "flate2",
  "fxhash",
  "itertools",
  "num 0.4.0",
- "pa-base-algos",
  "pa-generate",
  "pa-types",
+ "pa-wrapper",
  "parse-size",
  "parse_duration",
  "rayon",
- "rust-wfa2",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -1497,6 +1495,25 @@ dependencies = [
  "pa-heuristic 0.1.0 (git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner)",
  "pa-types",
  "serde",
+]
+
+[[package]]
+name = "pa-wrapper"
+version = "0.1.0"
+dependencies = [
+ "astarpa",
+ "block-aligner",
+ "clap",
+ "edlib_rs",
+ "itertools",
+ "ksw2-sys",
+ "libc",
+ "pa-base-algos",
+ "pa-types",
+ "parasailors",
+ "rust-wfa2",
+ "serde",
+ "triple_accel 0.4.0 (git+https://github.com/Daniel-Liu-c0deb0t/triple_accel)",
 ]
 
 [[package]]
@@ -1826,6 +1843,7 @@ dependencies = [
  "pa-base-algos",
  "pa-bench-types",
  "pa-types",
+ "pa-wrapper",
  "parasailors",
  "rust-wfa2",
  "rustix 0.36.13",

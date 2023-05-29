@@ -1,7 +1,4 @@
-use super::*;
-
-use pa_bench_types::BlockAlignerSize::*;
-
+use crate::*;
 // Leading :: needs to be preserved to disambiguate the crate against this module.
 #[rustfmt::skip]
 use ::block_aligner::scan_block::*;
@@ -9,6 +6,17 @@ use ::block_aligner::scan_block::*;
 use ::block_aligner::scores::*;
 #[rustfmt::skip]
 use ::block_aligner::percent_len;
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct BlockAlignerParams {
+    pub size: BlockAlignerSize,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+pub enum BlockAlignerSize {
+    Size(usize, usize),
+    Percent(f32, f32),
+}
 
 enum BlockAlignerBlock {
     Trace(Block<true, false>),
@@ -28,7 +36,7 @@ pub struct BlockAligner {
 impl AlignerParams for BlockAlignerParams {
     type Aligner = BlockAligner;
 
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,
@@ -38,8 +46,8 @@ impl AlignerParams for BlockAlignerParams {
             return Err("BlockAligner only works for affine cost models");
         }
         let max_size = match self.size {
-            Size(_, max) => max,
-            Percent(_, max) => percent_len(max_len, max),
+            BlockAlignerSize::Size(_, max) => max,
+            BlockAlignerSize::Percent(_, max) => percent_len(max_len, max),
         };
         let block = if trace {
             BlockAlignerBlock::Trace(Block::new(max_len, max_len, max_size))
@@ -75,8 +83,10 @@ impl Aligner for BlockAligner {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let max_len = a.len().max(b.len());
         let size = match self.params.size {
-            Size(min, max) => min..=max,
-            Percent(min, max) => percent_len(max_len, min)..=percent_len(max_len, max),
+            BlockAlignerSize::Size(min, max) => min..=max,
+            BlockAlignerSize::Percent(min, max) => {
+                percent_len(max_len, min)..=percent_len(max_len, max)
+            }
         };
         self.a.set_bytes::<NucMatrix>(a, *size.end());
         self.b.set_bytes::<NucMatrix>(b, *size.end());

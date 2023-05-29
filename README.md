@@ -17,7 +17,8 @@ Results are incrementally accumulated in a `json` file.
 
 There are three crates:
 
-- `pa-bench-types`: Shared types and aligner arguments.
+- `pa-wrappers`: Wraps aligners using an `Aligner` trait.
+- `pa-bench-types`: Shared types for benchmarking.
 - `runner`: Benchmarks a single job given as json on `stdin`.
 - `orchestrator`: Generates/downloads datasets, generates all jobs, and calls the runner for each job.
 
@@ -25,12 +26,11 @@ There are three crates:
 
 The following files will need to be updated:
 
-- `pa-bench-types/src/algorithms.rs`
-- `runner/src/Cargo.toml`
-- `runner/src/wrapper/mod.rs`
+- `pa-wrapper/Cargo.toml`
+- `pa-wrapper/src/lib.rs`
 
 Then, the wrapper implementation for the aligner should be put into a new file
-in `runner/src/wrapper/`. Remember to crash the program for unsupported parameter
+in `pa-wrapper/src/wrappers/<name>.rs`. Remember to crash the program for unsupported parameter
 configurations!
 
 ## Benchmarking features

@@ -1,14 +1,12 @@
-use std::{collections::HashMap, path::PathBuf};
-
+use pa_wrapper::{AlignerStats, WrappedAlignerParams};
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 use pa_generate::*;
 use pa_types::*;
 
-mod algorithms;
 mod experiments;
 pub mod stats;
-pub use algorithms::*;
 pub use experiments::*;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -116,7 +114,7 @@ pub struct Job {
     /// Return the full alignment/cigar?
     pub traceback: bool,
     /// The algorithm/parameters to use.
-    pub algo: AlgorithmParams,
+    pub algo: WrappedAlignerParams,
 }
 
 impl Job {
@@ -179,10 +177,6 @@ pub struct Measured {
     pub cpu_freq_start: Option<f32>,
     pub cpu_freq_end: Option<f32>,
 }
-
-/// Alignmend statistics. All stats are summed over all sequence pairs in a dataset.
-/// All times are in seconds.
-pub type AlignerStats = HashMap<String, f64>;
 
 pub fn merge_stats(lhs: &mut AlignerStats, rhs: AlignerStats) {
     for (k, v) in lhs.iter_mut() {

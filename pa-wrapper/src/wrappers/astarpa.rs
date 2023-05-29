@@ -1,12 +1,16 @@
-#[rustfmt::skip]
-use ::astarpa::*;
+use crate::*;
+use astarpa::*;
 
-use super::*;
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+pub struct AstarPaParams {
+    pub diagonal_transition: bool,
+    pub heuristic: astarpa::HeuristicParams,
+}
 
 impl AlignerParams for AstarPaParams {
     type Aligner = Box<dyn AstarStatsAligner>;
 
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,

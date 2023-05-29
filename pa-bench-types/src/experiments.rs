@@ -1,4 +1,5 @@
 use flate2::bufread::GzDecoder;
+use pa_wrapper::WrappedAlignerParams;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 #[rustfmt::skip]
@@ -46,7 +47,7 @@ pub struct Experiment {
     datasets: Vec<DatasetConfig>,
     traces: Vec<bool>,
     costs: Vec<CostModel>,
-    algos: Vec<AlgorithmParams>,
+    algos: Vec<WrappedAlignerParams>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

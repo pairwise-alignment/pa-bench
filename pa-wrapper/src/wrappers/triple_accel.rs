@@ -1,7 +1,8 @@
-use super::*;
+use crate::*;
+use triple_accel::*;
 
-#[rustfmt::skip]
-use ::triple_accel::*;
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct TripleAccelParams;
 
 pub struct TripleAccel {
     costs: ::triple_accel::levenshtein::EditCosts,
@@ -11,7 +12,7 @@ pub struct TripleAccel {
 impl AlignerParams for TripleAccelParams {
     type Aligner = TripleAccel;
 
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,

@@ -1,7 +1,39 @@
-use super::*;
-
+use crate::*;
 use ksw2_sys::*;
 use libc::c_void;
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Ksw2Method {
+    GlobalGreen,
+    GlobalSuzuki,
+    #[default]
+    GlobalSuzukiSse,
+    ExtensionGreen,
+    ExtensionSuzukiSse,
+    DualAffineExtensionGreen,
+    DualAffineExtensionSuzukiSse,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Ksw2Params {
+    #[serde(default)]
+    pub method: Ksw2Method,
+    #[serde(default = "band_doubling_enabled")]
+    pub band_doubling: bool,
+}
+fn band_doubling_enabled() -> bool {
+    true
+}
+
+impl Default for Ksw2Params {
+    fn default() -> Self {
+        Ksw2Params {
+            method: Ksw2Method::GlobalSuzukiSse,
+            band_doubling: true,
+        }
+    }
+}
 
 const M: usize = 4 + 1;
 pub struct Ksw2 {
@@ -16,7 +48,7 @@ pub struct Ksw2 {
 
 impl AlignerParams for Ksw2Params {
     type Aligner = Ksw2;
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,

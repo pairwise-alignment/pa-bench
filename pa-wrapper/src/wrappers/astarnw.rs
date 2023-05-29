@@ -1,13 +1,11 @@
 use pa_base_algos::nw::AstarNwParams;
 
-#[rustfmt::skip]
-
-use super::*;
+use crate::*;
 
 impl AlignerParams for AstarNwParams {
     type Aligner = Box<dyn pa_types::Aligner>;
 
-    fn new(
+    fn build(
         &self,
         cm: CostModel,
         trace: bool,
