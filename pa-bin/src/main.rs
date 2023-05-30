@@ -12,7 +12,7 @@ use std::process::exit;
 #[derive(Parser)]
 #[command(author)]
 struct Cli {
-    /// Return a only cost (no traceback).
+    /// Return only cost (no traceback).
     #[clap(long)]
     cost_only: bool,
 
@@ -20,7 +20,7 @@ struct Cli {
     #[clap(long)]
     silent: bool,
 
-    /// (Directories of) .seq, .txt, or Fasta files with sequence pairs to align.
+    /// (Directory of) .seq, .txt, or Fasta files with sequence pairs to align.
     ///
     /// For directories, this is not recursive. Only files in the directory itself are processed.
     #[clap(value_parser = value_parser!(PathBuf), display_order = 1, required_unless_present = "print_params")]
@@ -36,7 +36,7 @@ struct Cli {
     #[clap(flatten, next_help_heading = "Aligner")]
     aligner: AlignerArgs,
 
-    /// The parameters are json (default: yaml).
+    /// The parameters are json instead of yaml.
     #[clap(long)]
     json: bool,
 
@@ -49,19 +49,24 @@ struct Cli {
 #[group(required = true, multiple = false)]
 struct AlignerArgs {
     /// The aligner to use with default parameters.
-    #[clap(long)]
+    #[clap(long, value_name = "ALIGNER")]
     aligner: Option<Aligner>,
 
     /// A specific aligner with parameters.
-    #[clap(long)]
+    #[clap(long, value_name = "PARAMS")]
     params: Option<String>,
 
     /// File with aligner parameters.
-    #[clap(long, conflicts_with = "params", conflicts_with = "aligner")]
+    #[clap(
+        long,
+        conflicts_with = "params",
+        conflicts_with = "aligner",
+        value_name = "PATH"
+    )]
     params_file: Option<PathBuf>,
 
     /// Print default parameters for the given aligner.
-    #[clap(long)]
+    #[clap(long, value_name = "ALIGNER")]
     print_params: Option<Aligner>,
 }
 

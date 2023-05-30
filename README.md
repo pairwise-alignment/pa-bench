@@ -1,9 +1,77 @@
 # Pairwise Alignment Benchmarks
 
-This repository contains code to benchmark pairwise aligners. Evals for
-[A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) are at [`evals/astarpa`](./evals/astarpa/).
+This repository contains a few things:
 
-See [input format](#input-format), [usage](#usage), and [quick start](#quick-start) below.
+- [`pa-wrapper`](#pa-wrapper-wrapper-api): a wrapper library around pairwise aligners;
+- [`pa-bin`](#pa-bin-unified-binary): a unified command line tool to call these aligners;
+- [`pa-bench`](#pa-bench-benchmarking): a tool to benchmark aligners against each other;
+- [`evals/astarpa`](./evals/astarpa): experiments and analysis for the
+  [A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) paper.
+- [`evals/astarpa-next`](./evals/astarpa-next): the latest experiments and results.
+
+## `pa-wrapper`: Wrapper API
+
+`pa-wrapper` contains a unified API to a number of aligners:
+
+A\*PA, Block Aligner, Edlib, Ksw2, Parasail, Triple Accel, [Bi]Wfa
+
+Create an [`AlignerParams`](./pa-wrapper/src/lib.rs) object and call
+`build_aligner()` on it to obtain an instance of an aligner, on which `.align()`
+can be called repeatedly.
+
+<details><summary>Adding an aligner</summary>
+To add an aligner, update `pa-wrapper/Cargo.toml` and `pa-wrapper/src/lib.rs`,
+and add a new file `pa-wrapper/src/wrappers/<name>.rs`. Remember to crash the program for unsupported parameter
+configurations!
+
+</details>
+
+## `pa-bin`: Unified binary
+
+Use `cargo run --bin pa-bin -- <arguments> input/file/or/dir.{txt,seq,fa}` to run any of the supported aligners
+on some input.
+
+<details><summary>Succinct help of pa-bin (see --help for more):</summary>
+
+```text
+CLI tool that wraps other aligners and runs them on the given input
+
+Usage: pa-bin [OPTIONS] <--aligner <ALIGNER>|--params <PARAMS>|--params-file <PATH>|--print-params <ALIGNER>> [INPUT] [OUTPUT]
+
+Arguments:
+  [INPUT]   (Directory of) .seq, .txt, or Fasta files with sequence pairs to align
+  [OUTPUT]  Write a .csv of `{cost},{cigar}` lines. Defaults to input file with .csv extension
+
+Options:
+      --cost-only  Return only cost (no traceback)
+      --silent     Do not print anything to stderr
+  -h, --help       Print help (see more with '--help')
+
+Aligner:
+      --aligner <ALIGNER>       The aligner to use with default parameters [possible values: astar-nw, astar-pa,
+                                block-aligner, edlib, ksw2, triple-accel, wfa]
+      --params <PARAMS>         A specific aligner with parameters
+      --params-file <PATH>      File with aligner parameters
+      --print-params <ALIGNER>  Print default parameters for the given aligner [possible values: astar-nw, astar-pa,
+                                block-aligner, edlib, ksw2, triple-accel, wfa]
+      --json                    The parameters are json instead of yaml
+
+Cost model:
+      --sub <COST>     Substitution cost, (> 0) [default: 1]
+      --open <COST>    Gap open cost (>= 0) [default: 0]
+      --extend <COST>  Gap extend cost (> 0) [default: 1]
+```
+
+</details>
+
+The aligner to run can be specified with `--aligner <ALIGNER>` for default
+arguments, or `--params[-file]` to read a (yaml or json) string of parameters
+(from a file). Use `--print-params <ALIGNER>` to get default parameters that can
+be modified.
+
+## `pa-bench`: Benchmarking
+
+For benchmarking, see [input format](#input-format), [usage](#usage), and [quick start](#quick-start) below.
 
 Benchmarking is done using `job`s. Each job consists on an input dataset (a
 `.seq` file), a cost model, and a tool with parameters.
@@ -14,27 +82,22 @@ of jobs to run.
 
 Results are incrementally accumulated in a `json` _results_ file.
 
-## Repository layout
+### Quick start
 
-There are three crates:
+The easiest way to get started is probably to first clone (and fork) the repository.
+Then, you can copy either:
 
-- `pa-wrappers`: Wraps aligners using an `Aligner` trait.
-- `pa-bench-types`: Shared types for benchmarking.
-- `pa-bench`: Generates/downloads datasets, generates all jobs, and calls itself
-  recursively for each job to benchmark it.
+- The `evals/astarpa` directory with all experiments (`*.yaml`) and
+  analysis/plots (`evals.ipynb`) used in the A\*PA paper.
+- The `evals/astarpa-next` directory that specifically tests new versions of
+  A\*PA on some datasets of ultra long ONT reads of human data. This contains the
+  code to plot boxplots+swarmplots of the distribution of runtimes on a dataset.
+- Or you can modify/add experiments to `evals/experiments/` and use `evals/evals.ipynb`.
 
-## Adding an aligner
+If you think your experiments, analysis, and/or plots are generally useful and
+interesting, feel free to make a PR to add them here.
 
-The following files will need to be updated:
-
-- `pa-wrapper/Cargo.toml`
-- `pa-wrapper/src/lib.rs`
-
-Then, the wrapper implementation for the aligner should be put into a new file
-in `pa-wrapper/src/wrappers/<name>.rs`. Remember to crash the program for unsupported parameter
-configurations!
-
-## Benchmarking features
+### Benchmarking features
 
 **Main settings**
 
@@ -78,7 +141,7 @@ reused across experiments.
 - **Cost checking**: The cost returned by exact aligners is cross-validated. For
   inexact aligners, the fraction of correct results is computed.
 
-## Input format
+### Input format
 
 The input is specified as a `yaml` file containing:
 
@@ -141,7 +204,7 @@ algos:
   - !AstarPa
 ```
 
-## Usage
+### Usage
 
 1. Clone this repo and make sure you have Rust installed.
 2. Run `cargo run --release -- [--release] evals/experiments/test.yaml` from the root.
@@ -154,7 +217,7 @@ Results are written to `evals/results/test.json` and a cache of all (outdated)
 jobs for the current experiment is stored in `evals/results/test.cache.json` or
 at the provided `--cache`.
 
-Succinct help of `pa-bench bench -h` (run with `--help` for more):
+<details><summary>Succinct help of pa-bench (see --help for more):</summary>
 
 ```text
 Usage: pa-bench bench [OPTIONS] [EXPERIMENTS]...
@@ -183,22 +246,9 @@ Output:
       --stderr   Show stderr of runner process
 ```
 
-## Quick start
+</details>
 
-The easiest way to get started is probably to first clone (and fork) the repository.
-Then, you can copy either:
-
-- The `evals/astarpa` directory with all experiments (`*.yaml`) and
-  analysis/plots (`evals.ipynb`) used in the A\*PA paper.
-- The `evals/astarpa-next` directory that specifically tests new versions of
-  A\*PA on some datasets of ultra long ONT reads of human data. This contains the
-  code to plot boxplots+swarmplots of the distribution of runtimes on a dataset.
-- Or you can modify/add experiments to `evals/experiments/` and use `evals/evals.ipynb`.
-
-If you think your experiments, analysis, and/or plots are generally useful and
-interesting, feel free to make a PR to add them here.
-
-## Notes on benchmarking
+### Notes on benchmarking
 
 **Niceness.**
 Changing niceness to `-20` (the highest priority) requires running `pa-bench` as root. Alternatively, you could add the following line to
@@ -222,13 +272,13 @@ will crash and will report `Result: Err(Panic)`. Use `--no-pin` to avoid this.
 - disable power saving,
 - the laptop is fully charged and connected to power.
 
-## Datasets
+### Datasets
 
 Datasets are available in the [`datasets` release](https://github.com/pairwise-alignment/pa-bench/releases/tag/datasets).
 
 ## Code layout
 
-<!-- cargo depgraph --features parasailors  --include pa-wrapper,pa-bench,triple_accel,ksw2-sys,pa-generate,astarpa,edlib_rs,pa-types,pa-bench-types,rust-wfa2,wfa2-sys,parasailors --dedup-transitive-deps | dot -Tsvg > imgs/depgraph-small.svg -->
+<!-- cargo depgraph --features parasail --include pa-bin,pa-wrapper,pa-bench,triple_accel,ksw2-sys,pa-generate,astarpa,edlib_rs,pa-types,pa-bench-types,rust-wfa2,wfa2-sys,parasailors --dedup-transitive-deps | dot -Tsvg > imgs/depgraph-small.svg -->
 
 ![Dependency graph](imgs/depgraph-small.svg)
 
@@ -236,9 +286,10 @@ From low-level to higher, the following crates are relevant:
 
 - `pa-types`: Basic pairwise alignment types such as `Seq`, `Pos`, `Cost` and `Cigar`.
 - `pa-generate`: A utility to generate sequence pairs with various kinds or error types.
-- `pa-wrapper` contains an `Aligner` trait and implements this uniform interface
+- `pa-wrapper` contains an `AlignerTrait` and implements this uniform interface
   for all aligners. Each aligner is behind a feature flag. Parasailors is
   disabled by default do reduce the otherwise large build time.
+- `pa-bin` is a thin binary/CLI around `pa-wrappers`.
 - `pa-bench-types` contains the definition of a `Experiment`, `Dataset`, `Job`,
   `JobResult`, and the `AlgorithmParams` enum that selects the algorithm to run
   and its parameters. This causes `pa-bench-types` to have dependencies on

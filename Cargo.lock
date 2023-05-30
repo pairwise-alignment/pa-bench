@@ -1449,7 +1449,7 @@ dependencies = [
 [[package]]
 name = "pa-types"
 version = "0.1.0"
-source = "git+https://github.com/pairwise-alignment/pa-types#dda50dbb3b8083db27e11c36e4b5be0eb0c09d08"
+source = "git+https://github.com/pairwise-alignment/pa-types#39f6823d4d0803d92744729088a09dd297efbb63"
 dependencies = [
  "clap",
  "derive_more",
@@ -2441,7 +2441,7 @@ name = "wfa2-sys"
 version = "0.1.0"
 source = "git+https://github.com/pairwise-alignment/rust-wfa2#ed86f6831179cfd3cdd4a1c8c764c47c1fc3c028"
 dependencies = [
- "bindgen 0.63.0",
+ "bindgen 0.65.1",
  "cmake 0.1.50",
 ]
 
