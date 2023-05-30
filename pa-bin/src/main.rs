@@ -52,8 +52,8 @@ struct AlignerArgs {
     #[clap(long, value_name = "ALIGNER")]
     aligner: Option<Aligner>,
 
-    /// A specific aligner with parameters.
-    #[clap(long, value_name = "PARAMS")]
+    /// Yaml/json string of aligner parameters.
+    #[clap(long, value_name = "STRING")]
     params: Option<String>,
 
     /// File with aligner parameters.

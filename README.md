@@ -50,7 +50,7 @@ Options:
 Aligner:
       --aligner <ALIGNER>       The aligner to use with default parameters [possible values: astar-nw, astar-pa,
                                 block-aligner, edlib, ksw2, triple-accel, wfa]
-      --params <PARAMS>         A specific aligner with parameters
+      --params <PARAMS>         Yaml/json string of aligner parameters
       --params-file <PATH>      File with aligner parameters
       --print-params <ALIGNER>  Print default parameters for the given aligner [possible values: astar-nw, astar-pa,
                                 block-aligner, edlib, ksw2, triple-accel, wfa]
