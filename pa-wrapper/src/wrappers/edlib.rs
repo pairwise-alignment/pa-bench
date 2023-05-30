@@ -8,7 +8,7 @@ pub struct Edlib {
     config: EdlibAlignConfigRs<'static>,
 }
 
-impl AlignerParams for EdlibParams {
+impl AlignerParamsTrait for EdlibParams {
     type Aligner = Edlib;
 
     fn build(
@@ -33,7 +33,7 @@ impl AlignerParams for EdlibParams {
     }
 }
 
-impl Aligner for Edlib {
+impl AlignerTrait for Edlib {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let result = edlibAlignRs(a, b, &self.config);
         assert!(result.status == EDLIB_RS_STATUS_OK);

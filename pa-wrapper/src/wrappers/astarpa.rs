@@ -7,7 +7,16 @@ pub struct AstarPaParams {
     pub heuristic: astarpa::HeuristicParams,
 }
 
-impl AlignerParams for AstarPaParams {
+impl Default for AstarPaParams {
+    fn default() -> Self {
+        Self {
+            diagonal_transition: true,
+            heuristic: astarpa::HeuristicParams::default(),
+        }
+    }
+}
+
+impl AlignerParamsTrait for AstarPaParams {
     type Aligner = Box<dyn AstarStatsAligner>;
 
     fn build(
@@ -31,7 +40,7 @@ impl AlignerParams for AstarPaParams {
     }
 }
 
-impl Aligner for Box<dyn AstarStatsAligner> {
+impl AlignerTrait for Box<dyn AstarStatsAligner> {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let ((cost, cigar), stats) = AstarStatsAligner::align(self.as_mut(), a, b);
         let mut s = AlignerStats::default();

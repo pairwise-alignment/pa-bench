@@ -1,4 +1,4 @@
-use pa_wrapper::{AlignerStats, WrappedAlignerParams};
+use pa_wrapper::{AlignerParams, AlignerStats};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -114,7 +114,7 @@ pub struct Job {
     /// Return the full alignment/cigar?
     pub traceback: bool,
     /// The algorithm/parameters to use.
-    pub algo: WrappedAlignerParams,
+    pub algo: AlignerParams,
 }
 
 impl Job {

@@ -23,8 +23,8 @@ pub mod wrappers {
 }
 
 /// Parameters for an aligner, with a `new` method to instantiate the aligner.
-pub trait AlignerParams {
-    type Aligner: Aligner;
+trait AlignerParamsTrait {
+    type Aligner: AlignerTrait;
 
     /// Instantiate the aligner with a configuration.
     fn build(
@@ -43,7 +43,7 @@ pub trait AlignerParams {
 pub type AlignerStats = HashMap<String, f64>;
 
 /// Generic pairwise global alignment interface.
-pub trait Aligner {
+pub trait AlignerTrait {
     /// An alignment of sequences `a` and `b`.
     /// The returned cost is the *non-negative* cost of the alignment.
     /// Returns a trace when specified on construction of the aligner.
@@ -51,8 +51,10 @@ pub trait Aligner {
 }
 
 /// Which algorithm to run and benchmark, along with algorithm-specific parameters.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub enum WrappedAlignerParams {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, strum::EnumDiscriminants)]
+#[strum_discriminants(name(Aligner))]
+#[strum_discriminants(derive(clap::ValueEnum))]
+pub enum AlignerParams {
     #[cfg(feature = "astarpa")]
     AstarNW(pa_base_algos::nw::AstarNwParams),
     #[cfg(feature = "astarpa")]
@@ -72,15 +74,41 @@ pub enum WrappedAlignerParams {
     // Add more algorithms here!
 }
 
-impl WrappedAlignerParams {
+impl Aligner {
+    pub fn default_params(&self) -> AlignerParams {
+        use AlignerParams::*;
+        match self {
+            #[cfg(feature = "astarpa")]
+            Aligner::AstarNW => AstarNW(Default::default()),
+            #[cfg(feature = "astarpa")]
+            Aligner::AstarPA => AstarPA(Default::default()),
+            #[cfg(feature = "block_aligner")]
+            Aligner::BlockAligner => BlockAligner(Default::default()),
+            #[cfg(feature = "edlib")]
+            Aligner::Edlib => Edlib(Default::default()),
+            #[cfg(feature = "ksw2")]
+            Aligner::Ksw2 => Ksw2(Default::default()),
+            #[cfg(feature = "parasail")]
+            Aligner::ParasailStriped => ParasailStriped(Default::default()),
+            #[cfg(feature = "triple_accel")]
+            Aligner::TripleAccel => TripleAccel(Default::default()),
+            #[cfg(feature = "wfa")]
+            Aligner::Wfa => Wfa(Default::default()),
+        }
+    }
+}
+
+impl AlignerParams {
     /// Get an instance of the corresponding wrapper based on the algorithm.
+    ///
+    /// The bool indicates whether the aligner is exact.
     pub fn build_aligner(
         &self,
         cm: CostModel,
         trace: bool,
         max_len: usize,
-    ) -> (Box<dyn Aligner>, bool) {
-        use WrappedAlignerParams::*;
+    ) -> (Box<dyn AlignerTrait>, bool) {
+        use AlignerParams::*;
         let params: &dyn TypeErasedAlignerParams = match self {
             #[cfg(feature = "astarpa")]
             AstarNW(params) => params,
@@ -122,16 +150,16 @@ trait TypeErasedAlignerParams {
         cm: CostModel,
         trace: bool,
         max_len: usize,
-    ) -> Result<Box<dyn Aligner>, &'static str>;
+    ) -> Result<Box<dyn AlignerTrait>, &'static str>;
     fn is_exact(&self) -> bool;
 }
-impl<A: Aligner + 'static, T: AlignerParams<Aligner = A>> TypeErasedAlignerParams for T {
+impl<A: AlignerTrait + 'static, T: AlignerParamsTrait<Aligner = A>> TypeErasedAlignerParams for T {
     fn build(
         &self,
         cm: CostModel,
         trace: bool,
         max_len: usize,
-    ) -> Result<Box<dyn Aligner>, &'static str> {
+    ) -> Result<Box<dyn AlignerTrait>, &'static str> {
         Ok(Box::new(self.build(cm, trace, max_len)?))
     }
     fn is_exact(&self) -> bool {

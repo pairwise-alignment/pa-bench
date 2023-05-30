@@ -2,7 +2,7 @@ use pa_base_algos::nw::AstarNwParams;
 
 use crate::*;
 
-impl AlignerParams for AstarNwParams {
+impl AlignerParamsTrait for AstarNwParams {
     type Aligner = Box<dyn pa_types::Aligner>;
 
     fn build(
@@ -22,7 +22,7 @@ impl AlignerParams for AstarNwParams {
     }
 }
 
-impl Aligner for Box<dyn pa_types::Aligner> {
+impl AlignerTrait for Box<dyn pa_types::Aligner> {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let (cost, cigar) = pa_types::Aligner::align(self.as_mut(), a, b);
         (cost, cigar, AlignerStats::default())

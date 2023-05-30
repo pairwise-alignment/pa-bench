@@ -9,7 +9,7 @@ pub struct TripleAccel {
     trace: bool,
 }
 
-impl AlignerParams for TripleAccelParams {
+impl AlignerParamsTrait for TripleAccelParams {
     type Aligner = TripleAccel;
 
     fn build(
@@ -35,7 +35,7 @@ impl AlignerParams for TripleAccelParams {
     }
 }
 
-impl Aligner for TripleAccel {
+impl AlignerTrait for TripleAccel {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let (cost, edits) =
             ::triple_accel::levenshtein::levenshtein_exp_with_opts(a, b, self.trace, self.costs);

@@ -12,6 +12,14 @@ pub struct BlockAlignerParams {
     pub size: BlockAlignerSize,
 }
 
+impl Default for BlockAlignerParams {
+    fn default() -> Self {
+        Self {
+            size: BlockAlignerSize::Size(64, 4096),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum BlockAlignerSize {
     Size(usize, usize),
@@ -33,7 +41,7 @@ pub struct BlockAligner {
     s: ScoreModel,
 }
 
-impl AlignerParams for BlockAlignerParams {
+impl AlignerParamsTrait for BlockAlignerParams {
     type Aligner = BlockAligner;
 
     fn build(
@@ -79,7 +87,7 @@ impl AlignerParams for BlockAlignerParams {
     }
 }
 
-impl Aligner for BlockAligner {
+impl AlignerTrait for BlockAligner {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let max_len = a.len().max(b.len());
         let size = match self.params.size {

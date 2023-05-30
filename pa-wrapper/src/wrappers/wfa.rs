@@ -37,7 +37,7 @@ pub struct Wfa {
     aligner: WFAligner,
 }
 
-impl AlignerParams for WfaParams {
+impl AlignerParamsTrait for WfaParams {
     type Aligner = Wfa;
 
     fn build(
@@ -74,7 +74,7 @@ impl AlignerParams for WfaParams {
     }
 }
 
-impl Aligner for Wfa {
+impl AlignerTrait for Wfa {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let status = self.aligner.align_end_to_end(a, b);
         assert_eq!(status, AlignmentStatus::StatusSuccessful);

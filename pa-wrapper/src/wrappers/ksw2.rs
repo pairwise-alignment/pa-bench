@@ -46,7 +46,7 @@ pub struct Ksw2 {
     extend: i8,
 }
 
-impl AlignerParams for Ksw2Params {
+impl AlignerParamsTrait for Ksw2Params {
     type Aligner = Ksw2;
     fn build(
         &self,
@@ -83,7 +83,7 @@ impl AlignerParams for Ksw2Params {
     }
 }
 
-impl Aligner for Ksw2 {
+impl AlignerTrait for Ksw2 {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
         let a_mapped: Vec<u8> = a.iter().map(|x| self.encoding[*x as usize]).collect();
         let b_mapped: Vec<u8> = b.iter().map(|x| self.encoding[*x as usize]).collect();
