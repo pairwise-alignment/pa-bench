@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "pa-wrapper",
-    "pa-wrapper-bin",
+    "pa-bin",
     "pa-bench-types",
     "pa-bench",
 ]

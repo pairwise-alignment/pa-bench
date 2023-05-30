@@ -1,0 +1,29 @@
+[package]
+name = "pa-bin"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bio = "1.1.0"
+clap = { version = "4.3.0", features = ["derive"] }
+itertools = "0.10.5"
+pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
+pa-wrapper = { version = "0.1.0", path = "../pa-wrapper" }
+serde_json = "1.0.96"
+serde_yaml = "0.9.21"
+
+
+[features]
+astarpa = ["pa-wrapper/astarpa"]
+block_aligner = ["pa-wrapper/block_aligner"]
+edlib = ["pa-wrapper/edlib"]
+ksw2 = ["pa-wrapper/ksw2"]
+parasail = ["pa-wrapper/parasail"]
+triple_accel = ["pa-wrapper/triple_accel"]
+wfa = ["pa-wrapper/wfa"]
+
+# Modify this locally as needed.
+# Parasail is excluded by default because of slow compile times.
+default = ["astarpa", "block_aligner", "edlib", "triple_accel", "wfa", "ksw2"]
