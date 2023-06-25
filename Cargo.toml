@@ -8,6 +8,9 @@ members = [
 resolver = "2"
 
 [profile.release]
-debug = true
-opt-level = 3
 lto = "thin"
+incremental = true
+# True can slow things down.
+debug = false
+#strip = true
+#panick = 'abort'
