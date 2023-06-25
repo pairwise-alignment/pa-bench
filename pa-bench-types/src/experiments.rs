@@ -91,12 +91,14 @@ impl Experiments {
             .flat_map(|product| {
                 let time_limit = time_limit
                     .unwrap_or(
-                        parse_duration::parse(&product.time_limit.unwrap_or("1m".into()))
+                        // 1 year 'infinite' time limit by default.
+                        parse_duration::parse(&product.time_limit.unwrap_or("1y".into()))
                             .expect("Could not parse time limit"),
                     )
                     .as_secs();
                 let mem_limit = mem_limit.unwrap_or(
-                    parse_bytes(&product.mem_limit.unwrap_or("1GiB".into()))
+                    // 1000 TiB 'infinite' memory limit by default.
+                    parse_bytes(&product.mem_limit.unwrap_or("1000TiB".into()))
                         .expect("Could not parse memory limit"),
                 );
                 let datasets = product
