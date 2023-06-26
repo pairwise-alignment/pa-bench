@@ -480,13 +480,19 @@ fn verify_costs(
             if output.is_exact {
                 if output.costs != reference_output.costs {
                     all_ok = false;
+                    let idx = output
+                        .costs
+                        .iter()
+                        .zip(&reference_output.costs)
+                        .position(|(&a, &b)| a != b)
+                        .unwrap();
                     // For exact jobs, simply check they give the same result.
                     eprintln!(
-                        "\nTwo exact algorithms returned different costs!\nJob 1: {:?}\nJob 2: {:?}\nCosts 1: {:?}\nCosts 2: {:?}\n",
+                        "\nTwo exact algorithms returned different costs!\nJob 1: {:?}\nJob 2: {:?}\nSequence idx {idx}\nCost 1: {:?}\nCost 2: {:?}\n",
                         result.job,
                         reference_result.job,
-                        output.costs,
-                        reference_output.costs,
+                        output.costs[idx],
+                        reference_output.costs[idx],
                     );
                 }
                 // Remove the costs from this output, since they are the same as the reference output above.
