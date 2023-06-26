@@ -53,10 +53,8 @@ pub struct Experiment {
 #[serde(deny_unknown_fields)]
 pub enum DatasetConfig {
     Generated(DatasetGeneratorConfig),
-    /// Path to a .seq file, relative to `--data-dir`.
-    File(PathBuf),
-    /// Scans all .seq files in the given directory, relative to `--data-dir`.
-    Directory(PathBuf),
+    /// A file, or all .seq files in the given directory, relative to `--data-dir`.
+    Path(PathBuf),
     /// Download `url`, and extract to `dir` relative to `--data-dir`.
     /// `url` must end in either `.zip` or `.tar.gz`.
     Download {
@@ -157,13 +155,13 @@ impl DatasetConfig {
 
         let (dir_stats_path, dataset) = match self {
             DatasetConfig::Generated(generator) => (None, generator.generate(data_dir, regenerate)),
-            DatasetConfig::File(path) => {
+            DatasetConfig::Path(path) => {
                 let path = data_dir.join(&path);
-                (None, vec![Dataset::File(path)])
-            }
-            DatasetConfig::Directory(dir) => {
-                let path = data_dir.join(&dir);
-                (Some(path.join("stats.json")), collect_dir(&path))
+                if path.is_dir() {
+                    (Some(path.join("stats.json")), collect_dir(&path))
+                } else {
+                    (None, vec![Dataset::File(path)])
+                }
             }
             DatasetConfig::Download { url, dir } => {
                 let target_dir = &data_dir.join("download").join(&dir);

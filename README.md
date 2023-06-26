@@ -163,9 +163,9 @@ datasets:
     - - AACCAGGGTACACCGACTAATCCACGCACAAGTTGGGGTC
       - ACAGGTACACCACTATCACGACAAGTTGGGTC
   # Path to a single .seq file, relative to `evals/data`
-  - !File path/to/sequences.seq
+  - !Path path/to/sequences.seq
   # Recursively finds all non-hidden .seq files in a directory, relative to `evals/data`
-  - !Directory path/to/directory
+  - !Path path/to/directory
   # Download and extract a zip file containing .seq files to `evals/data/download/{dir}`
   - !Download
     url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
