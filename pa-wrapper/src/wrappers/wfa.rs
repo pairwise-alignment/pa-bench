@@ -83,7 +83,7 @@ impl AlignerTrait for Wfa {
         let cigar = if cigar.is_empty() {
             None
         } else {
-            Some(Cigar::parse(&cigar, a, b))
+            Some(Cigar::parse_without_resolving(&cigar))
         };
         let cost = if self.cm.is_unit() { cost } else { -cost };
         (cost as _, cigar, AlignerStats::default())
