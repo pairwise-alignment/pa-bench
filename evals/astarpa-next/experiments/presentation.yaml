@@ -1,0 +1,166 @@
+- time_limit: 10000s
+  mem_limit: 32GiB
+  datasets:
+    - !Generated
+      seed: 31415
+      error_rates: [0.20]
+      error_models: [Uniform]
+      lengths: [5000]
+      total_size: 5000
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+    - !AstarNW
+      name: edlib
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 1
+      heuristic:
+        type: !GapCost
+      front: !Bit
+        sparse: false
+      viz: true
+    - !AstarNW
+      name: blocks
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 64
+      heuristic:
+        type: !GapCost
+      front: !Bit
+        sparse: false
+      viz: true
+    - !AstarNW
+      name: sparse
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 64
+      heuristic:
+        type: !GapCost
+      front: !Bit
+        sparse: true
+      viz: true
+    - !AstarNW
+      name: DT trace
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 64
+      heuristic:
+        type: !GapCost
+      front: !Bit
+        sparse: true
+        dt_trace: true
+      viz: true
+    - !AstarNW
+      name: incremental doubling
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 64
+      heuristic:
+        type: !GapCost
+      front: !Bit
+        sparse: true
+        dt_trace: true
+        incremental_doubling: true
+      viz: true
+    - !AstarNW
+      name: Sparse h
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 64
+      heuristic:
+        type: !GapCost
+      front: !Bit
+        sparse: true
+        dt_trace: true
+        incremental_doubling: true
+      sparse_h_calls: true
+      viz: true
+    # - !AstarNW
+    #   name: SIMD
+    #   domain: !Astar
+    #   strategy: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 64
+    #   heuristic:
+    #     type: !GapCost
+    #   front: !Bit
+    #     dt_trace: true
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #   sparse_h_calls: true
+    #   viz: true
+    # - !AstarNW
+    #   name: GCSH
+    #   domain: !Astar
+    #   strategy: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 64
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     r: 1
+    #   front: !Bit
+    #     dt_trace: true
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #   sparse_h_calls: true
+    #   viz: true
+    # - !AstarNW
+    #   name: local pruning
+    #   domain: !Astar
+    #   strategy: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 64
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #     p: 14
+    #   front: !Bit
+    #     dt_trace: true
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #   sparse_h_calls: true
+    #   viz: true
+    # - !AstarNW
+    #   name: pruning
+    #   domain: !Astar
+    #   strategy: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 64
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #     p: 14
+    #   front: !Bit
+    #     dt_trace: true
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: true
+    #   sparse_h_calls: true
+    #   prune: true
+    #   viz: true

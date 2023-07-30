@@ -1,18 +1,12 @@
-- comment: |
-    A*, Edlib, and Wfa on real sequencing data
-
-    The time limit is low and cuts of excessively slow A*PA runs, but sufficient
-    for most Edlib and Biff runs.
-  time_limit: 1s
+- time_limit: 10s
   mem_limit: 32GiB
   datasets:
-    # A*PA sets
-    # - !Download
-    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-    #   dir: astarpa/ont-ul-500k
-    # - !Download
-    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-    #   dir: astarpa/ont-minion-ul-500k
+    - !Path tmp/bam2seq_10kto20k
+    - !Path tmp/overlap_10kto20k
+    - !Path tmp/bam2seq_100kto200k
+    - !Path tmp/overlap_100kto200k
+    - !Path tmp/bam2seq_unrestricted
+    - !Path tmp/overlap_unrestricted
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
@@ -202,6 +196,8 @@
       name: "dt-trace"
       domain: !Astar
       strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
       block_width: 256
       heuristic:
         type: !GCSH
