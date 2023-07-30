@@ -1,0 +1,168 @@
+- time_limit: 100s
+  mem_limit: 32GiB
+  datasets:
+    - !Generated
+      seed: 31415
+      error_rates: [0.05, 0.15]
+      error_models: [Uniform]
+      lengths: [1000, 10000, 100000, 1000000]
+      total_size: 10000000
+  traces: [true]
+  costs:
+    - { sub: 1, open: 0, extend: 1 }
+  algos:
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 5
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 7
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 9
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 11
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 13
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 17
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 19
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 21
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 23
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 25
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 5
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 7
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 9
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 11
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 13
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 17
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 19
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 21
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 23
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 25
+        prune: !Both
