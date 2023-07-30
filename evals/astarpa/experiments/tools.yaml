@@ -54,6 +54,44 @@
         r: 1
         prune: !Both
 
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !SH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 2
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        prune: !Both
+
 - comment: |
     For high error rates 10% and 15%, use r=2.
   time_limit: 3h
