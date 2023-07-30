@@ -8,3 +8,5 @@ plots
 
 flamegraph.svg
 heaptrack*
+/perf.data
+/perf.data.old

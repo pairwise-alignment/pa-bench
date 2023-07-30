@@ -5,6 +5,8 @@ members = [
     "pa-bench-types",
     "pa-bench",
 ]
+# 'cargo run' runs 'pa-bench', not 'pa-bin'.
+default-members = ["pa-bench"]
 resolver = "2"
 
 [profile.release]
@@ -12,5 +14,5 @@ lto = "thin"
 incremental = true
 # True can slow things down.
 debug = false
-#strip = true
-#panick = 'abort'
+strip = true
+panick = 'abort'
