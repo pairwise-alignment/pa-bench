@@ -175,6 +175,6 @@ fn run_experiment(args: &Args, experiment: &Path) {
 
     for (job, _stats) in jobs {
         let output = run_job(args, job);
-        eprintln!("Job output:\n{output:?}");
+        eprintln!("{output:?}");
     }
 }
