@@ -147,3 +147,10 @@
         type: !GCSH
         r: 2
         prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        prune: !Both
