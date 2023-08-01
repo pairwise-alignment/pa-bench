@@ -315,8 +315,10 @@ fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<us
             existing_jobs_in_experiment
                 .iter()
                 .find(|existing_job| {
+                    // Skip running a job (again) if the same job succeeded before
                     existing_job.job.is_same_as(job)
                         && (existing_job.output.is_ok()
+                            // or failed with at least as many resources.
                             || (!args.rerun_failed
                                 && existing_job.job.has_more_resources_than(job)))
                 })
@@ -337,6 +339,11 @@ fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<us
     let mut job_results = run_with_threads(
         &current_exe,
         jobs,
+        if args.rerun_all {
+            None
+        } else {
+            Some(&existing_jobs_in_experiment)
+        },
         runner_cores,
         args.nice,
         args.stderr,
@@ -517,6 +524,8 @@ fn verify_costs(
 fn run_with_threads(
     runner: &Path,
     jobs: Vec<(Job, DatasetStats)>,
+    // used for skipping
+    existing_job_results: Option<&Vec<JobResult>>,
     cores: &Vec<usize>,
     nice: Option<i32>,
     show_stderr: bool,
@@ -552,7 +561,8 @@ fn run_with_threads(
                     // If a smaller job for the same algorithm failed, skip it.
                     let mut skip = None;
                     if job.dataset.is_generated() {
-                        for prev in job_results.lock().unwrap().iter() {
+                        for prev in job_results.lock().unwrap().iter()
+                                .chain(existing_job_results.unwrap_or(&vec![])) {
                             if prev.output.is_err()
                                 && prev.job.dataset.is_generated()
                                 && job.is_larger(&prev.job)
