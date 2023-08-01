@@ -23,6 +23,20 @@
         type: !GCSH
         prune: !Start
         r: 1
+        k: 7
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        r: 1
+        k: 9
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        r: 1
         k: 11
     - !AstarPA
       diagonal_transition: true
@@ -38,20 +52,6 @@
         prune: !Start
         r: 1
         k: 15
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        k: 17
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        k: 19
     - !AstarPA
       diagonal_transition: true
       heuristic:
