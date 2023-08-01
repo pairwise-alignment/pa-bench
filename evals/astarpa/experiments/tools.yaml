@@ -114,6 +114,44 @@
       diagonal_transition: false
       heuristic:
         type: !SH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 1
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !SH
         r: 2
         prune: !Both
     - !AstarPA
@@ -146,11 +184,4 @@
       heuristic:
         type: !GCSH
         r: 2
-        prune: !Both
-
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        r: 1
         prune: !Both
