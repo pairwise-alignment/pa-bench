@@ -1,8 +1,8 @@
 - comment: |
-    Scaling with error rate with k=10
+    Scaling with error rate with k=15
 
     This runs in around 1 hour in total.
-  time_limit: 200s
+  time_limit: 1000s
   mem_limit: 32GiB
   datasets:
     - !Generated
@@ -29,15 +29,9 @@
           0.18,
           0.19,
           0.20,
-          0.21,
-          0.22,
-          0.23,
-          0.24,
-          0.25,
-          0.26,
         ]
       error_models: [Uniform]
-      lengths: [10000]
+      lengths: [100000]
       total_size: 1000000
   traces: [true]
   costs:
@@ -64,6 +58,20 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
+        type: !CSH
+        r: 1
+        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
         type: !GCSH
         r: 1
         k: 15
@@ -79,19 +87,17 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
+        type: !CSH
+        r: 2
+        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
         type: !GCSH
         r: 2
         k: 15
         prune: !Both
-
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        r: 1
-        k: 15
-        prune: !Both
-
     - !AstarPA
       diagonal_transition: true
       heuristic:
