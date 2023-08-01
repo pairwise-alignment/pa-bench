@@ -32,6 +32,18 @@
         prune: !None
         r: 1
         k: 15
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GapCost
+        r: 0
+        k: 15
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !Frequency
+        r: 0
+        k: 15
 - comment: |
     Fast tools with total size 10^8.
   time_limit: 1h
