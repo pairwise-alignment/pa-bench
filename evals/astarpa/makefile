@@ -2,13 +2,19 @@
 # use a separate cache because timings work out slightly differently.
 run:
 	cargo build --release --no-default-features
-	cd ../../ && cargo run --release -- --release evals/astarpa/experiments/{tools,scaling_n,scaling_e,real,memory}.yaml --cache evals/astarpa/results/cache.json
-	cd ../../ && cargo run --release -- --release evals/astarpa/experiments/{timing,timing_real}.yaml --cache evals/astarpa/results/timing_real.cache.json
+    # Note: this one runs in parallel, unlike the others, to speed things up a bit.
+	cd ../../ && cargo run --release -- bench -j=5 --nice=-20 evals/astarpa/experiments/{params,params_real}.yaml --cache evals/astarpa/results/cache_params.json
+	cd ../../ && cargo run --release -- bench --release evals/astarpa/experiments/{scaling_n,scaling_e,real,memory,timing,timing_real,tools}.yaml --cache evals/astarpa/results/cache.json
 
 run_release: cpu-freq prep run
 
+build_plots:
+	rm -f plots/*
+	jupyter execute evals.ipynb
+
 export_plots:
-	cp -r plots/* ../../../../astarpa-paper/plots/
+	rm -f ../../../../astarpa-paper/plots/*.pdf
+	cp -r plots/*.pdf ../../../../astarpa-paper/plots/
 
 # NOTE: BIOS settings used:
 # - no hyperthreading
