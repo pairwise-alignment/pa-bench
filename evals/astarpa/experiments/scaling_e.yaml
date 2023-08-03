@@ -105,3 +105,69 @@
         r: 2
         k: 15
         prune: !Both
+
+    - !AstarNW
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 256
+      heuristic:
+        type: !None
+        prune: !Start
+        k: 15
+        r: 1
+        p: 14
+      front: !Bit
+        sparse: true
+        simd: true
+        incremental_doubling: true
+        dt_trace: true
+        max_g: 40
+        drop: 20
+      sparse_h_calls: true
+      prune: true
+
+    - !AstarNW
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 256
+      heuristic:
+        type: !SH
+        prune: !Start
+        k: 15
+        r: 1
+        p: 14
+      front: !Bit
+        sparse: true
+        simd: true
+        incremental_doubling: true
+        dt_trace: true
+        max_g: 40
+        drop: 20
+      sparse_h_calls: true
+      prune: true
+
+    - !AstarNW
+      domain: !Astar
+      strategy: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 256
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        k: 15
+        r: 1
+        p: 14
+      front: !Bit
+        sparse: true
+        simd: true
+        incremental_doubling: true
+        dt_trace: true
+        max_g: 40
+        drop: 20
+      sparse_h_calls: true
+      prune: true

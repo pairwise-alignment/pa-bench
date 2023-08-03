@@ -1,5 +1,4 @@
-- comment: |
-    Slow tools (dijkstra, A* without pruning) with total size 10^6.
+- comment: "5%; slow"
   time_limit: 1h
   mem_limit: 32GiB
   datasets:
@@ -7,7 +6,7 @@
       seed: 31415
       error_rates: [0.05]
       error_models: [Uniform]
-      lengths: [1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+      lengths: [3000, 10000, 30000, 100000, 300000, 1000000]
       total_size: 1000000
   traces: [true]
   costs:
@@ -28,14 +27,7 @@
     - !AstarPA
       diagonal_transition: false
       heuristic:
-        type: !SH
-        prune: !None
-        r: 1
-        k: 15
-    - !AstarPA
-      diagonal_transition: false
-      heuristic:
-        type: !GapCost
+        type: !Gap
         r: 0
         k: 15
     - !AstarPA
@@ -44,8 +36,14 @@
         type: !Frequency
         r: 0
         k: 15
-- comment: |
-    Fast tools with total size 10^8.
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !SH
+        prune: !None
+        r: 1
+        k: 15
+- comment: "5%; fast"
   time_limit: 1h
   mem_limit: 32GiB
   datasets:
@@ -53,8 +51,7 @@
       seed: 31415
       error_rates: [0.05]
       error_models: [Uniform]
-      lengths:
-        [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+      lengths: [3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
       total_size: 10000000
   traces: [true]
   costs:
@@ -68,14 +65,37 @@
       heuristic:
         type: !SH
         r: 1
-        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 1
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 1
         prune: !Both
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !GCSH
         r: 1
-        k: 15
         prune: !Both
 
     - !AstarPA
@@ -83,12 +103,143 @@
       heuristic:
         type: !SH
         r: 2
-        k: 15
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 2
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 2
         prune: !Both
     - !AstarPA
       diagonal_transition: true
       heuristic:
         type: !GCSH
         r: 2
-        k: 15
+        prune: !Both
+
+- comment: "15%; fast"
+  time_limit: 3h
+  mem_limit: 32GiB
+  datasets:
+    - !Generated
+      seed: 31415
+      error_rates: [0.15]
+      error_models: [Uniform]
+      lengths: [3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+      total_size: 10000000
+  traces: [true]
+  costs:
+    - { sub: 1, open: 0, extend: 1 }
+  algos:
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !SH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 2
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 2
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        prune: !Both
+
+    - !Edlib
+    - !Wfa
+
+- comment: "15%; slow"
+  time_limit: 1h
+  mem_limit: 32GiB
+  datasets:
+    - !Generated
+      seed: 31415
+      error_rates: [0.15]
+      error_models: [Uniform]
+      lengths: [3000, 10000, 30000, 100000, 300000, 1000000]
+      total_size: 1000000
+  traces: [true]
+  costs:
+    - { sub: 1, open: 0, extend: 1 }
+  algos:
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !SH
+        r: 1
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !GCSH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !SH
+        r: 1
+        prune: !Both
+
+    - !AstarPA
+      diagonal_transition: false
+      heuristic:
+        type: !CSH
+        r: 1
+        prune: !Both
+    - !AstarPA
+      diagonal_transition: true
+      heuristic:
+        type: !CSH
+        r: 1
         prune: !Both
