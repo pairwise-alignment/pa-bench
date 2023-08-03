@@ -110,7 +110,6 @@ dependencies = [
 [[package]]
 name = "astarpa"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#a98f5a9307fd0eb0aae8d8e5e0060193c0967fad"
 dependencies = [
  "bio",
  "clap",
@@ -185,7 +184,7 @@ dependencies = [
  "regex",
  "rustc-hash",
  "shlex",
- "syn 2.0.27",
+ "syn 2.0.28",
  "which",
 ]
 
@@ -428,7 +427,7 @@ dependencies = [
  "heck",
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -590,6 +589,12 @@ name = "custom_derive"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
+
+[[package]]
+name = "deranged"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8810e7e2cf385b1e9b50d68264908ec367ba642c96d02edfe61c39e88e2a3c01"
 
 [[package]]
 name = "derive-new"
@@ -1010,9 +1015,9 @@ checksum = "ef53942eb7bf7ff43a617b3e2c1c4a5ecf5944a7c1bc12d7ee39bbb15e5c1519"
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.4.3"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09fc20d2ca12cb9f044c93e3bd6d32d523e6e2ec3db4f7b2939cd99026ecd3f0"
+checksum = "57bcfdad1b858c2db7c38303a6d2ad4dfaf5eb53dfeb0910128b2c26d6158503"
 
 [[package]]
 name = "log"
@@ -1294,7 +1299,6 @@ dependencies = [
 [[package]]
 name = "pa-affine-types"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#a98f5a9307fd0eb0aae8d8e5e0060193c0967fad"
 dependencies = [
  "pa-types",
 ]
@@ -1302,7 +1306,6 @@ dependencies = [
 [[package]]
 name = "pa-base-algos"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#a98f5a9307fd0eb0aae8d8e5e0060193c0967fad"
 dependencies = [
  "clap",
  "itertools 0.10.5",
@@ -1382,7 +1385,6 @@ dependencies = [
 [[package]]
 name = "pa-bitpacking"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#a98f5a9307fd0eb0aae8d8e5e0060193c0967fad"
 dependencies = [
  "bio",
  "itertools 0.10.5",
@@ -1406,7 +1408,6 @@ dependencies = [
 [[package]]
 name = "pa-heuristic"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#a98f5a9307fd0eb0aae8d8e5e0060193c0967fad"
 dependencies = [
  "bio",
  "clap",
@@ -1436,7 +1437,6 @@ dependencies = [
 [[package]]
 name = "pa-vis-types"
 version = "0.1.0"
-source = "git+https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner#a98f5a9307fd0eb0aae8d8e5e0060193c0967fad"
 dependencies = [
  "pa-affine-types",
  "pa-heuristic",
@@ -1569,7 +1569,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c64d9ba0963cdcea2e1b2230fbae2bab30eb25a174be395c41e764bfb65dd62"
 dependencies = [
  "proc-macro2",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -1806,7 +1806,7 @@ dependencies = [
  "bitflags 2.3.3",
  "errno",
  "libc",
- "linux-raw-sys 0.4.3",
+ "linux-raw-sys 0.4.5",
  "windows-sys 0.48.0",
 ]
 
@@ -1896,22 +1896,22 @@ checksum = "d4f410fedcf71af0345d7607d246e7ad15faaadd49d240ee3b24e5dc21a820ac"
 
 [[package]]
 name = "serde"
-version = "1.0.178"
+version = "1.0.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60363bdd39a7be0266a520dab25fdc9241d2f987b08a01e01f0ec6d06a981348"
+checksum = "0ea67f183f058fe88a4e3ec6e2788e003840893b91bac4559cabedd00863b3ed"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.178"
+version = "1.0.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f28482318d6641454cb273da158647922d1be6b5a2fcc6165cd89ebdd7ed576b"
+checksum = "24e744d7782b686ab3b73267ef05697159cc0e5abbed3f47f9933165e5219036"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -2072,9 +2072,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.27"
+version = "2.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b60f673f44a8255b9c8c657daf66a596d435f2da81a555b06dc644d080ba45e0"
+checksum = "04361975b3f5e348b2189d8dc55bc942f278b2d482a6a0365de5bdd62d351567"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2119,15 +2119,16 @@ checksum = "090198534930841fab3a5d1bb637cde49e339654e606195f8d9c76eeb081dc96"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
 name = "time"
-version = "0.3.23"
+version = "0.3.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59e399c068f43a5d116fedaf73b203fa4f9c519f17e2b34f63221d3792f81446"
+checksum = "b79eabcd964882a646b3584543ccabeae7869e9ac32a46f6f22b7a5bd405308b"
 dependencies = [
+ "deranged",
  "serde",
  "time-core",
 ]
@@ -2299,7 +2300,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
  "wasm-bindgen-shared",
 ]
 
@@ -2321,7 +2322,7 @@ checksum = "54681b18a46765f095758388f2d0cf16eb8d4169b639ab575a8f5693af210c7b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
