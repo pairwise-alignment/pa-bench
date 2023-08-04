@@ -38,5 +38,10 @@ prep:
 
 zip_results:
 	zip results.zip results/*.json
-unzip_results:
+
+# Download the results from the github release and unzip them.
+# See readme for more.
+download_results:
+	wget 'https://github.com/pairwise-alignment/pa-bench/releases/download/astarpa-evals/results.zip'
 	unzip results.zip
+	rm results.zip
