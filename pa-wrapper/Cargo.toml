@@ -17,6 +17,7 @@ pa-types = { git = "https://github.com/pairwise-alignment/pa-types" }
 triple_accel = { git = "https://github.com/Daniel-Liu-c0deb0t/triple_accel", optional = true}
 
 astarpa = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", optional = true, default-features = false }
+astarpa2 = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", optional = true, default-features = false }
 pa-base-algos = { git = "https://github.com/RagnarGrootKoerkamp/astar-pairwise-aligner", optional = true, default-features = false }
 # astarpa = { path = "../../../astarpa/astarpa", optional = true, default-features = false }
 # pa-base-algos = { path = "../../../astarpa/pa-base-algos", optional = true, default-features = false }
@@ -47,4 +48,4 @@ wfa = ["dep:rust-wfa2"]
 
 # Modify this locally as needed.
 # Parasail is excluded by default because of slow compile times.
-default = ["astarpa", "block_aligner", "edlib", "triple_accel", "wfa", "ksw2"]
+default = ["astarpa", "astarpa2", "block_aligner", "edlib", "triple_accel", "wfa", "ksw2"]

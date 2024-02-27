@@ -5,9 +5,9 @@ use pa_types::*;
 
 pub mod wrappers {
     #[cfg(feature = "astarpa")]
-    pub mod astarnw;
-    #[cfg(feature = "astarpa")]
     pub mod astarpa;
+    #[cfg(feature = "astarpa2")]
+    pub mod astarpa2;
     #[cfg(feature = "block_aligner")]
     pub mod block_aligner;
     #[cfg(feature = "edlib")]
@@ -56,9 +56,9 @@ pub trait AlignerTrait {
 #[strum_discriminants(derive(clap::ValueEnum))]
 pub enum AlignerParams {
     #[cfg(feature = "astarpa")]
-    AstarNW(pa_base_algos::nw::AstarNwParams),
-    #[cfg(feature = "astarpa")]
     AstarPA(wrappers::astarpa::AstarPaParams),
+    #[cfg(feature = "astarpa2")]
+    AstarPa2(wrappers::astarpa2::AstarPa2Params),
     #[cfg(feature = "block_aligner")]
     BlockAligner(wrappers::block_aligner::BlockAlignerParams),
     #[cfg(feature = "edlib")]
@@ -79,9 +79,9 @@ impl Aligner {
         use AlignerParams::*;
         match self {
             #[cfg(feature = "astarpa")]
-            Aligner::AstarNW => AstarNW(Default::default()),
-            #[cfg(feature = "astarpa")]
             Aligner::AstarPA => AstarPA(Default::default()),
+            #[cfg(feature = "astarpa2")]
+            Aligner::AstarPa2 => AstarPa2(Default::default()),
             #[cfg(feature = "block_aligner")]
             Aligner::BlockAligner => BlockAligner(Default::default()),
             #[cfg(feature = "edlib")]
@@ -111,9 +111,9 @@ impl AlignerParams {
         use AlignerParams::*;
         let params: &dyn TypeErasedAlignerParams = match self {
             #[cfg(feature = "astarpa")]
-            AstarNW(params) => params,
-            #[cfg(feature = "astarpa")]
             AstarPA(params) => params,
+            #[cfg(feature = "astarpa")]
+            AstarPa2(params) => params,
             #[cfg(feature = "block_aligner")]
             BlockAligner(params) => params,
             #[cfg(feature = "edlib")]

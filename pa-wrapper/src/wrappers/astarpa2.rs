@@ -1,8 +1,8 @@
-use pa_base_algos::nw::AstarNwParams;
+pub use astarpa2::AstarPa2Params;
 
 use crate::*;
 
-impl AlignerParamsTrait for AstarNwParams {
+impl AlignerParamsTrait for AstarPa2Params {
     type Aligner = Box<dyn pa_types::Aligner>;
 
     fn build(
