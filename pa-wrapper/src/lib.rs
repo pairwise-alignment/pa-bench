@@ -56,7 +56,7 @@ pub trait AlignerTrait {
 #[strum_discriminants(derive(clap::ValueEnum))]
 pub enum AlignerParams {
     #[cfg(feature = "astarpa")]
-    AstarPA(wrappers::astarpa::AstarPaParams),
+    AstarPa(wrappers::astarpa::AstarPaParams),
     #[cfg(feature = "astarpa2")]
     AstarPa2(wrappers::astarpa2::AstarPa2Params),
     #[cfg(feature = "block_aligner")]
@@ -79,7 +79,7 @@ impl Aligner {
         use AlignerParams::*;
         match self {
             #[cfg(feature = "astarpa")]
-            Aligner::AstarPA => AstarPA(Default::default()),
+            Aligner::AstarPa => AstarPa(Default::default()),
             #[cfg(feature = "astarpa2")]
             Aligner::AstarPa2 => AstarPa2(Default::default()),
             #[cfg(feature = "block_aligner")]
@@ -111,7 +111,7 @@ impl AlignerParams {
         use AlignerParams::*;
         let params: &dyn TypeErasedAlignerParams = match self {
             #[cfg(feature = "astarpa")]
-            AstarPA(params) => params,
+            AstarPa(params) => params,
             #[cfg(feature = "astarpa")]
             AstarPa2(params) => params,
             #[cfg(feature = "block_aligner")]
