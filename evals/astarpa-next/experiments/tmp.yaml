@@ -13,14 +13,14 @@
   algos:
     - !Wfa
     - !Edlib
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
         prune: !Start
     - !AstarNW
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 64
@@ -32,7 +32,7 @@
         sparse: false
     - !AstarNW
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -44,7 +44,7 @@
         sparse: true
     - !AstarNW
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -59,7 +59,7 @@
     - !AstarNW
       name: "sparse-h"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -74,7 +74,7 @@
     - !AstarNW
       name: "incremental-doubling"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -90,7 +90,7 @@
     - !AstarNW
       name: "new-profile"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -106,7 +106,7 @@
     - !AstarNW
       name: "trace"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -123,7 +123,7 @@
     - !AstarNW
       name: "local-pruning-5"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -141,7 +141,7 @@
     - !AstarNW
       name: "prune"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -159,7 +159,7 @@
     - !AstarNW
       name: "matches"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -177,7 +177,7 @@
     - !AstarNW
       name: "matches2"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -195,7 +195,7 @@
     - !AstarNW
       name: "dt-trace"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -216,7 +216,7 @@
     - !AstarNW
       name: "k12"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -240,7 +240,7 @@
     - !AstarNW
       name: "local-doubling"
       domain: !Astar
-      strategy: !LocalDoubling
+      doubling: !LocalDoubling
       block_width: 256
       heuristic:
         type: !GCSH

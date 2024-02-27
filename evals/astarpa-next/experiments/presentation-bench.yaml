@@ -16,7 +16,7 @@
     # - !AstarNW
     #   name: edlib
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 1
@@ -27,7 +27,7 @@
     # - !AstarNW
     #   name: blocks
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -38,7 +38,7 @@
     # - !AstarNW
     #   name: sparse
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -49,7 +49,7 @@
     # - !AstarNW
     #   name: DT trace
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -61,7 +61,7 @@
     # - !AstarNW
     #   name: incremental doubling
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -74,7 +74,7 @@
     # - !AstarNW
     #   name: Sparse h
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -88,7 +88,7 @@
     - !AstarNW
       name: SIMD
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
@@ -103,7 +103,7 @@
     # - !AstarNW
     #   name: GCSH
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -121,7 +121,7 @@
     # - !AstarNW
     #   name: local pruning
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64
@@ -140,7 +140,7 @@
     # - !AstarNW
     #   name: pruning
     #   domain: !Astar
-    #   strategy: !BandDoubling
+    #   doubling: !BandDoubling
     #     start: !H0
     #     factor: 2.0
     #   block_width: 64

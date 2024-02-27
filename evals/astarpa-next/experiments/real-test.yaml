@@ -55,7 +55,7 @@
     - !AstarNW
       name: "dt-trace"
       domain: !Astar
-      strategy: !BandDoubling
+      doubling: !BandDoubling
         start: !H0
         factor: 2.0
       block_width: 256
