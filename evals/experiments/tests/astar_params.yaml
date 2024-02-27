@@ -10,11 +10,11 @@
   costs: [{ sub: 1, open: 0, extend: 1 }]
   algos:
     - !Wfa
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !None
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH

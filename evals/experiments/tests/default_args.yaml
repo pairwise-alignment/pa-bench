@@ -3,7 +3,7 @@
   costs:
   algos:
     - !Wfa
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !None

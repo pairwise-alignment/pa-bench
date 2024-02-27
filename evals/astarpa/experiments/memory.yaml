@@ -16,38 +16,38 @@
   algos:
     - !Edlib
     - !Wfa
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 1
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
@@ -71,38 +71,38 @@
   algos:
     - !Edlib
     - !Wfa
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 2
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH

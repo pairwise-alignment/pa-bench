@@ -12,31 +12,31 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !None
         r: 0
         k: 15
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !None
         r: 0
         k: 15
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !Gap
         r: 0
         k: 15
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !Frequency
         r: 0
         k: 15
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
@@ -60,76 +60,76 @@
     - !Edlib
     - !Wfa
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 1
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
         r: 1
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 2
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
@@ -150,38 +150,38 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 2
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH
         r: 2
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
@@ -205,39 +205,39 @@
   costs:
     - { sub: 1, open: 0, extend: 1 }
   algos:
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         r: 1
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 1
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 1
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH

@@ -40,7 +40,7 @@
     - !Edlib
     - !Wfa
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !None
@@ -48,28 +48,28 @@
         k: 15
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 1
         k: 15
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 1
         k: 15
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 1
         k: 15
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
@@ -77,28 +77,28 @@
         k: 15
         prune: !Both
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         r: 2
         k: 15
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         r: 2
         k: 15
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         r: 2
         k: 15
         prune: !Both
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH

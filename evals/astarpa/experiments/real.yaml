@@ -20,33 +20,33 @@
     - !Edlib
     - !Wfa
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !SH
         prune: !Start
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !CSH
         prune: !Start
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: false
       heuristic:
         type: !GCSH
         prune: !Start
 
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !SH
         prune: !Start
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !CSH
         prune: !Start
-    - !AstarPA
+    - !AstarPa
       diagonal_transition: true
       heuristic:
         type: !GCSH
