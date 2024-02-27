@@ -15,4 +15,3 @@ incremental = true
 # True can slow things down.
 debug = false
 strip = true
-panick = 'abort'
