@@ -40,6 +40,10 @@ pub struct Args {
     /// Disable time and memory limit.
     #[arg(long)]
     no_limits: bool,
+
+    /// Also print Job.
+    #[arg(short, long)]
+    verbose: bool,
 }
 
 fn read_path<'a>(
@@ -85,6 +89,9 @@ pub fn main(args: Args) {
             .read_to_end(&mut stdin_job)
             .expect("Error in reading from stdin!");
         let job: Job = serde_json::from_slice(&stdin_job).expect("Error in parsing input json!");
+        if args.verbose {
+            eprintln!("{job:?}");
+        }
         let output = run_job(&args, job);
         println!("{}", serde_json::to_string(&output).unwrap());
     }
@@ -174,6 +181,9 @@ fn run_experiment(args: &Args, experiment: &Path) {
     let jobs = experiments.generate(&Path::new("evals/data"), false, None, None);
 
     for (job, _stats) in jobs {
+        if args.verbose {
+            eprintln!("{job:?}");
+        }
         let output = run_job(args, job);
         eprintln!("{output:?}");
     }
