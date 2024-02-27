@@ -542,6 +542,8 @@ fn run_with_threads(
         success: usize,
         unsupported: usize,
         skipped: usize,
+        timeout: usize,
+        panic: usize,
         failed: usize,
     }
 
@@ -599,27 +601,32 @@ fn run_with_threads(
 
                     let mut counts = counts.lock().unwrap();
                     counts.done += 1;
-                    if job_result.output.is_ok() {
-                        counts.success += 1;
-                    } else if skip == Some(JobError::Skipped) {
-                        counts.skipped += 1;
-                    } else if *job_result.output.as_ref().unwrap_err() == JobError::Unsupported {
-                        counts.unsupported += 1;
-                    } else if *job_result.output.as_ref().unwrap_err() != JobError::Interrupted {
-                        counts.failed += 1;
-                        if !verbose {
-                            eprintln!("\n Failed job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
+                    match (skip, &job_result.output) {
+                        (Some(JobError::Skipped), _) => counts.skipped += 1,
+                        (Some(JobError::Unsupported), _) => counts.unsupported += 1,
+                        (_, Ok(_)) => counts.success += 1,
+                        (_, Err(JobError::Timeout)) => counts.timeout += 1,
+                        (_, Err(JobError::Panic)) => counts.panic += 1,
+                        (_, Err(JobError::Interrupted)) => {}
+                        (_, Err(_)) => {
+                            counts.failed += 1;
+                            if !verbose {
+                                eprintln!("\n Failed job:\n{}\n Result: {:?}\n {:?}\n", serde_json::to_string(&job_result.job).unwrap(), job_result.output, job_result.resources);
+                            }
                         }
-                    };
+                    }
+
                     let Counts {
                         done,
                         success,
                         unsupported,
                         skipped,
+                        timeout,
+                        panic,
                         failed,
                     } = *counts;
                     {
-                        eprint!("\r Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Failed {failed:3}, Skipped {skipped}");
+                        eprint!("\r Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Timeout {timeout:3}, Panic {panic:3}, Failed {failed:3}, Skipped {skipped}");
                     }
 
                     // If the orchestrator was aborted, do not push failing job results.
