@@ -11,7 +11,7 @@
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
   algos:
-    - !AstarNW
+    - !AstarPa2
       name: edlib
       domain: !Astar
       doubling: !BandDoubling
@@ -23,7 +23,7 @@
       front: !Bit
         sparse: false
       viz: true
-    - !AstarNW
+    - !AstarPa2
       name: blocks
       domain: !Astar
       doubling: !BandDoubling
@@ -35,7 +35,7 @@
       front: !Bit
         sparse: false
       viz: true
-    - !AstarNW
+    - !AstarPa2
       name: sparse
       domain: !Astar
       doubling: !BandDoubling
@@ -47,7 +47,7 @@
       front: !Bit
         sparse: true
       viz: true
-    - !AstarNW
+    - !AstarPa2
       name: DT trace
       domain: !Astar
       doubling: !BandDoubling
@@ -60,7 +60,7 @@
         sparse: true
         dt_trace: true
       viz: true
-    - !AstarNW
+    - !AstarPa2
       name: incremental doubling
       domain: !Astar
       doubling: !BandDoubling
@@ -74,7 +74,7 @@
         dt_trace: true
         incremental_doubling: true
       viz: true
-    - !AstarNW
+    - !AstarPa2
       name: Sparse h
       domain: !Astar
       doubling: !BandDoubling
@@ -89,7 +89,7 @@
         incremental_doubling: true
       sparse_h_calls: true
       viz: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: SIMD
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -105,7 +105,7 @@
     #     incremental_doubling: true
     #   sparse_h_calls: true
     #   viz: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: GCSH
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -123,7 +123,7 @@
     #     incremental_doubling: true
     #   sparse_h_calls: true
     #   viz: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: local pruning
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -143,7 +143,7 @@
     #     incremental_doubling: true
     #   sparse_h_calls: true
     #   viz: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: pruning
     #   domain: !Astar
     #   doubling: !BandDoubling

@@ -13,7 +13,7 @@
   algos:
     # - !Edlib
     # - !Wfa
-    # - !AstarNW
+    # - !AstarPa2
     #   name: edlib
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -24,7 +24,7 @@
     #     type: !GapCost
     #   front: !Bit
     #     sparse: false
-    # - !AstarNW
+    # - !AstarPa2
     #   name: blocks
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -35,7 +35,7 @@
     #     type: !GapCost
     #   front: !Bit
     #     sparse: false
-    # - !AstarNW
+    # - !AstarPa2
     #   name: sparse
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -46,7 +46,7 @@
     #     type: !GapCost
     #   front: !Bit
     #     sparse: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: DT trace
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -58,7 +58,7 @@
     #   front: !Bit
     #     sparse: true
     #     dt_trace: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: incremental doubling
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -71,7 +71,7 @@
     #     sparse: true
     #     dt_trace: true
     #     incremental_doubling: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: Sparse h
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -85,7 +85,7 @@
     #     dt_trace: true
     #     incremental_doubling: true
     #   sparse_h_calls: true
-    - !AstarNW
+    - !AstarPa2
       name: SIMD
       domain: !Astar
       doubling: !BandDoubling
@@ -100,7 +100,7 @@
         simd: true
         incremental_doubling: true
       sparse_h_calls: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: GCSH
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -118,7 +118,7 @@
     #     simd: true
     #     incremental_doubling: true
     #   sparse_h_calls: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: local pruning
     #   domain: !Astar
     #   doubling: !BandDoubling
@@ -137,7 +137,7 @@
     #     simd: true
     #     incremental_doubling: true
     #   sparse_h_calls: true
-    # - !AstarNW
+    # - !AstarPa2
     #   name: pruning
     #   domain: !Astar
     #   doubling: !BandDoubling

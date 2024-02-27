@@ -25,7 +25,7 @@
     #     type: !GCSH
     #     prune: !Start
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "gapgap"
     #   domain: !GapGap
     #   heuristic:
@@ -39,7 +39,7 @@
     #     simd: false
     #     incremental_doubling: false
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "gapdist"
     #   domain: !Astar
     #   heuristic:
@@ -53,7 +53,7 @@
     #     simd: false
     #     incremental_doubling: false
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "blocks"
     #   domain: !Astar
     #   heuristic:
@@ -67,7 +67,7 @@
     #     simd: true
     #     incremental_doubling: false
 
-    - !AstarNW
+    - !AstarPa2
       name: "sparse_mem"
       domain: !Astar
       heuristic:
@@ -85,7 +85,7 @@
         simd: false
         incremental_doubling: false
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "sparse_h"
     #   domain: !Astar
     #   heuristic:
@@ -100,7 +100,7 @@
     #     incremental_doubling: false
     #   sparse_h_calls: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "simd"
     #   domain: !Astar
     #   heuristic:
@@ -115,7 +115,7 @@
     #     incremental_doubling: false
     #   sparse_h_calls: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "incrementaldoubling"
     #   domain: !Astar
     #   heuristic:
@@ -130,7 +130,7 @@
     #     incremental_doubling: false
     #   sparse_h_calls: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "dt-trace"
     #   domain: !Astar
     #   heuristic:
@@ -148,7 +148,7 @@
     #     drop: 20
     #   sparse_h_calls: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "SH"
     #   domain: !Astar
     #   heuristic:
@@ -169,7 +169,7 @@
     #     drop: 20
     #   sparse_h_calls: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "SH+prune"
     #   domain: !Astar
     #   heuristic:
@@ -191,7 +191,7 @@
     #   sparse_h_calls: true
     #   prune: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "pre-pruning"
     #   domain: !Astar
     #   heuristic:
@@ -214,7 +214,7 @@
     #   sparse_h_calls: true
     #   prune: true
 
-    # - !AstarNW
+    # - !AstarPa2
     #   name: "GCSH"
     #   domain: !Astar
     #   heuristic:

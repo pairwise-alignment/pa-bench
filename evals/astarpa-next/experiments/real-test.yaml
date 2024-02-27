@@ -52,7 +52,7 @@
     # - !Wfa
     # - !Wfa
     #   memory_model: !MemoryHigh
-    - !AstarNW
+    - !AstarPa2
       name: "dt-trace"
       domain: !Astar
       doubling: !BandDoubling

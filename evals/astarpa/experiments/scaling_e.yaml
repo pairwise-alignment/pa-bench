@@ -106,7 +106,7 @@
         k: 15
         prune: !Both
 
-    - !AstarNW
+    - !AstarPa2
       domain: !Astar
       strategy: !BandDoubling
         start: !H0
@@ -128,7 +128,7 @@
       sparse_h_calls: true
       prune: true
 
-    - !AstarNW
+    - !AstarPa2
       domain: !Astar
       strategy: !BandDoubling
         start: !H0
@@ -150,7 +150,7 @@
       sparse_h_calls: true
       prune: true
 
-    - !AstarNW
+    - !AstarPa2
       domain: !Astar
       strategy: !BandDoubling
         start: !H0

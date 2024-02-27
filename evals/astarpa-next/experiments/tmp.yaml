@@ -18,7 +18,7 @@
       heuristic:
         type: !GCSH
         prune: !Start
-    - !AstarNW
+    - !AstarPa2
       domain: !Astar
       doubling: !BandDoubling
         start: !H0
@@ -30,7 +30,7 @@
         r: 1
       front: !Bit
         sparse: false
-    - !AstarNW
+    - !AstarPa2
       domain: !Astar
       doubling: !BandDoubling
         start: !H0
@@ -42,7 +42,7 @@
         r: 1
       front: !Bit
         sparse: true
-    - !AstarNW
+    - !AstarPa2
       domain: !Astar
       doubling: !BandDoubling
         start: !H0
@@ -56,7 +56,7 @@
         sparse: true
         simd: true
       sparse_h_calls: false
-    - !AstarNW
+    - !AstarPa2
       name: "sparse-h"
       domain: !Astar
       doubling: !BandDoubling
@@ -71,7 +71,7 @@
         sparse: true
         simd: true
       sparse_h_calls: true
-    - !AstarNW
+    - !AstarPa2
       name: "incremental-doubling"
       domain: !Astar
       doubling: !BandDoubling
@@ -87,7 +87,7 @@
         simd: true
         incremental_doubling: true
       sparse_h_calls: true
-    - !AstarNW
+    - !AstarPa2
       name: "new-profile"
       domain: !Astar
       doubling: !BandDoubling
@@ -103,7 +103,7 @@
         simd: true
         incremental_doubling: true
       sparse_h_calls: true
-    - !AstarNW
+    - !AstarPa2
       name: "trace"
       domain: !Astar
       doubling: !BandDoubling
@@ -120,7 +120,7 @@
         incremental_doubling: true
       sparse_h_calls: true
       prune: false
-    - !AstarNW
+    - !AstarPa2
       name: "local-pruning-5"
       domain: !Astar
       doubling: !BandDoubling
@@ -138,7 +138,7 @@
         incremental_doubling: true
       sparse_h_calls: true
       prune: false
-    - !AstarNW
+    - !AstarPa2
       name: "prune"
       domain: !Astar
       doubling: !BandDoubling
@@ -156,7 +156,7 @@
         incremental_doubling: true
       sparse_h_calls: true
       prune: true
-    - !AstarNW
+    - !AstarPa2
       name: "matches"
       domain: !Astar
       doubling: !BandDoubling
@@ -174,7 +174,7 @@
         incremental_doubling: true
       sparse_h_calls: true
       prune: true
-    - !AstarNW
+    - !AstarPa2
       name: "matches2"
       domain: !Astar
       doubling: !BandDoubling
@@ -192,7 +192,7 @@
         incremental_doubling: true
       sparse_h_calls: true
       prune: true
-    - !AstarNW
+    - !AstarPa2
       name: "dt-trace"
       domain: !Astar
       doubling: !BandDoubling
@@ -213,7 +213,7 @@
         drop: 20
       sparse_h_calls: true
       prune: true
-    - !AstarNW
+    - !AstarPa2
       name: "k12"
       domain: !Astar
       doubling: !BandDoubling
@@ -237,7 +237,7 @@
       prune: true
     # DO NOT MODIFY OR RERUN ABOVE HERE.
 
-    - !AstarNW
+    - !AstarPa2
       name: "local-doubling"
       domain: !Astar
       doubling: !LocalDoubling
