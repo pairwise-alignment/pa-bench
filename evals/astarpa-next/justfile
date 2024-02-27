@@ -1,17 +1,10 @@
-run:
-    cd ../.. && cargo run        --release \
-                      -- run evals/astarpa-next/experiments/real-test.yaml
+run *args='':
+    cd ../.. && cargo run --release -- run evals/astarpa-next/experiments/real.yaml {{args}}
+bench *args='':
+    cd ../.. && cargo run --release -- bench evals/astarpa-next/experiments/real.yaml --cache evals/astarpa-next/results/cache.json {{args}}
 flamegraph *args='':
     cd ../.. && cargo flamegraph --release --deterministic --open --min-width 0.03 --skip-after 'runner::run_job::{{{{closure}}::{{{{closure}}' --palette rust --bin pa-bench {{args}} \
-                      -- run evals/astarpa-next/experiments/real-test.yaml
-bench *args:
-    cd ../.. && cargo run --release -- bench evals/astarpa-next/experiments/real-test.yaml --cache evals/astarpa-next/results/cache.json --rerun-all {{args}}
-bench-all:
-    cd ../.. && cargo run --release -- bench evals/astarpa-next/experiments/real.yaml --cache evals/astarpa-next/results/cache.json
-bench-tmp *args='':
-    cd ../.. && cargo run --release -- bench evals/astarpa-next/experiments/tmp.yaml --cache evals/astarpa-next/results/tmp.cache.json {{args}}
-affine *args:
-    cd ../.. && cargo run --release -- bench evals/astarpa-next/experiments/real-affine.yaml --cache evals/astarpa-next/results/real-affine.cache.json {{args}}
+                      -- run evals/astarpa-next/experiments/real.yaml
 
 memory:
     cd ../.. && cargo build --release

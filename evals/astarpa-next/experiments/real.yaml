@@ -3,13 +3,13 @@
 
     The time limit is low and cuts of excessively slow A*PA runs, but sufficient
     for most Edlib and Biff runs.
-  time_limit: 1s
+  time_limit: 100s
   mem_limit: 32GiB
   datasets:
     # A*PA sets
-    # - !Download
-    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-    #   dir: astarpa/ont-ul-500k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      dir: astarpa/ont-ul-500k
     # - !Download
     #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
     #   dir: astarpa/ont-minion-ul-500k
@@ -17,247 +17,222 @@
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
   algos:
-    - !Wfa
-    - !Edlib
-    - !AstarPA
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        prune: !Start
-    - !AstarNW
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 64
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: false
-    - !AstarNW
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: true
-    - !AstarNW
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: true
-        simd: true
-      sparse_h_calls: false
-    - !AstarNW
-      name: "sparse-h"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: true
-        simd: true
-      sparse_h_calls: true
-    - !AstarNW
-      name: "incremental-doubling"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-    - !AstarNW
-      name: "new-profile"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-    - !AstarNW
-      name: "trace"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-      prune: false
-    - !AstarNW
-      name: "local-pruning-5"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        p: 5
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-      prune: false
-    - !AstarNW
-      name: "prune"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        p: 5
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-      prune: true
-    - !AstarNW
-      name: "matches"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        p: 5
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-      prune: true
-    - !AstarNW
-      name: "matches2"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        p: 5
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-      sparse_h_calls: true
-      prune: true
-    - !AstarNW
-      name: "dt-trace"
-      domain: !Astar
-      strategy: !BandDoubling
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        r: 1
-        p: 5
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-        dt_trace: true
-        max_g: 40
-        drop: 20
-      sparse_h_calls: true
-      prune: true
-    - !AstarNW
-      name: "k12"
-      domain: !Astar
-      strategy: !BandDoubling
-        start: !H0
-        factor: 2.0
-      block_width: 256
-      heuristic:
-        type: !GCSH
-        prune: !Start
-        k: 12
-        r: 1
-        p: 14
-      front: !Bit
-        sparse: true
-        simd: true
-        incremental_doubling: true
-        dt_trace: true
-        max_g: 40
-        drop: 20
-      sparse_h_calls: true
-      prune: true
-    # DO NOT MODIFY OR RERUN ABOVE HERE.
+    # - !Edlib
+    # - !Wfa
+    # - !AstarPa
+    #   diagonal_transition: true
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+
+    # - !AstarNW
+    #   name: "gapgap"
+    #   domain: !GapGap
+    #   heuristic:
+    #     type: !None
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 1
+    #   front:
+    #     sparse: false
+    #     simd: false
+    #     incremental_doubling: false
+
+    # - !AstarNW
+    #   name: "gapdist"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GapCost
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 1
+    #   front:
+    #     sparse: false
+    #     simd: false
+    #     incremental_doubling: false
+
+    # - !AstarNW
+    #   name: "blocks"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GapCost
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
 
     - !AstarNW
-      name: "local-doubling"
+      name: "sparse_mem"
       domain: !Astar
-      strategy: !LocalDoubling
-      block_width: 256
       heuristic:
-        type: !GCSH
+        #type: !GapCost
+        type: !SH
         prune: !Start
         k: 12
         r: 1
-        p: 14
-      front: !Bit
+      doubling: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 256
+      front:
         sparse: true
-        simd: true
-        incremental_doubling: true
-        dt_trace: true
-        max_g: 40
-        drop: 20
-      sparse_h_calls: true
-      prune: true
+        simd: false
+        incremental_doubling: false
+
+    # - !AstarNW
+    #   name: "sparse_h"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GapCost
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: false
+    #     incremental_doubling: false
+    #   sparse_h_calls: true
+
+    # - !AstarNW
+    #   name: "simd"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GapCost
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #   sparse_h_calls: true
+
+    # - !AstarNW
+    #   name: "incrementaldoubling"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GapCost
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #   sparse_h_calls: true
+
+    # - !AstarNW
+    #   name: "dt-trace"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GapCost
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+
+    # - !AstarNW
+    #   name: "SH"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !SH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+
+    # - !AstarNW
+    #   name: "SH+prune"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !SH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+    #   prune: true
+
+    # - !AstarNW
+    #   name: "pre-pruning"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !SH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #     p: 14
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+    #   prune: true
+
+    # - !AstarNW
+    #   name: "GCSH"
+    #   domain: !Astar
+    #   heuristic:
+    #     type: !GCSH
+    #     prune: !Start
+    #     k: 12
+    #     r: 1
+    #     p: 14
+    #   doubling: !BandDoubling
+    #     start: !H0
+    #     factor: 2.0
+    #   block_width: 256
+    #   front:
+    #     sparse: true
+    #     simd: true
+    #     incremental_doubling: false
+    #     dt_trace: true
+    #     max_g: 40
+    #     drop: 20
+    #   sparse_h_calls: true
+    #   prune: true
