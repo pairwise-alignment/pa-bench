@@ -1,0 +1,20 @@
+run *args='':
+    cd ../.. && cargo run --release -- run evals/astarpa2/experiments/real.yaml {{args}}
+
+bench *args='':
+    cd ../.. && cargo run --release -- bench evals/astarpa2/experiments/real.yaml --cache evals/astarpa2/results/cache.json {{args}}
+
+flamegraph *args='':
+    cd ../.. && cargo flamegraph --release --deterministic --open --min-width 0.03 --skip-after 'runner::run_job::{{{{closure}}::{{{{closure}}' --palette rust --bin pa-bench {{args}} \
+                      -- run evals/astarpa2/experiments/real.yaml
+
+memory:
+    cd ../.. && cargo build --release
+    cd ../.. && heaptrack target/release/orchestrator run evals/astarpa2/experiments/real.yaml
+record *args='':
+    cd ../.. && perf record cargo run --release -- run evals/astarpa2/experiments/real.yaml && perf report
+
+cpufreq:
+    sudo cpupower frequency-set --governor performance -d 2.6GHz -u 2.6GHz
+powersave:
+    sudo cpupower frequency-set --governor powersave -d 0.8GHz -u 2.6GHz
