@@ -43,7 +43,7 @@
         name: "gapdist"
         domain: !Astar
         heuristic:
-            type: !GapCost
+            type: !Gap
         doubling: !BandDoubling
             start: !H0
             factor: 2.0
@@ -57,7 +57,7 @@
         name: "blocks"
         domain: !Astar
         heuristic:
-            type: !GapCost
+            type: !Gap
         doubling: !BandDoubling
             start: !H0
             factor: 2.0
@@ -71,8 +71,8 @@
         name: "sparse_mem"
         domain: !Astar
         heuristic:
-            #type: !GapCost
-            type: !SH
+            type: !Gap # type: !SH
+
             prune: !Start
             k: 12
             r: 1
@@ -89,7 +89,7 @@
         name: "sparse_h"
         domain: !Astar
         heuristic:
-            type: !GapCost
+            type: !Gap
         doubling: !BandDoubling
             start: !H0
             factor: 2.0
@@ -104,7 +104,7 @@
         name: "simd"
         domain: !Astar
         heuristic:
-            type: !GapCost
+            type: !Gap
         doubling: !BandDoubling
             start: !H0
             factor: 2.0
@@ -119,7 +119,7 @@
         name: "incrementaldoubling"
         domain: !Astar
         heuristic:
-            type: !GapCost
+            type: !Gap
         doubling: !BandDoubling
             start: !H0
             factor: 2.0
@@ -134,7 +134,7 @@
         name: "dt-trace"
         domain: !Astar
         heuristic:
-            type: !GapCost
+            type: !Gap
         doubling: !BandDoubling
             start: !H0
             factor: 2.0
