@@ -1,12 +1,12 @@
 run *args='':
-    cd ../.. && cargo run --release -- run evals/astarpa2/experiments/real.yaml {{args}}
+    cd ../.. && cargo run -r -- run evals/astarpa2/experiments/real.yaml {{args}}
 
 bench *args='':
-    cd ../.. && cargo run --release -- bench evals/astarpa2/experiments/real.yaml --cache evals/astarpa2/results/cache.json {{args}}
+    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real.yaml --cache evals/astarpa2/results/cache.json {{args}}
 
-flamegraph *args='':
+flame *args='':
     cd ../.. && cargo flamegraph --release --deterministic --open --min-width 0.03 --skip-after 'runner::run_job::{{{{closure}}::{{{{closure}}' --palette rust --bin pa-bench {{args}} \
-                      -- run evals/astarpa2/experiments/real.yaml
+                      -- run evals/astarpa2/experiments/real.yaml --no-limits
 
 memory:
     cd ../.. && cargo build --release
