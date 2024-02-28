@@ -102,10 +102,12 @@ struct BenchArgs {
     remove_from_cache: bool,
 
     /// Rerun failed jobs that are otherwise reused.
-    ///
-    /// This also reruns jobs that had at least as many resources. Useful when code changed.
     #[arg(long, conflicts_with = "rerun_all")]
     rerun_failed: bool,
+
+    /// Rerun jobs that timed out or had memory limit.
+    #[arg(long, conflicts_with = "rerun_all")]
+    rerun_timeouts: bool,
 
     /// Regenerate generated datasets.
     #[arg(long, hide_short_help = true)]
@@ -316,11 +318,20 @@ fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<us
                 .iter()
                 .find(|existing_job| {
                     // Skip running a job (again) if the same job succeeded before
-                    existing_job.job.is_same_as(job)
-                        && (existing_job.output.is_ok()
-                            // or failed with at least as many resources.
-                            || (!args.rerun_failed
-                                && existing_job.job.has_more_resources_than(job)))
+                    if !existing_job.job.is_same_as(job) {
+                        return false;
+                    }
+                    // If same job already succeeded, skip.
+                    match existing_job.output {
+                        // Skip new job; it succeeded before.
+                        Ok(_) => true,
+                        // If it timed out before with at least as many resources, skip.
+                        Err(JobError::Timeout | JobError::MemoryLimit) => {
+                            !args.rerun_timeouts && existing_job.job.has_more_resources_than(job)
+                        }
+                        // Otherwise, skip only if not rerunning failed jobs.
+                        Err(_) => !args.rerun_failed,
+                    }
                 })
                 .is_none()
         });
