@@ -398,12 +398,14 @@ fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<us
     }
 
     // Remove jobs that were run from existing results.
-    existing_jobs_in_experiment.retain(|existing_job| {
-        job_results
+    {
+        let job_results_set = job_results
             .iter()
-            .find(|job_result| job_result.job.is_same_as(&existing_job.job))
-            .is_none()
-    });
+            .map(|r| r.job.to_key())
+            .collect::<std::collections::HashSet<_>>();
+        existing_jobs_in_experiment
+            .retain(|existing_job| !job_results_set.contains(&existing_job.job.to_key()));
+    }
 
     let mut experiment_jobs = existing_jobs_in_experiment;
     experiment_jobs.extend(job_results);
