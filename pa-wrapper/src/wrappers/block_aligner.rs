@@ -8,6 +8,7 @@ use ::block_aligner::scores::*;
 use ::block_aligner::percent_len;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct BlockAlignerParams {
     pub size: BlockAlignerSize,
 }

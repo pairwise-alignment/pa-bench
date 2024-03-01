@@ -2,6 +2,7 @@ use crate::*;
 use astarpa::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct AstarPaParams {
     pub diagonal_transition: bool,
     pub heuristic: astarpa::HeuristicParams,

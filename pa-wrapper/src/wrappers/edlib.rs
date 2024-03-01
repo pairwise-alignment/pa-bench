@@ -2,6 +2,7 @@ use crate::*;
 use edlib_rs::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[serde(deny_unknown_fields)]
 pub struct EdlibParams;
 
 pub struct Edlib {
