@@ -271,12 +271,15 @@ fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<us
     //
     // Lastly, we remove from existing_jobs_used any job equal to a job_to_run.
 
-    let (mut existing_jobs_in_experiment, existing_jobs_extra): (Vec<_>, Vec<_>) =
-        existing_jobs.into_iter().partition(|existing_job| {
-            jobs.iter()
-                .find(|(j, _)| j.is_same_as(&existing_job.job))
-                .is_some()
-        });
+    let (mut existing_jobs_in_experiment, existing_jobs_extra): (Vec<_>, Vec<_>) = {
+        let jobs_set = jobs
+            .iter()
+            .map(|(j, _)| j.to_key())
+            .collect::<std::collections::HashSet<_>>();
+        existing_jobs
+            .into_iter()
+            .partition(|existing_job| jobs_set.contains(&existing_job.job.to_key()))
+    };
 
     // Remove jobs in this experiment from the cache.
     if args.remove_from_cache {

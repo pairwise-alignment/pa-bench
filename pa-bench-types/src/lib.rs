@@ -118,12 +118,23 @@ pub struct Job {
 }
 
 impl Job {
+    pub fn to_key(&self) -> String {
+        let job = Job {
+            dataset: self.dataset.clone(),
+            costs: self.costs.clone(),
+            traceback: self.traceback,
+            algo: self.algo.clone(),
+            time_limit: 0,
+            mem_limit: 0,
+        };
+        serde_json::to_string(&job).unwrap()
+    }
     /// Whether the jobs are the same, ignoring resources.
     pub fn is_same_as(&self, o: &Self) -> bool {
-        self.dataset == o.dataset
-            && self.costs == o.costs
+        self.costs == o.costs
             && self.traceback == o.traceback
             && self.algo == o.algo
+            && self.dataset == o.dataset
     }
 
     /// Whether this job is larger than another job.
