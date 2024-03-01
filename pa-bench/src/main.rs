@@ -12,9 +12,11 @@ mod runner;
 use chrono::Timelike;
 use clap::{Parser, Subcommand};
 use core_affinity;
+use itertools::Itertools;
 use once_cell::sync::Lazy;
 use serde_json;
 use serde_yaml;
+use std::collections::HashMap;
 use std::fs;
 use std::io::prelude::*;
 use std::os::unix::process::ExitStatusExt;
@@ -316,27 +318,32 @@ fn run_experiment(args: &BenchArgs, experiment_idx: usize, runner_cores: &Vec<us
             existing_jobs_extra.len()
         );
         let num_jobs_before = jobs.len();
-        jobs.retain(|(job, _stats)| {
+        let existing_jobs_in_experiment_map: HashMap<String, Vec<&JobResult>> = HashMap::from_iter(
             existing_jobs_in_experiment
                 .iter()
-                .find(|existing_job| {
-                    // Skip running a job (again) if the same job succeeded before
-                    if !existing_job.job.is_same_as(job) {
-                        return false;
+                .group_by(|j| j.job.to_key())
+                .into_iter()
+                .map(|(k, g)| (k, g.collect())),
+        );
+        jobs.retain(|(job, _stats)| {
+            let similar_jobs = existing_jobs_in_experiment_map.get(&job.to_key());
+            for similar_job in similar_jobs.into_iter().flatten() {
+                // If same job already succeeded, skip.
+                let skip_job = match similar_job.output {
+                    // Skip new job; it succeeded before.
+                    Ok(_) => true,
+                    // If it timed out before with at least as many resources, skip.
+                    Err(JobError::Timeout | JobError::MemoryLimit) => {
+                        !args.rerun_timeouts && similar_job.job.has_more_resources_than(job)
                     }
-                    // If same job already succeeded, skip.
-                    match existing_job.output {
-                        // Skip new job; it succeeded before.
-                        Ok(_) => true,
-                        // If it timed out before with at least as many resources, skip.
-                        Err(JobError::Timeout | JobError::MemoryLimit) => {
-                            !args.rerun_timeouts && existing_job.job.has_more_resources_than(job)
-                        }
-                        // Otherwise, skip only if not rerunning failed jobs.
-                        Err(_) => !args.rerun_failed,
-                    }
-                })
-                .is_none()
+                    // Otherwise, skip only if not rerunning failed jobs.
+                    Err(_) => !args.rerun_failed,
+                };
+                if skip_job {
+                    return false;
+                }
+            }
+            true
         });
         eprintln!("Reused jobs: {}", num_jobs_before - jobs.len());
         eprintln!("Running {} jobs...", jobs.len());
