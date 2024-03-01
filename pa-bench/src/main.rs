@@ -554,7 +554,6 @@ fn run_with_threads(
         unsupported: usize,
         skipped: usize,
         timeout: usize,
-        panic: usize,
         failed: usize,
     }
 
@@ -617,7 +616,6 @@ fn run_with_threads(
                         (Some(JobError::Unsupported), _) => counts.unsupported += 1,
                         (_, Ok(_)) => counts.success += 1,
                         (_, Err(JobError::Timeout)) => counts.timeout += 1,
-                        (_, Err(JobError::Panic)) => counts.panic += 1,
                         (_, Err(JobError::Interrupted)) => {}
                         (_, Err(_)) => {
                             counts.failed += 1;
@@ -633,11 +631,10 @@ fn run_with_threads(
                         unsupported,
                         skipped,
                         timeout,
-                        panic,
                         failed,
                     } = *counts;
                     {
-                        eprint!("\r Processed: {done:3} / {num_jobs:3}. Success {success:3}, Unsupported {unsupported:3}, Timeout {timeout:3}, Panic {panic:3}, Failed {failed:3}, Skipped {skipped}");
+                        eprint!("\r {done:3} / {num_jobs:3}. Success {success:3}, Timeout {timeout:>2}, Failed {failed}, Unsup. {unsupported}, Skip {skipped:>3}");
                     }
 
                     // If the orchestrator was aborted, do not push failing job results.
