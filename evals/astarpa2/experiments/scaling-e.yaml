@@ -1,0 +1,107 @@
+- comment: |
+    Scaling with error rate with k=15
+
+    This runs in around 1 hour in total.
+  time_limit: 10s
+  mem_limit: 32GiB
+  datasets:
+    - !Generated
+      seed: 31415
+      error_rates:
+        [
+          0.01,
+          0.02,
+          0.03,
+          0.04,
+          0.05,
+          0.06,
+          0.07,
+          0.08,
+          0.09,
+          0.10,
+          0.11,
+          0.12,
+          0.13,
+          0.14,
+          0.15,
+          0.16,
+          0.17,
+          0.18,
+          0.19,
+          0.20,
+          0.21,
+          0.22,
+          0.23,
+          0.24,
+          0.25,
+          0.26,
+          0.27,
+          0.28,
+          0.29,
+          0.30,
+        ]
+      error_models: [Uniform]
+      lengths: [100000]
+      total_size: 1000000
+  traces: [true]
+  costs:
+    - { sub: 1, open: 0, extend: 1 }
+  algos:
+    - !Edlib
+    - !Wfa
+
+    - !AstarPa
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 1
+        k: 15
+        prune: !Both
+    - !AstarPa
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        r: 2
+        k: 15
+        prune: !Both
+
+    - !AstarPa2
+      name: "small-base"
+      domain: !Astar
+      heuristic:
+        type: !Gap
+      doubling: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 256
+      front:
+        sparse: true
+        simd: true
+        incremental_doubling: false
+        dt_trace: false
+        max_g: 20
+        x_drop: 10
+      sparse_h: true
+
+    - !AstarPa2
+      name: "base"
+      domain: !Astar
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        k: 12
+        r: 1
+        p: 14
+      doubling: !BandDoubling
+        start: !H0
+        factor: 2.0
+      block_width: 256
+      front:
+        sparse: true
+        simd: true
+        incremental_doubling: true
+        dt_trace: false
+        max_g: 20
+        x_drop: 10
+      sparse_h: true
+      prune: true

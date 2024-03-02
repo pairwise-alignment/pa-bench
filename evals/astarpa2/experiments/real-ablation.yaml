@@ -1,0 +1,825 @@
+- comment: |
+      A*, Edlib, and Wfa on real sequencing data
+
+      The time limit is low and cuts of excessively slow A*PA runs, but sufficient
+      for most Edlib and Biff runs.
+  time_limit: 10s
+  mem_limit: 32GiB
+  datasets:
+      - !Download
+        url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+        dir: astarpa/ont-ul-500k
+      - !Download
+        url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
+        dir: astarpa/ont-minion-ul-500k
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+      - !AstarPa2
+        name: "GCSH-base"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "nopreprune"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 0
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "noprune"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !None
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: false
+
+      - !AstarPa2
+        name: "noGCSH"
+        domain: !Astar
+        heuristic:
+            type: !SH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "noGCSH-Gap"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "noGCSH-GapGap"
+        domain: !GapGap
+        heuristic:
+            type: !None
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "noid"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "nodt"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: false
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "nosparseh"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: false
+        prune: true
+
+      - !AstarPa2
+        name: "noilp"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            no_ilp: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "nosimd"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: false
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "B512"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 512
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 40
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "B128"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 128
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 10
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "B64"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 64
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 5
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "f1.5"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 1.5
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "f2.5"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.5
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "x20"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 20
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "x5"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 5
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "k10"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 10
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "k14"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 14
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "p7"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 7
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "p28"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 28
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+- comment: |
+      A*, Edlib, and Wfa on real sequencing data
+
+      The time limit is low and cuts of excessively slow A*PA runs, but sufficient
+      for most Edlib and Biff runs.
+  time_limit: 10s
+  mem_limit: 32GiB
+  datasets:
+      - !Path tmp/bam2seq_10kto20k
+      - !Path tmp/overlap_10kto20k
+
+      - !Path tmp/bam2seq_100kto200k
+      - !Path tmp/overlap_100kto200k
+
+      - !Path tmp/bam2seq_unrestricted
+      - !Path tmp/overlap_unrestricted
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+      - !AstarPa2
+        name: "small-base"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-gapgap"
+        domain: !GapGap
+        heuristic:
+            type: !None
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-id"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-nodt"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: false
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-nosparseh"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: false
+
+      - !AstarPa2
+        name: "small-noilp"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            no_ilp: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-nosimd"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: false
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-B512"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 512
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 40
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-B128"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 128
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 10
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-B64"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 64
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 5
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-f1.5"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 1.5
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-f2.5"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.5
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-g40"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.5
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 40
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-g10"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.5
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 10
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-x5"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 5
+        sparse_h: true
+
+      - !AstarPa2
+        name: "small-x20"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 20
+        sparse_h: true

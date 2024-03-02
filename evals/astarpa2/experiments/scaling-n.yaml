@@ -1,0 +1,133 @@
+- comment: "5%; fast"
+  #TODO INCREASE
+  time_limit: 100s
+  mem_limit: 32GiB
+  datasets:
+      - !Generated
+        seed: 31415
+        error_rates: [0.05]
+        error_models: [Uniform]
+        lengths:
+            [3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+        total_size: 10000000
+  traces: [true]
+  costs:
+      - { sub: 1, open: 0, extend: 1 }
+  algos:
+      - !Edlib
+      - !Wfa
+
+      - !AstarPa
+        diagonal_transition: true
+        heuristic:
+            type: !GCSH
+            r: 1
+            prune: !Both
+
+      - !AstarPa2
+        name: "small-base"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "base"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+- comment: "15%; fast"
+  #TODO INCREASE
+  time_limit: 100s
+  mem_limit: 32GiB
+  datasets:
+      - !Generated
+        seed: 31415
+        error_rates: [0.15]
+        error_models: [Uniform]
+        lengths:
+            [3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 10000000]
+        total_size: 10000000
+  traces: [true]
+  costs:
+      - { sub: 1, open: 0, extend: 1 }
+  algos:
+      - !AstarPa
+        diagonal_transition: true
+        heuristic:
+            type: !GCSH
+            r: 2
+            prune: !Both
+
+      - !Edlib
+      - !Wfa
+
+      - !AstarPa2
+        name: "small-base"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "base"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 12
+            r: 1
+            p: 14
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true

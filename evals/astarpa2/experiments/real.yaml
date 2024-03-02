@@ -3,16 +3,24 @@
 
       The time limit is low and cuts of excessively slow A*PA runs, but sufficient
       for most Edlib and Biff runs.
-  time_limit: 20s
+  time_limit: 10s
   mem_limit: 32GiB
   datasets:
-      # A*PA sets
+      - !Path tmp/bam2seq_10kto20k
+      - !Path tmp/overlap_10kto20k
+
+      - !Path tmp/bam2seq_100kto200k
+      - !Path tmp/overlap_100kto200k
+
+      - !Path tmp/bam2seq_unrestricted
+      - !Path tmp/overlap_unrestricted
+
       - !Download
         url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
         dir: astarpa/ont-ul-500k
-      # - !Download
-      #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-      #   dir: astarpa/ont-minion-ul-500k
+      - !Download
+        url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
+        dir: astarpa/ont-minion-ul-500k
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
@@ -63,30 +71,12 @@
             factor: 2.0
         block_width: 256
         front:
-            sparse: true
-            simd: true
-            incremental_doubling: false
-
-      - !AstarPa2
-        name: "sparse_mem"
-        domain: !Astar
-        heuristic:
-            type: !Gap # type: !SH
-
-            prune: !Start
-            k: 12
-            r: 1
-        doubling: !BandDoubling
-            start: !H0
-            factor: 2.0
-        block_width: 256
-        front:
-            sparse: true
+            sparse: false
             simd: false
             incremental_doubling: false
 
       - !AstarPa2
-        name: "sparse_h"
+        name: "sparse_mem"
         domain: !Astar
         heuristic:
             type: !Gap
@@ -98,7 +88,7 @@
             sparse: true
             simd: false
             incremental_doubling: false
-        sparse_h_calls: true
+        sparse_h: false
 
       - !AstarPa2
         name: "simd"
@@ -112,11 +102,12 @@
         front:
             sparse: true
             simd: true
+            no_ilp: true
             incremental_doubling: false
-        sparse_h_calls: true
+        sparse_h: false
 
       - !AstarPa2
-        name: "incrementaldoubling"
+        name: "ilp"
         domain: !Astar
         heuristic:
             type: !Gap
@@ -128,7 +119,22 @@
             sparse: true
             simd: true
             incremental_doubling: false
-        sparse_h_calls: true
+        sparse_h: false
+
+      - !AstarPa2
+        name: "sparse_h"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: false
+        sparse_h: true
 
       - !AstarPa2
         name: "dt-trace"
@@ -144,16 +150,34 @@
             simd: true
             incremental_doubling: false
             dt_trace: true
-            max_g: 40
-            drop: 20
-        sparse_h_calls: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+
+      - !AstarPa2
+        name: "incrementaldoubling"
+        domain: !Astar
+        heuristic:
+            type: !Gap
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
 
       - !AstarPa2
         name: "SH"
         domain: !Astar
         heuristic:
             type: !SH
-            prune: !Start
+            prune: !None
             k: 12
             r: 1
         doubling: !BandDoubling
@@ -163,11 +187,11 @@
         front:
             sparse: true
             simd: true
-            incremental_doubling: false
+            incremental_doubling: true
             dt_trace: true
-            max_g: 40
-            drop: 20
-        sparse_h_calls: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
 
       - !AstarPa2
         name: "SH+prune"
@@ -184,11 +208,11 @@
         front:
             sparse: true
             simd: true
-            incremental_doubling: false
+            incremental_doubling: true
             dt_trace: true
-            max_g: 40
-            drop: 20
-        sparse_h_calls: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
         prune: true
 
       - !AstarPa2
@@ -207,11 +231,11 @@
         front:
             sparse: true
             simd: true
-            incremental_doubling: false
+            incremental_doubling: true
             dt_trace: true
-            max_g: 40
-            drop: 20
-        sparse_h_calls: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
         prune: true
 
       - !AstarPa2
@@ -230,9 +254,9 @@
         front:
             sparse: true
             simd: true
-            incremental_doubling: false
+            incremental_doubling: true
             dt_trace: true
-            max_g: 40
-            drop: 20
-        sparse_h_calls: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
         prune: true
