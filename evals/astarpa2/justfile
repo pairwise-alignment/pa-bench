@@ -1,11 +1,23 @@
+
+bug *args='':
+    cd ../.. && cargo run -r -- run evals/astarpa2/experiments/bug-pre-pruning.yaml {{args}}
+
 run *args='':
     cd ../.. && cargo run -r -- run evals/astarpa2/experiments/real.yaml {{args}}
 
+
 bench *args='':
     cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real.yaml --cache evals/astarpa2/results/cache.json {{args}}
+ablation *args='':
+    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-ablation.yaml --cache evals/astarpa2/results/cache.json {{args}}
+n *args='':
+    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/scaling-n.yaml --cache evals/astarpa2/results/cache.json {{args}}
+e *args='':
+    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/scaling-e.yaml --cache evals/astarpa2/results/cache.json {{args}}
+
 
 flame *args='':
-    cd ../.. && cargo flamegraph --release --deterministic --open --min-width 0.03 --skip-after 'runner::run_job::{{{{closure}}::{{{{closure}}' --palette rust --bin pa-bench {{args}} \
+    cd ../.. && cargo flamegraph --release --deterministic --open --min-width 0.06 --skip-after 'runner::run_job::{{{{closure}}::{{{{closure}}' --palette rust --bin pa-bench {{args}} \
                       -- run evals/astarpa2/experiments/real.yaml --no-limits
 
 memory:
@@ -13,8 +25,10 @@ memory:
     cd ../.. && heaptrack target/release/orchestrator run evals/astarpa2/experiments/real.yaml
 record *args='':
     cd ../.. && perf record cargo run --release -- run evals/astarpa2/experiments/real.yaml && perf report
+report *args='':
+    cd ../.. && perf report
 
 cpufreq:
-    sudo cpupower frequency-set --governor performance -d 2.6GHz -u 2.6GHz
+    sudo cpupower frequency-set --governor performance -d 3.3GHz -u 3.3GHz
 powersave:
     sudo cpupower frequency-set --governor powersave -d 0.8GHz -u 2.6GHz
