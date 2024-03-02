@@ -153,7 +153,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
             assert_eq!(
                 cigar_cost,
                 cost,
-                "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {:?}\ncost: {cost}\ncigar_cost: {cigar_cost}\n",
+                "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {:?}\nreturned cost: {cost}\nactual cost: {cigar_cost}\n",
                 String::from_utf8(a.to_vec()).unwrap(),
                 String::from_utf8(b.to_vec()).unwrap(),
                 cigar.to_string(),
