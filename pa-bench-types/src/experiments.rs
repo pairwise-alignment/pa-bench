@@ -1,23 +1,15 @@
 use flate2::bufread::GzDecoder;
+use fxhash::FxHasher;
+use itertools::{iproduct, Itertools};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
-#[rustfmt::skip]
-use ::stats::merge_all;
-use tar::Archive;
-use walkdir::DirEntry;
-
 use std::fs;
 use std::hash::{Hash, Hasher};
 use std::io::{BufWriter, Cursor, Write};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
-
-use itertools::{iproduct, Itertools};
-
-use fxhash::FxHasher;
-
-use pa_generate::*;
-use pa_types::*;
+use tar::Archive;
+use walkdir::DirEntry;
 
 use crate::stats::file_stats;
 use crate::*;
@@ -239,7 +231,7 @@ impl DatasetConfig {
                 (d, stats)
             })
             .collect::<Vec<_>>();
-        let merged_stats = merge_all(datasets_with_stats.iter().map(|(_d, s)| s.clone()));
+        let merged_stats = ::stats::merge_all(datasets_with_stats.iter().map(|(_d, s)| s.clone()));
         if let Some(stats_path) = dir_stats_path {
             if let Some(merged_stats) = merged_stats {
                 if !stats_path.exists() {
