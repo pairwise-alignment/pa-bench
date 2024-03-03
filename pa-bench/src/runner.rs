@@ -150,14 +150,16 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
     if job.traceback {
         for ((a, b), &cost, cigar) in izip!(sequence_pairs, &costs, cigars) {
             let cigar_cost = cigar.verify(&job.costs, a, b);
-            assert_eq!(
-                cigar_cost,
-                cost,
-                "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {:?}\nreturned cost: {cost}\nactual cost: {cigar_cost}\n",
-                String::from_utf8(a.to_vec()).unwrap(),
-                String::from_utf8(b.to_vec()).unwrap(),
-                cigar.to_string(),
-            );
+            if is_exact {
+                assert_eq!(
+                    cigar_cost,
+                    cost,
+                    "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {:?}\nreturned cost: {cost}\nactual cost: {cigar_cost}\n",
+                    String::from_utf8(a.to_vec()).unwrap(),
+                    String::from_utf8(b.to_vec()).unwrap(),
+                    cigar.to_string(),
+                );
+            }
         }
     }
 
