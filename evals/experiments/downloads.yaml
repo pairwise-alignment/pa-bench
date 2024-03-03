@@ -13,6 +13,11 @@
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
       dir: astarpa/ont-minion-ul-500k
 
+    # A*PA2 sets
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/covid.zip
+      dir: astarpa2/covid
+
     # BiWFA sets
     - !Download
       url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.2000.tar.gz
