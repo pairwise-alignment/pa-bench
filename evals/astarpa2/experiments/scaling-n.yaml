@@ -31,7 +31,7 @@
         prune: !Both
 
     - !AstarPa2
-      name: "small-base"
+      name: "simple"
       domain: !Astar
       heuristic:
         type: !Gap
@@ -49,7 +49,7 @@
       sparse_h: true
 
     - !AstarPa2
-      name: "base"
+      name: "full"
       domain: !Astar
       heuristic:
         type: !GCSH
@@ -72,7 +72,7 @@
       prune: true
 
     - !AstarPa2
-      name: "base-r2"
+      name: "full-r2"
       domain: !Astar
       heuristic:
         type: !GCSH

@@ -9,14 +9,6 @@
       - !Download
         url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
         dir: astarpa/ont-ul-500k
-      - !Download
-        url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-        dir: astarpa/ont-minion-ul-500k
-
-      # A*PA2 sets
-      - !Download
-        url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/covid.zip
-        dir: astarpa2/covid
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
@@ -124,7 +116,7 @@
         sparse_h: false
 
       - !AstarPa2
-        name: "sparse_h"
+        name: "dt-trace"
         domain: !Astar
         heuristic:
             type: !Gap
@@ -136,10 +128,13 @@
             sparse: true
             simd: true
             incremental_doubling: false
-        sparse_h: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: false
 
       - !AstarPa2
-        name: "dt-trace"
+        name: "sparse_h"
         domain: !Astar
         heuristic:
             type: !Gap
@@ -173,6 +168,7 @@
             max_g: 20
             x_drop: 10
         sparse_h: true
+
       - !AstarPa2
         name: "SH"
         domain: !Astar
@@ -195,7 +191,7 @@
         sparse_h: true
 
       - !AstarPa2
-        name: "SH+prune"
+        name: "prune"
         domain: !Astar
         heuristic:
             type: !SH

@@ -10,6 +10,15 @@
     - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/covid.zip
       dir: astarpa2/covid
+    # - !Path download/astarpa2/illumina
+    - !Path download/astarpa2/ont-minion-ul-1k-split
+    - !Path download/astarpa2/ont-minion-ul-10k-split
+    - !Path download/astarpa2/ont-minion-ul-50k-split
+
+    # - !Path tmp/bam2seq_10kto20k
+    # - !Path tmp/overlap_10kto20k
+    # - !Path tmp/bam2seq_100kto200k
+    # - !Path tmp/overlap_100kto200k
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
