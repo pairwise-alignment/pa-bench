@@ -3,11 +3,10 @@ bug *args='':
     cd ../.. && cargo run -r -- run evals/astarpa2/experiments/bug-pre-pruning.yaml {{args}}
 
 run *args='':
-    cd ../.. && cargo run -r -- run evals/astarpa2/experiments/real.yaml {{args}}
+    cd ../.. && cargo run -r -- run evals/astarpa2/experiments/real-incremental.yaml {{args}}
 
-
-bench *args='':
-    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real.yaml --cache evals/astarpa2/results/cache.json {{args}}
+incremental *args='':
+    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-incremental.yaml --cache evals/astarpa2/results/cache.json {{args}}
 summary *args='':
     cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-summary.yaml --cache evals/astarpa2/results/cache.json {{args}}
 ablation *args='':
