@@ -33,3 +33,6 @@ itertools = "0.10.5"
 core_affinity = "^0.7"
 libc = "^0.2"
 rustix = { version = "0.36.5", features = ["process"] }
+
+[dev-dependencies]
+rayon = "1.9.0"
