@@ -37,6 +37,29 @@
         prune: true
 
       - !AstarPa2
+        name: "r2"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 15
+            r: 2
+            p: 11
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 20
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
         name: "nopreprune"
         domain: !Astar
         heuristic:
@@ -270,7 +293,7 @@
       - !Download
         url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/covid.zip
         dir: astarpa2/covid
-      - !Path download/astarpa2/ont-minion-ul-10k-split
+      - !Path download/astarpa2/ont-minion-ul-50k-split
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]

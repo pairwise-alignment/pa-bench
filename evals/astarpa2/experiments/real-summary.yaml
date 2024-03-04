@@ -25,11 +25,6 @@
   algos:
     - !Edlib
     - !Wfa
-    - !AstarPa
-      diagonal_transition: true
-      heuristic:
-        type: !GCSH
-        prune: !Start
 
     - !AstarPa2
       name: "simple"
@@ -71,3 +66,43 @@
         x_drop: 10
       sparse_h: true
       prune: true
+
+- time_limit: 10s
+  mem_limit: 32GiB
+  datasets:
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
+      dir: astarpa/ont-ul-500k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
+      dir: astarpa/ont-minion-ul-500k
+    - !Path download/astarpa2/ont-minion-ul-1k-split
+    - !Path download/astarpa2/ont-minion-ul-10k-split
+    - !Path download/astarpa2/ont-minion-ul-50k-split
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+    - !AstarPa
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        r: 2
+
+- time_limit: 10s
+  mem_limit: 32GiB
+  datasets:
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/covid.zip
+      dir: astarpa2/covid
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+    - !AstarPa
+      diagonal_transition: true
+      heuristic:
+        type: !GCSH
+        prune: !Start
+        r: 1
