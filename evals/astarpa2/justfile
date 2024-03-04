@@ -11,6 +11,8 @@ summary *args='':
     cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-summary.yaml --cache evals/astarpa2/results/cache.json {{args}}
 ablation *args='':
     cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-ablation.yaml --cache evals/astarpa2/results/cache.json {{args}}
+params *args='':
+    cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-params.yaml --cache evals/astarpa2/results/cache.json {{args}}
 n *args='':
     cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/scaling-n.yaml --cache evals/astarpa2/results/cache.json {{args}}
 e *args='':
