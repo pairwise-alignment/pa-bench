@@ -1,5 +1,3 @@
-# NOTE: Stats collection for timing was added after main evals were done, and
-# use a separate cache because timings work out slightly differently.
 run:
 	cargo build --release --no-default-features
     # Note: this one runs in parallel, unlike the others, to speed things up a bit.
