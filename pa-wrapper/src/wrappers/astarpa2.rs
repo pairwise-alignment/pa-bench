@@ -24,8 +24,10 @@ impl AlignerParamsTrait for AstarPa2Params {
 
 impl AlignerTrait for Box<dyn astarpa2::AstarPa2StatsAligner> {
     fn align(&mut self, a: Seq, b: Seq) -> (Cost, Option<Cigar>, AlignerStats) {
-        let (cost, cigar, stats) = astarpa2::AstarPa2StatsAligner::align(self.as_mut(), a, b);
+        let (cost, cigar, stats) =
+            astarpa2::AstarPa2StatsAligner::align_with_stats(self.as_mut(), a, b);
         let mut s = AlignerStats::default();
+        s.reserve(20);
         // block stats
         s.insert("fmax_tries".into(), stats.f_max_tries as _);
         s.insert("num_blocks".into(), stats.block_stats.num_blocks as _);
