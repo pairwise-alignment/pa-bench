@@ -42,6 +42,17 @@ trait AlignerParamsTrait {
 /// Times are in seconds.
 pub type AlignerStats = HashMap<String, f64>;
 
+pub fn merge_stats(lhs: &mut AlignerStats, rhs: AlignerStats) {
+    for (k, v) in lhs.iter_mut() {
+        if let Some(vr) = rhs.get(k) {
+            *v += vr;
+        }
+    }
+    for (k, v) in rhs.into_iter() {
+        lhs.entry(k).or_insert(v);
+    }
+}
+
 /// Generic pairwise global alignment interface.
 pub trait AlignerTrait {
     /// An alignment of sequences `a` and `b`.

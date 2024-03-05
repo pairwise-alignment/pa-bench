@@ -189,17 +189,6 @@ pub struct Measured {
     pub cpu_freq_end: Option<f32>,
 }
 
-pub fn merge_stats(lhs: &mut AlignerStats, rhs: AlignerStats) {
-    for (k, v) in lhs.iter_mut() {
-        if let Some(vr) = rhs.get(k) {
-            *v += vr;
-        }
-    }
-    for (k, v) in rhs.into_iter() {
-        lhs.entry(k).or_insert(v);
-    }
-}
-
 /// The output of an alignment job.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JobOutput {

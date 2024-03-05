@@ -3,7 +3,7 @@ use crate::bench::*;
 use itertools::{izip, Itertools};
 use pa_bench_types::*;
 use pa_types::Seq;
-use pa_wrapper::AlignerStats;
+use pa_wrapper::{merge_stats, AlignerStats};
 
 use std::{
     cmp::max,
