@@ -1,4 +1,4 @@
-- time_limit: 10s
+- time_limit: 100s
   mem_limit: 32GiB
   datasets:
     - !Download
@@ -61,7 +61,7 @@
       sparse_h: true
       prune: true
 
-- time_limit: 10s
+- time_limit: 100s
   mem_limit: 32GiB
   datasets:
     - !Download
@@ -83,8 +83,7 @@
         type: !GCSH
         prune: !Start
         r: 2
-
-- time_limit: 10s
+- time_limit: 100s
   mem_limit: 32GiB
   datasets:
     - !Download
