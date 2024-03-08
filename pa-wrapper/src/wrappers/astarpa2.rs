@@ -62,6 +62,10 @@ impl AlignerTrait for Box<dyn astarpa2::AstarPa2StatsAligner> {
         s.insert("t_fixed_jrange".into(), stats.t_fixed_j_range.as_secs_f64());
         s.insert("t_pruning".into(), stats.t_pruning.as_secs_f64());
         s.insert(
+            "t_contours_update".into(),
+            stats.t_contours_update.as_secs_f64(),
+        );
+        s.insert(
             "t_compute".into(),
             stats.block_stats.t_compute.as_secs_f64(),
         );
