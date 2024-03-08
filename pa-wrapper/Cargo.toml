@@ -47,3 +47,5 @@ wfa = ["dep:rust-wfa2"]
 # Modify this locally as needed.
 # Parasail is excluded by default because of slow compile times.
 default = ["astarpa", "astarpa2", "block_aligner", "edlib", "triple_accel", "wfa", "ksw2"]
+
+example = ["astarpa2/example"]

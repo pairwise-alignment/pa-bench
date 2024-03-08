@@ -36,3 +36,6 @@ rustix = { version = "0.36.5", features = ["process"] }
 
 [dev-dependencies]
 rayon = "1.9.0"
+
+[features]
+example = ["pa-wrapper/example"]

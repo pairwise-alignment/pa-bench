@@ -3,7 +3,9 @@ bug *args='':
     cd ../.. && cargo run -r -- run evals/astarpa2/experiments/bug-pre-pruning.yaml {{args}}
 
 run *args='':
-    cd ../.. && cargo run -r -- run evals/astarpa2/experiments/real-incremental.yaml {{args}}
+    cd ../.. && cargo run -r -- run evals/astarpa2/experiments/real-timing.yaml {{args}} --no-limits
+vis *args='':
+    cd ../.. && cargo run -r --features example -- run evals/astarpa2/experiments/real-vis.yaml
 
 incremental *args='':
     cd ../.. && cargo run -r -- bench evals/astarpa2/experiments/real-incremental.yaml --cache evals/astarpa2/results/cache.json {{args}}
