@@ -2,11 +2,11 @@
   mem_limit: 32GiB
   datasets:
     - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-      dir: astarpa/ont-ul-500k
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+      dir: ont-500k
     - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-      dir: astarpa/ont-minion-ul-500k
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k-genvar.zip
+      dir: ont-500k-genvar
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]
@@ -38,11 +38,17 @@
   mem_limit: 32GiB
   datasets:
     - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-50k.zip
+      dir: ont-50k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
+      dir: ont-10k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-1k.zip
+      dir: ont-1k
+    - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/sars-cov-2.zip
-      dir: astarpa2/sars-cov-2
-    - !Path download/astarpa2/ont-minion-ul-1k-split
-    - !Path download/astarpa2/ont-minion-ul-10k-split
-    - !Path download/astarpa2/ont-minion-ul-50k-split
+      dir: sars-cov-2
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]

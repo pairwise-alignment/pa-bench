@@ -6,13 +6,12 @@
   time_limit: 100s
   mem_limit: 32GiB
   datasets:
-    # A*PA sets
     - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-      dir: astarpa/ont-ul-500k
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+      dir: ont-500k
     - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-      dir: astarpa/ont-minion-ul-500k
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k-genvar.zip
+      dir: ont-500k-genvar
 
   traces: [true]
   costs: [{ sub: 1, open: 0, extend: 1 }]

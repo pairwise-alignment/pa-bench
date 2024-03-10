@@ -1,4 +1,4 @@
-# ==== CHM13
+# ==== ONT-500k
 
 # 50 ONT UL reads used in CHM13
 #
@@ -30,7 +30,8 @@ rule chm13_sample:
         for (i, sample_idx) in enumerate(sample, start=1):
             pathlib.Path(f'chm13/seq{i:02}.seq').write_text(reads[2*i] + reads[2*i+1])
 
-# ==== NA12878
+# ==== ONT-500k-genvar
+
 # BiWFA test data: 500k+ ONT MinION UL reads of NA12878 aligned to CHM13 v1.1
 # The only modification we do is renaming so that they start from 01 instead of 1.
 

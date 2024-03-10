@@ -3,47 +3,31 @@
   # - Rename directories
   # - Automatically collect statistics
   datasets:
-    # A*PA sets
+    # A*PA
     - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-      dir: astarpa/ont-ul-500k
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+      dir: ont-500k
+    # BiWFA
     - !Download
-      # NOTE: This one is the same as biwfa-ont-minion-ul-500k below; just with
-      # cleaner file names.
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/na12878-ont-minion-vs-chm13.v1.1.500kbps.zip
-      dir: astarpa/ont-minion-ul-500k
-
-    # A*PA2 sets
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k-genvar.zip
+      dir: ont-500k-genvar
+    # BiWFA
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-50k.zip
+      dir: ont-50k
+    # BiWFA
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
+      dir: ont-10k
+    # WFA
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-1k.zip
+      dir: ont-1k
+    # A*PA2
     - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/sars-cov-2.zip
-      dir: astarpa2/sars-cov-2
+      dir: sars-cov-2
 
-    # BiWFA sets
-    - !Download
-      url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.2000.tar.gz
-      dir: biwfa/ont-minion-ul
-    - !Download
-      url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.10kbps.5000.tar.gz
-      dir: biwfa/ont-minion-ul-10k
-    - !Download
-      url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.500kbps.48.tar.gz
-      dir: biwfa/ont-minion-ul-500k
-    - !Download
-      url: https://github.com/smarco/BiWFA-paper/raw/main/evaluation/data/ONT_MinION_UL.50kbps.10000.tar.gz
-      dir: biwfa/ont-minion-ul-50k
-
-    # WFA sets
-    - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/real.illumina.b10M.seq.tar.gz
-      dir: wfa/illumina-10m
-    - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/real.ont.b10M.seq.tar.gz
-      dir: wfa/ont-10m
-
-    - !Path download/astarpa2/illumina
-    - !Path download/astarpa2/ont-minion-ul-1k-split
-    - !Path download/astarpa2/ont-minion-ul-10k-split
-    - !Path download/astarpa2/ont-minion-ul-50k-split
     - !Path tmp/bam2seq_10kto20k
     - !Path tmp/overlap_10kto20k
     - !Path tmp/bam2seq_100kto200k

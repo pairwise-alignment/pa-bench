@@ -168,8 +168,8 @@ datasets:
   - !Path path/to/directory
   # Download and extract a zip file containing .seq files to `evals/data/download/{dir}`
   - !Download
-    url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-    dir: human/chm13/
+    url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+    dir: ont-500k
   # Generated data in `evals/data/generated/`
   - !Generated # Seed for the RNG.
     seed: 31415

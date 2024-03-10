@@ -13,8 +13,8 @@
     - !Path manual/11867059027841440347.seq
     - !Path manual
     - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/chm13.v1.1-ont-ul.500kbps.zip
-      dir: human/chm13/
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+      dir: ont-500k
   traces: [false]
   costs:
     - { sub: 1, open: 0, extend: 1 }
