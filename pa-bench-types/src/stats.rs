@@ -1,7 +1,8 @@
 use crate::{DatasetStats, Stats};
-use edlib_rs::*;
 use itertools::Itertools;
 use num::ToPrimitive;
+use pa_types::CigarElem;
+use pa_wrapper::wrappers::astarpa2::AstarPa2Params;
 use stats::merge_all;
 use stats::Commute;
 use std::cmp::max;
@@ -90,8 +91,7 @@ impl Commute for DatasetStats {
 pub fn file_stats(file: &Path) -> DatasetStats {
     eprintln!("Generating stats for {}", file.display());
     let data = fs::read(&file).expect("Could not read dataset file!");
-    let mut config = EdlibAlignConfigRs::default();
-    config.task = EdlibAlignTaskRs::EDLIB_TASK_PATH;
+    let mut aligner = AstarPa2Params::simple().make_aligner(true);
     let mut stats = merge_all(
         data.split(|&c| c == b'\n')
             .tuples()
@@ -102,31 +102,31 @@ pub fn file_stats(file: &Path) -> DatasetStats {
                 )
             })
             .map(|(a, b)| {
-                let res = edlibAlignRs(&a, &b, &config);
-                let aln = res.getAlignment().unwrap();
-                let divergence = (res.getDistance() as f64) / (aln.len() as f64);
+                let (cost, cigar) = aligner.align(&a, &b);
+                let cigar = cigar.unwrap();
 
                 // Compute the largest gap as the max over all intervals of the number of insertions (deletions) minus non-insertions (non-deletions).
                 let mut largest_gap = 0;
                 let mut ins = 0usize;
                 let mut dels = 0usize;
-                for &op in aln {
+                for CigarElem { op, cnt } in &cigar.ops {
+                    let cnt = *cnt as usize;
                     match op {
-                        1 => {
-                            ins += 1;
+                        pa_types::CigarOp::Ins => {
+                            ins += cnt;
                             largest_gap = max(largest_gap, ins);
 
-                            dels = dels.saturating_sub(1);
+                            dels = dels.saturating_sub(cnt);
                         }
-                        2 => {
-                            dels += 1;
+                        pa_types::CigarOp::Del => {
+                            dels += cnt;
                             largest_gap = max(largest_gap, dels);
 
-                            ins = ins.saturating_sub(1);
+                            ins = ins.saturating_sub(cnt);
                         }
                         _ => {
-                            ins = ins.saturating_sub(1);
-                            dels = dels.saturating_sub(1);
+                            ins = ins.saturating_sub(cnt);
+                            dels = dels.saturating_sub(cnt);
                         }
                     }
                 }
@@ -134,13 +134,21 @@ pub fn file_stats(file: &Path) -> DatasetStats {
                 let mut insertions = 0;
                 let mut deletions = 0;
                 let mut substitutions = 0;
+                let mut cigar_len = 0;
 
-                aln.iter().for_each(|&op| match op {
-                    1 => insertions += 1,
-                    2 => deletions += 1,
-                    3 => substitutions += 1,
-                    _ => (),
-                });
+                for CigarElem { op, cnt } in &cigar.ops {
+                    let cnt = *cnt as usize;
+                    cigar_len += cnt;
+                    match op {
+                        pa_types::CigarOp::Ins => insertions += cnt,
+                        pa_types::CigarOp::Del => deletions += cnt,
+                        pa_types::CigarOp::Sub => substitutions += cnt,
+                        _ => (),
+                    }
+                }
+
+                let divergence = (cost as f64) / (cigar_len as f64);
+
                 let mut length = Stats::new(a.len());
                 length.merge(Stats::new(b.len()), 1, 1);
                 DatasetStats {
@@ -150,7 +158,7 @@ pub fn file_stats(file: &Path) -> DatasetStats {
                     length,
                     divergence: Stats::new(divergence),
                     largest_gap: Stats::new(largest_gap),
-                    edit_distance: res.getDistance() as _,
+                    edit_distance: cost as _,
                     substitutions,
                     insertions,
                     deletions,
