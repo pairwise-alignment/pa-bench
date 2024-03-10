@@ -37,6 +37,29 @@
         prune: true
 
       - !AstarPa2
+        name: "r2"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 15
+            r: 2
+            p: 11
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2.0
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 40
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
         name: "k10"
         domain: !Astar
         heuristic:
@@ -60,17 +83,40 @@
         prune: true
 
       - !AstarPa2
-        name: "r2"
+        name: "k11"
         domain: !Astar
         heuristic:
             type: !GCSH
             prune: !Start
-            k: 15
-            r: 2
-            p: 11
+            k: 11
+            r: 1
+            p: 16
         doubling: !BandDoubling
             start: !H0
-            factor: 2.0
+            factor: 2
+        block_width: 256
+        front:
+            sparse: true
+            simd: true
+            incremental_doubling: true
+            dt_trace: true
+            max_g: 40
+            x_drop: 10
+        sparse_h: true
+        prune: true
+
+      - !AstarPa2
+        name: "k13"
+        domain: !Astar
+        heuristic:
+            type: !GCSH
+            prune: !Start
+            k: 13
+            r: 1
+            p: 13
+        doubling: !BandDoubling
+            start: !H0
+            factor: 2
         block_width: 256
         front:
             sparse: true
@@ -169,7 +215,7 @@
             simd: true
             incremental_doubling: true
             dt_trace: true
-            max_g: 40
+            max_g: 80
             x_drop: 10
         sparse_h: true
         prune: true
@@ -192,7 +238,7 @@
             simd: true
             incremental_doubling: true
             dt_trace: true
-            max_g: 10
+            max_g: 20
             x_drop: 10
         sparse_h: true
         prune: true
@@ -215,7 +261,7 @@
             simd: true
             incremental_doubling: true
             dt_trace: true
-            max_g: 5
+            max_g: 10
             x_drop: 10
         sparse_h: true
         prune: true
@@ -406,7 +452,7 @@
             simd: true
             incremental_doubling: false
             dt_trace: true
-            max_g: 40
+            max_g: 80
             x_drop: 10
         sparse_h: true
 
@@ -424,7 +470,7 @@
             simd: true
             incremental_doubling: false
             dt_trace: true
-            max_g: 10
+            max_g: 20
             x_drop: 10
         sparse_h: true
 
@@ -442,7 +488,7 @@
             simd: true
             incremental_doubling: false
             dt_trace: true
-            max_g: 5
+            max_g: 10
             x_drop: 10
         sparse_h: true
 

@@ -29,8 +29,8 @@
         simd: true
         incremental_doubling: true
         dt_trace: true
-        max_g: 20
-        x_drop: 10
+        max_g: 40
+        x_drop: 20
       sparse_h: true
       prune: true
 
@@ -61,6 +61,6 @@
         simd: true
         incremental_doubling: false
         dt_trace: true
-        max_g: 20
-        x_drop: 10
+        max_g: 40
+        x_drop: 20
       sparse_h: true
