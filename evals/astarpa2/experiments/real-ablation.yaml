@@ -37,29 +37,6 @@
         prune: true
 
       - !AstarPa2
-        name: "r2"
-        domain: !Astar
-        heuristic:
-            type: !GCSH
-            prune: !Start
-            k: 15
-            r: 2
-            p: 11
-        doubling: !BandDoubling
-            start: !H0
-            factor: 2.0
-        block_width: 256
-        front:
-            sparse: true
-            simd: true
-            incremental_doubling: true
-            dt_trace: true
-            max_g: 40
-            x_drop: 10
-        sparse_h: true
-        prune: true
-
-      - !AstarPa2
         name: "nopreprune"
         domain: !Astar
         heuristic:
