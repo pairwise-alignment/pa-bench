@@ -65,20 +65,6 @@
             factor: 2.0
         block_width: 256
         front:
-            sparse: false
-            simd: false
-            incremental_doubling: false
-
-      - !AstarPa2
-        name: "sparse_mem"
-        domain: !Astar
-        heuristic:
-            type: !Gap
-        doubling: !BandDoubling
-            start: !H0
-            factor: 2.0
-        block_width: 256
-        front:
             sparse: true
             simd: false
             incremental_doubling: false
