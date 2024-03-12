@@ -2,7 +2,7 @@
     Scaling with error rate with k=15
 
     This runs in around 1 hour in total.
-  time_limit: 10s
+  time_limit: 100s
   mem_limit: 32GiB
   datasets:
     - !Generated

@@ -3,7 +3,7 @@
 
       The time limit is low and cuts of excessively slow A*PA runs, but sufficient
       for most Edlib and Biff runs.
-  time_limit: 10s
+  time_limit: 100s
   mem_limit: 32GiB
   datasets:
       - !Download
@@ -409,7 +409,7 @@
 
       The time limit is low and cuts of excessively slow A*PA runs, but sufficient
       for most Edlib and Biff runs.
-  time_limit: 10s
+  time_limit: 100s
   mem_limit: 32GiB
   datasets:
       - !Download

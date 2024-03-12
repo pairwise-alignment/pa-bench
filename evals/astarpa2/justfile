@@ -1,3 +1,7 @@
+release: cpufreq
+    rm -rf results
+    cd ../.. && cargo run -r -- \
+        bench --release evals/astarpa2/experiments/*.yaml --cache evals/astarpa2/results/cache.json
 
 bug *args='':
     cd ../.. && cargo run -r -- run evals/astarpa2/experiments/bug-pre-pruning.yaml {{args}}
@@ -34,6 +38,6 @@ report *args='':
     cd ../.. && perf report
 
 cpufreq:
-    sudo cpupower frequency-set --governor performance -d 3.3GHz -u 3.3GHz
+    sudo cpupower frequency-set --governor performance -d 3.6GHz -u 3.6GHz
 powersave:
     sudo cpupower frequency-set --governor powersave -d 0.8GHz -u 2.6GHz
