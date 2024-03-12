@@ -170,10 +170,10 @@
         sparse_h: true
 
       - !AstarPa2
-        name: "SH"
+        name: "GCSH"
         domain: !Astar
         heuristic:
-            type: !SH
+            type: !GCSH
             prune: !None
             k: 12
             r: 1
@@ -191,32 +191,10 @@
         sparse_h: true
 
       - !AstarPa2
-        name: "prune"
-        domain: !Astar
-        heuristic:
-            type: !SH
-            prune: !Start
-            k: 12
-            r: 1
-        doubling: !BandDoubling
-            start: !H0
-            factor: 2.0
-        block_width: 256
-        front:
-            sparse: true
-            simd: true
-            incremental_doubling: true
-            dt_trace: true
-            max_g: 40
-            x_drop: 10
-        sparse_h: true
-        prune: true
-
-      - !AstarPa2
         name: "pre-pruning"
         domain: !Astar
         heuristic:
-            type: !SH
+            type: !GCSH
             prune: !Start
             k: 12
             r: 1
@@ -233,10 +211,10 @@
             max_g: 40
             x_drop: 10
         sparse_h: true
-        prune: true
+        prune: false
 
       - !AstarPa2
-        name: "GCSH"
+        name: "prune"
         domain: !Astar
         heuristic:
             type: !GCSH
