@@ -116,7 +116,7 @@
             incremental_doubling: false
             dt_trace: true
             max_g: 40
-            x_drop: 10
+            fr_drop: 10
         sparse_h: false
 
       - !AstarPa2
@@ -134,7 +134,7 @@
             incremental_doubling: false
             dt_trace: true
             max_g: 40
-            x_drop: 10
+            fr_drop: 10
         sparse_h: true
 
       - !AstarPa2
@@ -152,7 +152,7 @@
             incremental_doubling: true
             dt_trace: true
             max_g: 40
-            x_drop: 10
+            fr_drop: 10
         sparse_h: true
 
       - !AstarPa2
@@ -173,7 +173,7 @@
             incremental_doubling: true
             dt_trace: true
             max_g: 40
-            x_drop: 10
+            fr_drop: 10
         sparse_h: true
 
       - !AstarPa2
@@ -195,7 +195,7 @@
             incremental_doubling: true
             dt_trace: true
             max_g: 40
-            x_drop: 10
+            fr_drop: 10
         sparse_h: true
         prune: false
 
@@ -218,6 +218,6 @@
             incremental_doubling: true
             dt_trace: true
             max_g: 40
-            x_drop: 10
+            fr_drop: 10
         sparse_h: true
         prune: true
