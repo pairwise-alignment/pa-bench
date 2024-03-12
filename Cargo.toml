@@ -13,5 +13,5 @@ resolver = "2"
 lto = "thin"
 incremental = true
 # True can slow things down.
-debug = true
-strip = false
+debug = false
+strip = true
