@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::hash::{Hash, Hasher};
 use std::io::{BufWriter, Cursor, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::Duration;
 use tar::Archive;
 use walkdir::DirEntry;

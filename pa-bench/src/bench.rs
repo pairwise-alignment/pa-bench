@@ -1,7 +1,6 @@
 use std::{path::Path, time::Instant};
 
 use chrono::SubsecRound;
-use libc;
 use pa_bench_types::{Bytes, Measured};
 
 /// F can return some state that is dropped only after the memory is measured.

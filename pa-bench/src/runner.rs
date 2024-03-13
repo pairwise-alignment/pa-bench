@@ -12,10 +12,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use serde_json;
-
-use core_affinity;
-
 use clap::Parser;
 
 #[derive(Debug, Parser)]

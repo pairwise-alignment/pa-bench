@@ -11,11 +11,8 @@ mod runner;
 
 use chrono::Timelike;
 use clap::{Parser, Subcommand};
-use core_affinity;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
-use serde_json;
-use serde_yaml;
 use std::collections::HashMap;
 use std::fs;
 use std::io::prelude::*;
