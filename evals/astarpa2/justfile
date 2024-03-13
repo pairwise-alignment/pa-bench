@@ -1,5 +1,6 @@
 release: cpufreq
-    rm -rf results
+    mkdir -p results
+    mv results results-$(date +%Y%m%d-%H%M%S)
     cd ../.. && cargo run -r -- \
         bench --release evals/astarpa2/experiments/*.yaml --cache evals/astarpa2/results/cache.json
 
