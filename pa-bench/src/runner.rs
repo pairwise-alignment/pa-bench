@@ -136,7 +136,7 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
             costs.push(cost);
             merge_stats(&mut total_stats, stats);
             if job.traceback {
-                cigars.push(cigar.unwrap());
+                cigars.push(cigar);
             }
         });
         aligner
@@ -145,16 +145,18 @@ fn run_job(args: &Args, job: Job) -> JobOutput {
     // Verify the cigar strings, but do not return them as they are not used for further analysis and take a lot of space.
     if job.traceback {
         for ((a, b), &cost, cigar) in izip!(sequence_pairs, &costs, cigars) {
-            let cigar_cost = cigar.verify(&job.costs, a, b);
-            if is_exact {
-                assert_eq!(
-                    cigar_cost,
-                    cost,
-                    "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {:?}\nreturned cost: {cost}\nactual cost: {cigar_cost}\n",
-                    String::from_utf8(a.to_vec()).unwrap(),
-                    String::from_utf8(b.to_vec()).unwrap(),
-                    cigar.to_string(),
-                );
+            if let Some(cigar) = cigar {
+                let cigar_cost = cigar.verify(&job.costs, a, b).unwrap();
+                if is_exact {
+                    assert_eq!(
+                        cigar_cost,
+                        cost,
+                        "\nCIGAR COST IS NOT CORRECT\njob: {job:?}\nA: {}\nB: {}\nCigar: {:?}\nreturned cost: {cost}\nactual cost: {cigar_cost}\n",
+                        String::from_utf8(a.to_vec()).unwrap(),
+                        String::from_utf8(b.to_vec()).unwrap(),
+                        cigar.to_string(),
+                    );
+                }
             }
         }
     }
