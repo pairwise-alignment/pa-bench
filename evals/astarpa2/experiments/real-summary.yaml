@@ -10,9 +10,9 @@
     - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-50k.zip
       dir: ont-50k
-    - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
-      dir: ont-10k
+    # - !Download
+    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
+    #   dir: ont-10k
     - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-1k.zip
       dir: ont-1k
@@ -79,9 +79,9 @@
     - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-50k.zip
       dir: ont-50k
-    - !Download
-      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
-      dir: ont-10k
+    # - !Download
+    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
+    #   dir: ont-10k
     - !Download
       url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-1k.zip
       dir: ont-1k
@@ -95,6 +95,7 @@
         type: !GCSH
         prune: !Start
         r: 2
+
 - time_limit: 100s
   mem_limit: 32GiB
   datasets:
@@ -111,3 +112,60 @@
         type: !GCSH
         prune: !Start
         r: 1
+# Approximate methods
+- time_limit: 100s
+  mem_limit: 32GiB
+  datasets:
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+      dir: ont-500k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k-genvar.zip
+      dir: ont-500k-genvar
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-50k.zip
+      dir: ont-50k
+    # - !Download
+    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
+    #   dir: ont-10k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-1k.zip
+      dir: ont-1k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/sars-cov-2.zip
+      dir: sars-cov-2
+
+  traces: [true]
+  costs: [{ sub: 1, open: 0, extend: 1 }]
+  algos:
+    - !Wfa
+      memory_model: !MemoryUltraLow
+      heuristic: !WFadaptive [10, 50, 10]
+
+- time_limit: 100s
+  mem_limit: 32GiB
+  datasets:
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k.zip
+      dir: ont-500k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-500k-genvar.zip
+      dir: ont-500k-genvar
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-50k.zip
+      dir: ont-50k
+    # - !Download
+    #   url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-10k.zip
+    #   dir: ont-10k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/ont-1k.zip
+      dir: ont-1k
+    - !Download
+      url: https://github.com/pairwise-alignment/pa-bench/releases/download/datasets/sars-cov-2.zip
+      dir: sars-cov-2
+
+  traces: [true]
+  costs: [{ sub: 1, open: 1, extend: 1 }]
+  algos:
+    - !BlockAligner
+      size: !Percent [0.001, 0.01]
