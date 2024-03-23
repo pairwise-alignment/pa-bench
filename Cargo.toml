@@ -9,9 +9,17 @@ members = [
 default-members = ["pa-bench"]
 resolver = "2"
 
+# TODO: Make a separate benchmarking profile?
 [profile.release]
-lto = "thin"
-incremental = true
-# True can slow things down.
+# Debug settings
+# lto = "thin"
+# incremental = true
+# debug = true
+# strip = false
+
+# Release settings
+incremental = false
 debug = false
 strip = true
+lto = true
+codegen-units = 1
