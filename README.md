@@ -7,7 +7,7 @@ This repository contains a few things:
 - [`pa-bench`](#pa-bench-benchmarking): a tool to benchmark aligners against each other;
 - [`evals/astarpa`](./evals/astarpa): experiments and analysis for the
   [A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) paper.
-- [`evals/astarpa-next`](./evals/astarpa-next): the latest experiments and results.
+- [`evals/astarpa2`](./evals/astarpa2): experiments and analysis for the [A\*PA2](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) paper.
 
 ## `pa-wrapper`: Wrapper API
 

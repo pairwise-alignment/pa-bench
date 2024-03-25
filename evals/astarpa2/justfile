@@ -1,8 +1,11 @@
+# Main rule to rerun all experiments.
 release: cpufreq
     mkdir -p results
     mv results results-$(date +%Y%m%d-%H%M%S)
     cd ../.. && cargo run -r -- \
         bench --release evals/astarpa2/experiments/*.yaml --cache evals/astarpa2/results/cache.json
+
+# Below here is stuff used for development/debugging.
 
 bug *args='':
     cd ../.. && cargo run -r -- run evals/astarpa2/experiments/bug-pre-pruning.yaml {{args}}
@@ -38,7 +41,18 @@ record *args='':
 report *args='':
     cd ../.. && perf report
 
+# Set the CPU frequency 3.6GHz.
 cpufreq:
     sudo cpupower frequency-set --governor performance -d 3.6GHz -u 3.6GHz
 powersave:
     sudo cpupower frequency-set --governor powersave -d 0.8GHz -u 2.6GHz
+
+zip_results:
+    zip results.zip results/*.json
+
+# Download the results from the github release and unzip them.
+# See readme for more.
+download_results:
+    wget 'https://github.com/pairwise-alignment/pa-bench/releases/download/astarpa2-evals/results.zip'
+    unzip results.zip
+    rm results.zip
