@@ -5,15 +5,15 @@ This repository contains a few things:
 - [`pa-wrapper`](#pa-wrapper-wrapper-api): a wrapper library around pairwise aligners;
 - [`pa-bin`](#pa-bin-unified-binary): a unified command line tool to call these aligners;
 - [`pa-bench`](#pa-bench-benchmarking): a tool to benchmark aligners against each other;
-- [`evals/astarpa`](./evals/astarpa): experiments and analysis for the
-  [A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) paper.
-- [`evals/astarpa2`](./evals/astarpa2): experiments and analysis for the [A\*PA2](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner) paper.
+- [`evals/astarpa`](./evals/astarpa): experiments and analysis for
+  [A\*PA](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner).
+- [`evals/astarpa2`](./evals/astarpa2): experiments and analysis for [A\*PA2](https://github.com/ragnargrootkoerkamp/astar-pairwise-aligner).
 
 ## `pa-wrapper`: Wrapper API
 
 `pa-wrapper` contains a unified API to a number of aligners:
 
-A\*PA, Block Aligner, Edlib, Ksw2, Parasail, Triple Accel, [Bi]Wfa
+A\*PA, A\*PA2 Block Aligner, Edlib, Ksw2, Parasail, Triple Accel, [Bi]Wfa
 
 Create an [`AlignerParams`](./pa-wrapper/src/lib.rs) object and call
 `build_aligner()` on it to obtain an instance of an aligner, on which `.align()`
